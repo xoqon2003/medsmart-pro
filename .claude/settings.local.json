@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls -la \"/c/Users/user/Desktop/Delop qilingani \\(Claude code\\)/src/app/utils\")",
+      "Bash(ls -la \"/c/Users/user/Desktop/Delop qilingani \\(Claude code\\)/src/app/components/ui\")",
+      "Bash(find \"/c/Users/user/Desktop/Delop qilingani \\(Claude code\\)\" -maxdepth 1 -type f)",
+      "Bash(npm run:*)",
+      "Bash(find \"C:/Users/user/Desktop/Delop qilingani \\(Claude code\\)/src\" -type f \\\\\\( -name \"*.ts\" -o -name \"*.tsx\" -o -name \"*.json\" \\\\\\))",
+      "Bash(ls -la \"C:/Users/user/Desktop/Delop qilingani \\(Claude code\\)/src/app/\")"
+    ]
+  }
+}
