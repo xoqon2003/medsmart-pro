@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, FileText, CheckSquare, Square, AlertCircle, Shield } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { calculatePrice, formatPrice, getServiceLabel, getUrgencyLabel } from '../../../data/mockData';
+import { calculatePrice, formatPrice, getServiceLabel, getUrgencyLabel } from '../../../utils/formatters';
 
 const STEP_LABELS = ['Tasvir', 'Shikoyat', 'Xizmat', 'Shartnoma', "To'lov"];
 

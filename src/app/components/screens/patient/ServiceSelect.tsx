@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ChevronRight, CheckCircle, AlertTriangle, Bot, User, Users } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { PRICING, formatPrice, calculatePrice } from '../../../data/mockData';
+import { PRICING, formatPrice, calculatePrice } from '../../../utils/formatters';
 import type { ServiceType, Urgency } from '../../../types';
 
 const STEP_LABELS = ['Tasvir', 'Shikoyat', 'Xizmat', 'Shartnoma', "To'lov"];

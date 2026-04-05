@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=7d
+      - PORT=3000
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - ESKIZ_EMAIL=${ESKIZ_EMAIL}
+      - ESKIZ_PASSWORD=${ESKIZ_PASSWORD}
+      - PAYME_MERCHANT_ID=${PAYME_MERCHANT_ID}
+      - PAYME_MERCHANT_KEY=${PAYME_MERCHANT_KEY}
+      - PAYME_TEST_MODE=${PAYME_TEST_MODE:-true}
+      - CLICK_MERCHANT_ID=${CLICK_MERCHANT_ID}
+      - CLICK_SERVICE_ID=${CLICK_SERVICE_ID}
+      - CLICK_SECRET_KEY=${CLICK_SECRET_KEY}
+      - UZUM_TERMINAL_ID=${UZUM_TERMINAL_ID}
+      - UZUM_CASH_ID=${UZUM_CASH_ID}
+      - UZUM_SECRET_KEY=${UZUM_SECRET_KEY}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:

@@ -1,22 +1,26 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft, ChevronRight, Search, Star, MapPin,
-  Stethoscope, User as UserIcon, Building2, Clock,
+  Stethoscope, User as UserIcon, Building2, Clock, X,
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import { bookingService } from '../../../../services';
 import type { GeoRegion } from '../../../../services';
-import type { User } from '../../../types';
+import type { User, ClinicSearchResult } from '../../../types';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '../../ui/select';
+import { ClinicSearchBar } from '../../patient/ClinicSearchBar';
+import { ClinicAdvancedFilter } from '../../patient/ClinicAdvancedFilter';
+import { TopClinicCarousel } from '../../patient/TopClinicCarousel';
+import { ClinicCard } from '../../patient/ClinicCard';
 
 /* ── Tibbiy mutaxassisliklar (emoji bilan) ── */
 const SPECIALTY_ICONS: Record<string, string> = {
-  Kardiolog: '❤️', Nevrolog: '🧠', Ortoped: '🦴', Travmatolog: '🩹',
-  Dermatolog: '🫀', Oftalmolog: '👁️', Urolog: '🔬', Ginekolog: '🌸',
-  Pediatr: '👶', Psixiatr: '🧬', Terapevt: '🩺', Endokrinolog: '⚗️',
+  Kardiolog: '\u2764\uFE0F', Nevrolog: '\uD83E\uDDE0', Ortoped: '\uD83E\uDDB4', Travmatolog: '\uD83E\uDE79',
+  Dermatolog: '\uD83E\uDEC0', Oftalmolog: '\uD83D\uDC41\uFE0F', Urolog: '\uD83D\uDD2C', Ginekolog: '\uD83C\uDF38',
+  Pediatr: '\uD83D\uDC76', Psixiatr: '\uD83E\uDDEC', Terapevt: '\uD83E\uDE7A', Endokrinolog: '\u2697\uFE0F',
 };
 
 /* ── Qidiruv rejimlari ── */
@@ -61,13 +65,153 @@ export function KonsultatsiyaDoctor() {
   const [geo, setGeo]             = useState<GeoRegion[]>([]);
   const [specialties, setSpecialties] = useState<string[]>([]);
 
+  /* ── TT-001: Klinika filtr holatlari ── */
+  const [clinicSearch, setClinicSearch] = useState('');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filterValues, setFilterValues] = useState({
+    region: '',
+    district: '',
+    nearbyEnabled: false,
+    minServices: '0',
+  });
+  const [clinicResults, setClinicResults] = useState<ClinicSearchResult[]>([]);
+  const [topClinics, setTopClinics] = useState<ClinicSearchResult[]>([]);
+  const [selectedClinic, setSelectedClinic] = useState<ClinicSearchResult | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
+  const [isGeoLoading, setIsGeoLoading] = useState(false);
+  const [geoError, setGeoError] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+
   useEffect(() => {
     bookingService.getGeo().then(setGeo);
     bookingService.getSpecialties().then(setSpecialties);
-  }, []);
+
+    // Top klinikalarni yuklash
+    if (isOffline) {
+      bookingService.getTopClinics(10).then(setTopClinics);
+      // Dastlabki barcha klinikalarni yuklash
+      bookingService.searchClinics({}).then(res => setClinicResults(res.data));
+    }
+  }, [isOffline]);
 
   const districts = useMemo(() => geo.find((x) => x.region === region)?.districts || [], [geo, region]);
   const clinics   = useMemo(() => districts.find((x) => x.name === district)?.clinics || [], [district, districts]);
+
+  /* ── TT-001: Klinika qidiruv (debounce 300ms) ── */
+  const searchClinics = useCallback((searchQuery: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        if (filterValues.nearbyEnabled) {
+          // Geolokatsiya rejimida
+          // Faqat yangi search query bilan filtrlaymiz
+          return;
+        }
+        const res = await bookingService.searchClinics({
+          query: searchQuery.length >= 2 ? searchQuery : undefined,
+          region: filterValues.region || undefined,
+          district: filterValues.district || undefined,
+          minServices: filterValues.minServices !== '0' ? parseInt(filterValues.minServices) : undefined,
+        });
+        setClinicResults(res.data);
+      } catch (e) {
+        console.error('Clinic search error:', e);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+  }, [filterValues]);
+
+  /* Clinic search debounce */
+  useEffect(() => {
+    if (isOffline && mode === 'location') {
+      searchClinics(clinicSearch);
+    }
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [clinicSearch, isOffline, mode, searchClinics]);
+
+  /* ── TT-001: Geolokatsiya ── */
+  const handleGeoToggle = useCallback((newValues: typeof filterValues) => {
+    setFilterValues(newValues);
+
+    if (newValues.nearbyEnabled) {
+      setIsGeoLoading(true);
+      setGeoError(null);
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          setIsGeoLoading(false);
+          try {
+            const nearby = await bookingService.getNearbyClinics(latitude, longitude, 10);
+            setClinicResults(nearby);
+          } catch (e) {
+            console.error('Nearby clinics error:', e);
+          }
+        },
+        (error) => {
+          setIsGeoLoading(false);
+          setGeoError('Geolokatsiyaga ruxsat bering');
+          // Toggle ni o'chirish
+          setFilterValues(prev => ({ ...prev, nearbyEnabled: false }));
+        },
+        { enableHighAccuracy: true, timeout: 10000 }
+      );
+    }
+  }, []);
+
+  /* ── TT-001: Filtrlarni qo'llash ── */
+  const applyFilters = useCallback(async () => {
+    setIsFilterOpen(false);
+    setIsSearching(true);
+    try {
+      if (filterValues.nearbyEnabled) {
+        // Geolokatsiya allaqachon ma'lumotlarni yuklagan
+        return;
+      }
+      const res = await bookingService.searchClinics({
+        query: clinicSearch.length >= 2 ? clinicSearch : undefined,
+        region: filterValues.region || undefined,
+        district: filterValues.district || undefined,
+        minServices: filterValues.minServices !== '0' ? parseInt(filterValues.minServices) : undefined,
+      });
+      setClinicResults(res.data);
+    } catch (e) {
+      console.error('Filter apply error:', e);
+    } finally {
+      setIsSearching(false);
+    }
+  }, [filterValues, clinicSearch]);
+
+  /* ── TT-001: Filtrlarni tozalash ── */
+  const resetFilters = useCallback(async () => {
+    const resetValues = { region: '', district: '', nearbyEnabled: false, minServices: '0' };
+    setFilterValues(resetValues);
+    setClinicSearch('');
+    setIsFilterOpen(false);
+    try {
+      const res = await bookingService.searchClinics({});
+      setClinicResults(res.data);
+    } catch (e) {
+      console.error('Reset error:', e);
+    }
+  }, []);
+
+  /* ── TT-001: Klinika tanlash ── */
+  const selectClinic = useCallback((c: ClinicSearchResult) => {
+    setSelectedClinic(c);
+    setClinic(c.name);
+    updateDraftConsultation({
+      clinic: c.id,
+      clinicName: c.name,
+      clinicAddress: c.address,
+    });
+  }, [updateDraftConsultation]);
+
+  const hasActiveFilters = filterValues.region !== '' || filterValues.district !== '' || filterValues.nearbyEnabled || filterValues.minServices !== '0';
 
   /* ── Shifokorlarni yuklash (mode ga qarab) ── */
   useEffect(() => {
@@ -76,7 +220,8 @@ export function KonsultatsiyaDoctor() {
         bookingService.getDoctors({ query: '', specialities: [] }).then(setDoctors);
         return;
       }
-      if (!region || !district || !clinic) { setDoctors([]); return; }
+      // TT-001: Klinika tanlanganda shifokorlarni yuklash
+      if (!selectedClinic) { setDoctors([]); return; }
       bookingService.getDoctors({ query: '', specialities: [] }).then(setDoctors);
     } else if (mode === 'specialty') {
       if (activeSpecs.length === 0) { setDoctors([]); return; }
@@ -86,18 +231,18 @@ export function KonsultatsiyaDoctor() {
       if (query.length < 2) { setDoctors([]); return; }
       bookingService.getDoctors({ query, specialities: [] }).then(setDoctors);
     }
-  }, [mode, query, activeSpecs, region, district, clinic, isOffline]);
+  }, [mode, query, activeSpecs, selectedClinic, isOffline]);
 
   /* ── Shifokor tanlash ── */
   const pickDoctor = (d: User) => {
     updateDraftConsultation({
       query,
       specialityFilters: activeSpecs,
-      region:      isOffline ? region   : undefined,
-      district:    isOffline ? district : undefined,
-      clinic:      isOffline ? clinic   : undefined,
-      clinicName:  isOffline ? clinic   : undefined,
-      clinicAddress: isOffline && region && district ? `${district}, ${region}` : undefined,
+      region:      isOffline && selectedClinic ? selectedClinic.region : undefined,
+      district:    isOffline && selectedClinic ? selectedClinic.city : undefined,
+      clinic:      isOffline && selectedClinic ? selectedClinic.id : undefined,
+      clinicName:  isOffline && selectedClinic ? selectedClinic.name : undefined,
+      clinicAddress: isOffline && selectedClinic ? selectedClinic.address : undefined,
       selectedDoctorId: d.id,
       price: getPrice(d.id),
     });
@@ -112,7 +257,7 @@ export function KonsultatsiyaDoctor() {
     if (m !== 'name') setQuery('');
   };
 
-  const locationReady = !isOffline || (!!region && !!district && !!clinic);
+  const locationReady = !isOffline || !!selectedClinic;
   const showDoctors = doctors.length > 0;
 
   return (
@@ -168,103 +313,118 @@ export function KonsultatsiyaDoctor() {
               transition={{ duration: 0.18 }}
               className="space-y-3"
             >
-              {isOffline && (
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-emerald-600" />
-                    <p className="text-gray-700 text-sm font-medium">Klinika manzilini tanlang</p>
-                  </div>
+              {isOffline ? (
+                <>
+                  {/* ── TT-001: Yangi klinika qidiruv tizimi ── */}
 
-                  {/* Viloyat */}
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1.5">Viloyat</p>
-                    <Select
-                      value={region || undefined}
-                      onValueChange={(v) => {
-                        setRegion(v); setDistrict(''); setClinic('');
-                        updateDraftConsultation({ region: v, district: undefined, clinic: undefined });
-                      }}
+                  {/* Qidiruv bar */}
+                  <ClinicSearchBar
+                    value={clinicSearch}
+                    onChange={setClinicSearch}
+                    isFilterOpen={isFilterOpen}
+                    hasActiveFilters={hasActiveFilters}
+                    onToggleFilter={() => setIsFilterOpen(!isFilterOpen)}
+                    isLoading={isSearching}
+                  />
+
+                  {/* Kengaytirilgan filtr paneli */}
+                  <ClinicAdvancedFilter
+                    isOpen={isFilterOpen}
+                    values={filterValues}
+                    onChange={(vals) => {
+                      if (vals.nearbyEnabled !== filterValues.nearbyEnabled) {
+                        handleGeoToggle(vals);
+                      } else {
+                        setFilterValues(vals);
+                      }
+                    }}
+                    onApply={applyFilters}
+                    onReset={resetFilters}
+                    geo={geo}
+                    isGeoLoading={isGeoLoading}
+                    geoError={geoError}
+                  />
+
+                  {/* Tanlangan klinika info */}
+                  {selectedClinic && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5"
                     >
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder="Viloyatni tanlang" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {geo.map((r) => (
-                          <SelectItem key={r.region} value={r.region}>{r.region}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Tuman */}
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1.5">Tuman / Shahar</p>
-                    <Select
-                      value={district || undefined}
-                      onValueChange={(v) => {
-                        setDistrict(v); setClinic('');
-                        updateDraftConsultation({ district: v, clinic: undefined });
-                      }}
-                      disabled={!region}
-                    >
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder={region ? 'Tumanni tanlang' : 'Avval viloyatni tanlang'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {districts.map((d) => (
-                          <SelectItem key={d.name} value={d.name}>{d.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Klinika */}
-                  <div>
-                    <p className="text-gray-500 text-xs mb-1.5">Klinika</p>
-                    <Select
-                      value={clinic || undefined}
-                      onValueChange={(v) => {
-                        setClinic(v);
-                        updateDraftConsultation({ clinic: v });
-                      }}
-                      disabled={!district}
-                    >
-                      <SelectTrigger className="rounded-xl">
-                        <SelectValue placeholder={district ? 'Klinikani tanlang' : 'Avval tumanni tanlang'} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clinics.map((c) => (
-                          <SelectItem key={c} value={c}>{c}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Klinika tanlangandan keyin info */}
-                  {clinic && (
-                    <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-start gap-2">
-                      <Building2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="text-emerald-800 text-xs font-medium">{clinic}</p>
-                        <p className="text-emerald-600 text-xs mt-0.5">{district}, {region}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-emerald-700 text-[11px]">⭐ 4.7 (demo)</span>
-                          <span className="text-emerald-600 text-[11px]">• Du–Sh 08:00–20:00</span>
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0">
+                          <Building2 className="w-5 h-5 text-emerald-700" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <p className="text-emerald-800 text-sm font-semibold">{selectedClinic.name}</p>
+                            <button
+                              onClick={() => { setSelectedClinic(null); setClinic(''); }}
+                              className="text-emerald-600 text-xs underline"
+                            >
+                              O'zgartirish
+                            </button>
+                          </div>
+                          <p className="text-emerald-600 text-xs mt-0.5">{selectedClinic.address}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="flex items-center gap-0.5 text-xs text-emerald-700">
+                              <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                              {selectedClinic.rating.toFixed(1)}
+                            </span>
+                            <span className="text-emerald-600 text-[11px]">{selectedClinic.servicesCount} xizmat</span>
+                            <span className="text-emerald-600 text-[11px]">{selectedClinic.doctorsCount} shifokor</span>
+                          </div>
                         </div>
                       </div>
+                    </motion.div>
+                  )}
+
+                  {/* Top klinikalar carousel */}
+                  {!selectedClinic && !clinicSearch && !hasActiveFilters && topClinics.length > 0 && (
+                    <TopClinicCarousel clinics={topClinics} onSelect={selectClinic} />
+                  )}
+
+                  {/* Klinikalar ro'yxati */}
+                  {!selectedClinic && (
+                    <div className="space-y-2">
+                      {clinicResults.length > 0 && (
+                        <p className="text-gray-500 text-xs px-1">
+                          {clinicResults.length} ta klinika topildi
+                        </p>
+                      )}
+                      {clinicResults.map((c, i) => (
+                        <ClinicCard key={c.id} clinic={c} index={i} onSelect={selectClinic} />
+                      ))}
+                      {clinicResults.length === 0 && !isSearching && (
+                        <div className="text-center py-10">
+                          <p className="text-4xl mb-3">{'\uD83C\uDFE5'}</p>
+                          <p className="text-gray-500 text-sm font-medium">Klinika topilmadi</p>
+                          <p className="text-gray-400 text-xs mt-1">Filtrlarni o'zgartiring</p>
+                        </div>
+                      )}
+                      {isSearching && (
+                        <div className="space-y-2">
+                          {[1, 2, 3].map(i => (
+                            <div key={i} className="bg-white rounded-2xl border border-gray-100 p-4 animate-pulse">
+                              <div className="flex items-start gap-3">
+                                <div className="w-12 h-12 rounded-2xl bg-gray-200" />
+                                <div className="flex-1 space-y-2">
+                                  <div className="h-4 bg-gray-200 rounded w-3/4" />
+                                  <div className="h-3 bg-gray-100 rounded w-1/2" />
+                                  <div className="h-3 bg-gray-100 rounded w-2/3" />
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   )}
+                </>
+              ) : null}
 
-                  {!locationReady && (
-                    <p className="text-amber-600 text-xs flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5" />
-                      Shifokorlarni ko'rish uchun viloyat, tuman va klinikani tanlang
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {/* Doctor list */}
+              {/* Doctor list — onlayn yoki klinika tanlangan */}
               {locationReady && <DoctorList doctors={doctors} onPick={pickDoctor} />}
             </motion.div>
           )}
@@ -280,48 +440,71 @@ export function KonsultatsiyaDoctor() {
               className="space-y-3"
             >
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <p className="text-gray-700 text-sm font-medium mb-3">Mutaxassislikni tanlang</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {specialties.map((s) => {
-                    const active = activeSpecs.includes(s);
-                    const icon = SPECIALTY_ICONS[s] || '🏥';
-                    return (
-                      <button
-                        key={s}
-                        onClick={() => {
-                          setActiveSpecs((prev) =>
-                            prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]
-                          );
-                        }}
-                        className={`flex flex-col items-center gap-1 py-3 px-2 rounded-xl border text-xs transition-all ${
-                          active
-                            ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm'
-                            : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-200 hover:bg-emerald-50'
-                        }`}
-                      >
-                        <span className="text-lg">{icon}</span>
-                        <span className="font-medium leading-tight text-center">{s}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                {activeSpecs.length === 0 && (
-                  <p className="text-gray-400 text-xs mt-3 text-center">
-                    Kamida 1 ta mutaxassislikni tanlang
-                  </p>
-                )}
-                {activeSpecs.length > 0 && (
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="text-emerald-700 text-xs font-medium">
-                      {activeSpecs.length} ta tanlangan
-                    </p>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-gray-700 text-sm font-medium">Mutaxassislikni tanlang</p>
+                  {activeSpecs.length > 0 && (
                     <button
                       onClick={() => setActiveSpecs([])}
-                      className="text-gray-400 text-xs underline"
+                      className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-400 transition-colors"
+                      aria-label="Tozalash"
                     >
-                      Tozalash
+                      <X className="w-3.5 h-3.5" />
                     </button>
-                  </div>
+                  )}
+                </div>
+
+                {activeSpecs.length === 0 ? (
+                  /* ── Grid: hech narsa tanlanmagan ── */
+                  <>
+                    <div className="grid grid-cols-3 gap-2">
+                      {specialties.map((s) => {
+                        const icon = SPECIALTY_ICONS[s] || '\uD83C\uDFE5';
+                        return (
+                          <button
+                            key={s}
+                            onClick={() => setActiveSpecs([s])}
+                            className="flex flex-col items-center gap-1 py-3 px-2 rounded-xl border bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-200 hover:bg-emerald-50 text-xs transition-all"
+                          >
+                            <span className="text-lg">{icon}</span>
+                            <span className="font-medium leading-tight text-center">{s}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <p className="text-gray-400 text-xs mt-3 text-center">
+                      Kamida 1 ta mutaxassislikni tanlang
+                    </p>
+                  </>
+                ) : (
+                  /* ── Tanlangan: katta karta + mini ikonkalar ── */
+                  <>
+                    {/* Katta tanlangan mutaxassislik */}
+                    <motion.button
+                      key={activeSpecs[0]}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      onClick={() => setActiveSpecs([])}
+                      className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-5 flex flex-col items-center mb-3 active:scale-[0.98] transition-transform"
+                    >
+                      <span className="text-4xl mb-1">{SPECIALTY_ICONS[activeSpecs[0]] || '\uD83C\uDFE5'}</span>
+                      <span className="text-white text-base font-semibold">{activeSpecs[0]}</span>
+                    </motion.button>
+
+                    {/* Boshqa mutaxassisliklar — mini ikonkalar */}
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {specialties.filter(s => s !== activeSpecs[0]).map(s => (
+                        <button
+                          key={s}
+                          onClick={() => setActiveSpecs([s])}
+                          className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-lg flex-shrink-0 hover:border-emerald-300 hover:bg-emerald-50 transition-all"
+                          title={s}
+                        >
+                          {SPECIALTY_ICONS[s] || '\uD83C\uDFE5'}
+                        </button>
+                      ))}
+                    </div>
+                  </>
                 )}
               </div>
 
@@ -367,7 +550,7 @@ export function KonsultatsiyaDoctor() {
 
               {query.length === 0 && (
                 <div className="text-center py-10">
-                  <p className="text-4xl mb-3">🔍</p>
+                  <p className="text-4xl mb-3">{'\uD83D\uDD0D'}</p>
                   <p className="text-gray-500 text-sm">Shifokor ismini kiriting</p>
                   <p className="text-gray-400 text-xs mt-1">Masalan: "Umarov" yoki "Yusupov"</p>
                 </div>
@@ -383,11 +566,41 @@ export function KonsultatsiyaDoctor() {
 /* ════════════════════════════════════════════ */
 /* Shifokor kartochkalar ro'yxati               */
 /* ════════════════════════════════════════════ */
+const isTopDoctor = (d: User) => (d.rating || 0) >= 4.9;
+
 function DoctorList({ doctors, onPick }: { doctors: User[]; onPick: (d: User) => void }) {
+  const [previewId, setPreviewId] = useState<number | null>(null);
+  const [searchQ, setSearchQ]     = useState('');
+  const [minRating, setMinRating] = useState(0);
+  const [minExp, setMinExp]       = useState(0);
+
+  /* ── Client-side filtr + saralash ── */
+  const filtered = useMemo(() => {
+    let list = [...doctors];
+    if (searchQ.length >= 2) {
+      const q = searchQ.toLowerCase();
+      list = list.filter(d =>
+        d.fullName.toLowerCase().includes(q) ||
+        (d.specialty || '').toLowerCase().includes(q)
+      );
+    }
+    if (minRating > 0) list = list.filter(d => (d.rating || 0) >= minRating);
+    if (minExp > 0) list = list.filter(d => (d.experience || 0) >= minExp);
+    list.sort((a, b) => {
+      const aT = isTopDoctor(a) ? 1 : 0;
+      const bT = isTopDoctor(b) ? 1 : 0;
+      if (aT !== bT) return bT - aT;
+      return (b.rating || 0) - (a.rating || 0);
+    });
+    return list;
+  }, [doctors, searchQ, minRating, minExp]);
+
+  const previewDoc = previewId ? filtered.find(d => d.id === previewId) || null : null;
+
   if (doctors.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-4xl mb-3">🏥</p>
+        <p className="text-4xl mb-3">{'\uD83C\uDFE5'}</p>
         <p className="text-gray-500 text-sm font-medium">Shifokor topilmadi</p>
         <p className="text-gray-400 text-xs mt-1">Boshqa filtr yoki hudud tanlang</p>
       </div>
@@ -396,64 +609,213 @@ function DoctorList({ doctors, onPick }: { doctors: User[]; onPick: (d: User) =>
 
   return (
     <div className="space-y-2.5">
-      <p className="text-gray-500 text-xs px-1">{doctors.length} ta shifokor topildi</p>
-      {doctors.map((d, i) => (
-        <motion.button
-          key={d.id}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05 }}
-          onClick={() => onPick(d)}
-          className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-left active:scale-[0.99] transition-transform"
-        >
-          <div className="flex items-start gap-3">
-            {/* Avatar */}
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 text-sm font-bold flex-shrink-0">
-              {(d.avatar || d.fullName.slice(0, 2)).slice(0, 2).toUpperCase()}
+
+      {/* ── Qidiruv ── */}
+      {doctors.length >= 3 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 px-3 flex items-center gap-2">
+          <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
+          <input
+            value={searchQ}
+            onChange={e => setSearchQ(e.target.value)}
+            placeholder="Shifokor qidirish..."
+            className="w-full py-2.5 text-sm outline-none text-gray-800 placeholder:text-gray-400"
+          />
+          {searchQ && (
+            <button onClick={() => setSearchQ('')} className="text-gray-400 text-lg leading-none">×</button>
+          )}
+        </div>
+      )}
+
+      {/* ── Filtr pill'lar ── */}
+      {doctors.length >= 4 && (
+        <div className="flex gap-1.5 overflow-x-auto pb-0.5">
+          {([
+            { label: '⭐ 4.5+', val: 4.5, grp: 'r' },
+            { label: '⭐ 4.8+', val: 4.8, grp: 'r' },
+            { label: '10+ yil', val: 10,  grp: 'e' },
+            { label: '15+ yil', val: 15,  grp: 'e' },
+          ] as const).map(f => {
+            const active = f.grp === 'r' ? minRating === f.val : minExp === f.val;
+            return (
+              <button
+                key={f.label}
+                onClick={() => {
+                  if (f.grp === 'r') setMinRating(active ? 0 : f.val);
+                  else setMinExp(active ? 0 : f.val);
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap border transition-all ${
+                  active
+                    ? 'bg-emerald-600 border-emerald-600 text-white'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-emerald-200'
+                }`}
+              >
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Son ── */}
+      <p className="text-gray-500 text-xs px-1">{filtered.length} ta shifokor topildi</p>
+
+      {/* ── Preview rejim ── */}
+      {previewDoc ? (
+        <div className="space-y-3">
+          {/* Kengaytirilgan kartochka */}
+          <motion.div
+            key={`preview-${previewDoc.id}`}
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white rounded-2xl shadow-md border border-emerald-100 p-5"
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-start gap-3">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center text-emerald-800 text-lg font-bold flex-shrink-0">
+                  {(previewDoc.avatar || previewDoc.fullName.slice(0, 2)).slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  {isTopDoctor(previewDoc) && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-1">
+                      🏆 Top mutaxassis
+                    </span>
+                  )}
+                  <p className="text-gray-900 font-semibold">Dr. {previewDoc.fullName}</p>
+                  <p className="text-emerald-700 text-sm font-medium">{previewDoc.specialty || 'Mutaxassis'}</p>
+                </div>
+              </div>
+              <button onClick={() => setPreviewId(null)} className="p-1 text-gray-400 hover:text-gray-600">
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <p className="text-gray-900 text-sm font-semibold leading-snug">
-                Dr. {d.fullName}
-              </p>
-              <p className="text-emerald-700 text-xs mt-0.5 font-medium">
-                {d.specialty || 'Mutaxassis'}
-              </p>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="bg-gray-50 rounded-xl p-2 text-center">
+                <p className="text-gray-500 text-[10px]">Reyting</p>
+                <p className="text-gray-800 text-sm font-semibold flex items-center justify-center gap-1">
+                  <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
+                  {previewDoc.rating?.toFixed(2) ?? '4.50'}
+                </p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-2 text-center">
+                <p className="text-gray-500 text-[10px]">Tajriba</p>
+                <p className="text-gray-800 text-sm font-semibold">{previewDoc.experience || 0} yil</p>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-2 text-center">
+                <p className="text-gray-500 text-[10px]">Xulosalar</p>
+                <p className="text-gray-800 text-sm font-semibold">{previewDoc.totalConclusions || 0}</p>
+              </div>
+            </div>
 
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-                {/* Rating */}
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                  <span className="font-medium text-gray-700">{d.rating?.toFixed(1) ?? '4.5'}</span>
-                </span>
+            {previewDoc.license && (
+              <p className="text-gray-400 text-[11px] mb-2">📋 {previewDoc.license}</p>
+            )}
 
-                {/* Experience */}
-                {d.experience && (
-                  <span className="text-xs text-gray-500">
-                    {d.experience} yil tajriba
-                  </span>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-xs text-emerald-700">Bo'sh: {nextSlot(previewDoc.id)}</span>
+              </div>
+              <span className="text-blue-700 text-sm font-bold">{formatPrice(getPrice(previewDoc.id))}</span>
+            </div>
+
+            <button
+              onClick={() => onPick(previewDoc)}
+              className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl py-3 text-sm font-medium shadow-lg shadow-emerald-200"
+            >
+              ✅ Tanlash
+            </button>
+          </motion.div>
+
+          {/* Boshqa shifokorlar (mini ikonkalar) */}
+          {filtered.length > 1 && (
+            <div>
+              <p className="text-gray-400 text-xs mb-2">Boshqa shifokorlar</p>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {filtered.filter(d => d.id !== previewId).map(d => (
+                  <button
+                    key={d.id}
+                    onClick={() => setPreviewId(d.id)}
+                    className="flex flex-col items-center gap-1 flex-shrink-0"
+                  >
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                      isTopDoctor(d)
+                        ? 'bg-amber-50 border-amber-300 text-amber-800'
+                        : 'bg-emerald-50 border-emerald-100 text-emerald-800'
+                    }`}>
+                      {(d.avatar || d.fullName.slice(0, 2)).slice(0, 2).toUpperCase()}
+                    </div>
+                    <span className="text-[10px] text-gray-500 max-w-[48px] truncate">
+                      {d.fullName.split(' ')[0]}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* ── Oddiy ro'yxat ── */
+        filtered.map((d, i) => (
+          <motion.button
+            key={d.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.04 }}
+            onClick={() => setPreviewId(d.id)}
+            className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-left active:scale-[0.99] transition-transform"
+          >
+            <div className="flex items-start gap-3">
+              <div className="relative">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 text-sm font-bold flex-shrink-0">
+                  {(d.avatar || d.fullName.slice(0, 2)).slice(0, 2).toUpperCase()}
+                </div>
+                {isTopDoctor(d) && (
+                  <span className="absolute -top-1 -right-1 text-[10px]">🏆</span>
                 )}
-
-                {/* Price */}
-                <span className="text-xs font-semibold text-blue-700">
-                  {formatPrice(getPrice(d.id))}
-                </span>
               </div>
-
-              {/* Next slot */}
-              <div className="flex items-center gap-1 mt-1.5">
-                <Clock className="w-3 h-3 text-emerald-500" />
-                <span className="text-xs text-emerald-700">
-                  Bo'sh vaqt: {nextSlot(d.id)}
-                </span>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-gray-900 text-sm font-semibold leading-snug">Dr. {d.fullName}</p>
+                  {isTopDoctor(d) && (
+                    <span className="text-[9px] font-semibold bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full flex-shrink-0">Top</span>
+                  )}
+                </div>
+                <p className="text-emerald-700 text-xs mt-0.5 font-medium">{d.specialty || 'Mutaxassis'}</p>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                    <span className="font-medium text-gray-700">{d.rating?.toFixed(1) ?? '4.5'}</span>
+                  </span>
+                  {d.experience && (
+                    <span className="text-xs text-gray-500">{d.experience} yil tajriba</span>
+                  )}
+                  <span className="text-xs font-semibold text-blue-700">{formatPrice(getPrice(d.id))}</span>
+                </div>
+                <div className="flex items-center gap-1 mt-1.5">
+                  <Clock className="w-3 h-3 text-emerald-500" />
+                  <span className="text-xs text-emerald-700">Bo'sh vaqt: {nextSlot(d.id)}</span>
+                </div>
               </div>
+              <ChevronRight className="w-5 h-5 text-gray-300 mt-1 flex-shrink-0" />
             </div>
+          </motion.button>
+        ))
+      )}
 
-            <ChevronRight className="w-5 h-5 text-gray-300 mt-1 flex-shrink-0" />
-          </div>
-        </motion.button>
-      ))}
+      {/* ── Bo'sh filtr natijasi ── */}
+      {filtered.length === 0 && doctors.length > 0 && (
+        <div className="text-center py-8">
+          <p className="text-4xl mb-2">{'\uD83D\uDD0D'}</p>
+          <p className="text-gray-500 text-sm">Filtr bo'yicha natija topilmadi</p>
+          <button
+            onClick={() => { setSearchQ(''); setMinRating(0); setMinExp(0); }}
+            className="text-emerald-600 text-xs mt-2 underline"
+          >
+            Filtrlarni tozalash
+          </button>
+        </div>
+      )}
     </div>
   );
 }

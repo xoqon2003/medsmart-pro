@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Bell, ChevronRight, CheckCircle, AlertCircle, Info, XCircle, ArrowRight } from 'lucide-react';
 import { useApp } from '../../store/appStore';
-import { formatDateTime } from '../../data/mockData';
+import { formatDateTime } from '../../utils/formatters';
 import type { Screen } from '../../types';
 
 export function NotificationsScreen() {

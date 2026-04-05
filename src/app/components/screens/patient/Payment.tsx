@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CreditCard, ChevronRight, CheckCircle, XCircle, Clock, X } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { calculatePrice, formatPrice } from '../../../data/mockData';
+import { calculatePrice, formatPrice } from '../../../utils/formatters';
 import type { PaymentProvider } from '../../../types';
 
 const STEP_LABELS = ['Tasvir', 'Shikoyat', 'Xizmat', 'Shartnoma', "To'lov"];
@@ -303,7 +303,7 @@ export function Payment() {
           <h2 className="text-gray-900 text-xl mb-2">To'lov muvaffaqiyatli!</h2>
           <p className="text-gray-500 text-sm mb-1">Ariza raqami: <span className="text-blue-600">{arizaNumber}</span></p>
           <p className="text-gray-500 text-sm mb-1">To'langan summa: <span className="text-gray-800">{formatPrice(price)}</span></p>
-          <p className="text-gray-500 text-sm">Chek PDF Telegram ga yuborildi</p>
+          <p className="text-gray-500 text-sm">Chekni ariza holatida ko'rishingiz mumkin</p>
         </div>
 
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 w-full max-w-sm text-center">
@@ -579,7 +579,7 @@ export function Payment() {
         {/* Note */}
         <div className="bg-gray-50 rounded-xl p-3">
           <p className="text-gray-500 text-xs">
-            To'lovdan so'ng chek PDF Telegram chatga avtomatik yuboriladi. 
+            To'lovdan so'ng chekni ariza holati sahifasidan ko'rishingiz mumkin.
             Radiolog ariza qabul qilganda xabarnoma olasiz.
           </p>
         </div>

@@ -8,7 +8,7 @@ import {
 import { useApp } from '../../../store/appStore';
 import {
   getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel
-} from '../../../data/mockData';
+} from '../../../utils/formatters';
 import {
   downloadConclusionReport, downloadSingleConclusion, printConclusionReport, shareConclusion
 } from '../../../utils/pdfGenerator';

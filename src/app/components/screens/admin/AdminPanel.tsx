@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { useApp } from '../../../store/appStore';
 import { authService } from '../../../../services';
-import { formatPrice } from '../../../data/mockData';
+import { formatPrice } from '../../../utils/formatters';
 import type { User as UserType } from '../../../types';
 
 const ADMIN_TABS = ['Ko\'rsatkichlar', 'Foydalanuvchilar', 'Moliya', 'Tizim'];

@@ -5,7 +5,7 @@ import {
   AlertCircle, Clock, ChevronRight, DollarSign, FileText, X, Send, Download, Eye
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../data/mockData';
+import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../utils/formatters';
 import { downloadConclusionReport } from '../../../utils/pdfGenerator';
 import type { Application } from '../../../types';
 

@@ -9,7 +9,7 @@ import {
   ResponsiveContainer, BarChart, Bar
 } from 'recharts';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime } from '../../../data/mockData';
+import { getStatusLabel, getUrgencyLabel, formatDateTime } from '../../../utils/formatters';
 import type { Application } from '../../../types';
 
 const TABS = ['Yangi', 'Jarayonda', 'Bajarildi', 'Statistika'];

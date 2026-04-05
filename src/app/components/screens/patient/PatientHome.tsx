@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download, LayoutGrid, List } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../data/mockData';
+import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../utils/formatters';
 import { downloadConclusionReport } from '../../../utils/pdfGenerator';
+import { PatientApplicationsTable } from './PatientApplicationsTable';
+import type { ViewMode } from '../../../types';
 
 export function PatientHome() {
   const { currentUser, applications, navigate, setSelectedApplication, unreadCount, openServiceSheet } = useApp();
   const [activeTab, setActiveTab] = useState<'active' | 'done'>('active');
   const [downloading, setDownloading] = useState<number | null>(null);
+  const [viewMode, setViewMode] = useState<ViewMode>(() =>
+    (localStorage.getItem('patientViewMode') as ViewMode) || 'card'
+  );
+
+  useEffect(() => {
+    localStorage.setItem('patientViewMode', viewMode);
+  }, [viewMode]);
 
   const myApps = applications.filter(a => a.patientId === currentUser?.id);
-  const activeApps = myApps.filter(a => !['done', 'archived', 'failed'].includes(a.status));
+  const activeApps = myApps
+    .filter(a => !['done', 'archived', 'failed'].includes(a.status))
+    .sort((a, b) => (a.status === 'booked' ? -1 : b.status === 'booked' ? 1 : 0));
   const doneApps = myApps.filter(a => ['done', 'archived', 'failed'].includes(a.status));
 
   const displayApps = activeTab === 'active' ? activeApps : doneApps;
@@ -89,31 +100,53 @@ export function PatientHome() {
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </motion.button>
 
-        {/* Tabs */}
-        <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm mb-4">
-          {[
-            { id: 'active', label: 'Faol arizalar', count: activeApps.length },
-            { id: 'done', label: 'Tarix', count: doneApps.length },
-          ].map(tab => (
+        {/* Tabs + View Toggle */}
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm flex-1">
+            {[
+              { id: 'active', label: 'Faol arizalar', count: activeApps.length },
+              { id: 'done', label: 'Tarix', count: doneApps.length },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex-1 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-1.5 ${
+                  activeTab === tab.id
+                    ? 'bg-blue-600 text-white shadow-sm'
+                    : 'text-gray-500'
+                }`}
+              >
+                {tab.label}
+                {tab.count > 0 && (
+                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                    activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="flex bg-white rounded-xl p-1 shadow-sm">
             <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
-              className={`flex-1 py-2 rounded-lg text-sm transition-all flex items-center justify-center gap-1.5 ${
-                activeTab === tab.id
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-500'
+              onClick={() => setViewMode('card')}
+              className={`p-2 rounded-lg transition-all ${
+                viewMode === 'card' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
               }`}
+              aria-label="Card ko'rinishi"
             >
-              {tab.label}
-              {tab.count > 0 && (
-                <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                  activeTab === tab.id ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-600'
-                }`}>
-                  {tab.count}
-                </span>
-              )}
+              <LayoutGrid className="w-4 h-4" />
             </button>
-          ))}
+            <button
+              onClick={() => setViewMode('table')}
+              className={`p-2 rounded-lg transition-all ${
+                viewMode === 'table' ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
+              }`}
+              aria-label="Jadval ko'rinishi"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Applications list */}
@@ -125,6 +158,17 @@ export function PatientHome() {
                 {activeTab === 'active' ? 'Faol arizalar yo\'q' : 'Tugallangan arizalar yo\'q'}
               </p>
             </div>
+          ) : viewMode === 'table' ? (
+            <PatientApplicationsTable
+              applications={displayApps}
+              onSelect={(app) => { setSelectedApplication(app); navigate('patient_status'); }}
+              onDownload={(app) => {
+                setDownloading(app.id);
+                downloadConclusionReport(app);
+                setTimeout(() => setDownloading(null), 1000);
+              }}
+              downloadingId={downloading}
+            />
           ) : (
             displayApps.map((app, i) => {
               const status = getStatusLabel(app.status);
@@ -144,9 +188,15 @@ export function PatientHome() {
                         <p className="text-gray-900 text-sm">{app.arizaNumber}</p>
                         <p className="text-gray-400 text-xs">{formatDateTime(app.createdAt)}</p>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded-full ${status.bg} ${status.color}`}>
-                        {status.label}
-                      </span>
+                      {app.status === 'booked' ? (
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-teal-600 text-white font-medium flex items-center gap-1">
+                          Davom etish <ChevronRight className="w-3 h-3" />
+                        </span>
+                      ) : (
+                        <span className={`text-xs px-2 py-1 rounded-full ${status.bg} ${status.color}`}>
+                          {status.label}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-2 mb-2">

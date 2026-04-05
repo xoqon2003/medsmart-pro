@@ -5,7 +5,7 @@ import {
   AlertCircle, CheckCircle, Clock, Stethoscope
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel } from '../../../data/mockData';
+import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel } from '../../../utils/formatters';
 import type { Conclusion } from '../../../types';
 
 export function ApplicationView() {

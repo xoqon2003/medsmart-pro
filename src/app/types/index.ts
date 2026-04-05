@@ -1,3 +1,5 @@
+export type ViewMode = 'card' | 'table';
+
 export type UserRole = 'patient' | 'radiolog' | 'operator' | 'admin' | 'specialist' | 'doctor' | 'kassir';
 
 export type ApplicantType = 'self' | 'relative' | 'doctor' | 'organization';
@@ -33,6 +35,7 @@ export interface SavedPatient {
 
 export type ApplicationStatus =
   | 'new'
+  | 'booked'
   | 'paid_pending'
   | 'accepted'
   | 'extra_info_needed'
@@ -397,6 +400,429 @@ export interface DraftExamination {
   price?: number;
 }
 
+// ── TZ-01: Shifokor Profili va Tarif Tizimi ──────────────────────────────────
+
+export type TariffCode = 'FREE' | 'START' | 'LITE' | 'PREMIUM';
+export type OperationComplexity = 'SIMPLE' | 'MEDIUM' | 'COMPLEX' | 'VERY_COMPLEX';
+export type VerificationStatus = 'PENDING' | 'VERIFIED' | 'REJECTED';
+
+export interface Tariff {
+  id: string;
+  name: string;
+  code: TariffCode;
+  price: number;
+  features: TariffFeatures;
+  isActive: boolean;
+  sortOrder: number;
+  description?: string;
+}
+
+export interface TariffFeatures {
+  maxPatients: number; // -1 = cheksiz
+  hasPortfolio: boolean;
+  portfolioType?: 'basic' | 'full';
+  hasCalendar: boolean;
+  hasFaq: boolean;
+  faqLimit: number; // -1 = cheksiz
+  hasServices: boolean;
+  servicesLimit: number; // -1 = cheksiz
+  hasMessaging: boolean;
+  hasAnonymousNumber: boolean;
+  hasTelegramBot: boolean;
+  showAds: boolean;
+  canChangeTemplate: boolean;
+  profileUrl: boolean;
+  profileUrlCustom?: boolean;
+  setupLimit: number; // -1 = cheksiz
+  callTimeLimit: boolean;
+}
+
+export interface Clinic {
+  id: string;
+  name: string;
+  address: string;
+  city?: string;
+  region?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  isVerified: boolean;
+  latitude?: number;
+  longitude?: number;
+  servicesCount?: number;
+  isTop?: boolean;
+  topPriority?: number;
+  logoUrl?: string;
+  rating?: number;
+  description?: string;
+}
+
+export interface ClinicFilters {
+  query?: string;
+  region?: string;
+  district?: string;
+  nearbyEnabled?: boolean;
+  userLat?: number;
+  userLng?: number;
+  minServices?: number;
+}
+
+export interface ClinicSearchResult {
+  id: string;
+  name: string;
+  address: string;
+  region?: string;
+  city?: string;
+  servicesCount: number;
+  rating: number;
+  logoUrl?: string;
+  isTop: boolean;
+  description?: string;
+  doctorsCount: number;
+  distance?: number;
+}
+
+export interface DoctorClinic {
+  id: string;
+  doctorId: string;
+  clinicId: string;
+  clinic: Clinic;
+  position?: string;
+  department?: string;
+  cabinet?: string;
+  floor?: number;
+  isVerified: boolean;
+  isActive: boolean;
+}
+
+export interface DoctorOperationType {
+  id: string;
+  operationCode: string;
+  operationName: string;
+  operationNameRu?: string;
+  category: string;
+  complexity: OperationComplexity;
+  avgDurationMin?: number;
+  description?: string;
+  count: number;
+}
+
+// ── TZ-03: Calendar & Booking Types ───────────────────────────────────────
+
+export type ConsultType = 'OFFLINE' | 'ONLINE' | 'PHONE' | 'VIDEO';
+export type SlotStatus = 'FREE' | 'BOOKED' | 'BLOCKED' | 'CANCELLED';
+export type ConsultationStatus = 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'RESCHEDULED';
+
+export interface CalendarSetting {
+  id: string;
+  doctorId: string;
+  workDays: number[];
+  startTime: string;
+  endTime: string;
+  slotDuration: number;
+  breakDuration: number;
+  consultTypes: string[];
+  onlinePrice: number;
+  offlinePrice: number;
+  phonePrice: number;
+  videoPrice: number;
+  maxPatientsDay: number;
+  officeAddress?: string;
+  officeName?: string;
+  officeFloor?: number;
+  officeCabinet?: string;
+  isActive: boolean;
+}
+
+export interface CalendarSlot {
+  id: string;
+  doctorId: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  status: SlotStatus;
+  blockedBy?: string;
+  blockReason?: string;
+}
+
+export interface ConsultationRequest {
+  id: string;
+  patientId: number;
+  doctorId: string;
+  slotId: string;
+  slot?: CalendarSlot;
+  consultType: ConsultType;
+  status: ConsultationStatus;
+  patientName?: string;
+  patientPhone?: string;
+  reason?: string;
+  cancelReason?: string;
+  cancelledBy?: string;
+  meetingUrl?: string;
+  price: number;
+  isPaid: boolean;
+  rating?: number;
+  comment?: string;
+  createdAt: string;
+}
+
+// ── TZ-07: Additional Features Types ──────────────────────────────────────
+
+export interface AnonymousNumber {
+  id: string;
+  doctorId: string;
+  virtualNumber?: string;
+  realNumber?: string;
+  provider?: string;
+  isActive: boolean;
+}
+
+export interface CallSchedule {
+  id: string;
+  doctorId: string;
+  workDays: number[];
+  startTime: string;
+  endTime: string;
+  lunchStart?: string;
+  lunchEnd?: string;
+  isActive: boolean;
+}
+
+export interface TelegramBotConfig {
+  id: string;
+  doctorId: string;
+  botToken?: string;
+  channelId?: string;
+  channelUrl?: string;
+  isOwnBot: boolean;
+  autoPost: boolean;
+}
+
+export interface AdSetting {
+  id: string;
+  doctorId: string;
+  showBannerAds: boolean;
+  showPopupAds: boolean;
+  showInFeedAds: boolean;
+  adFrequency: string;
+}
+
+// ── TZ-06: FAQ & Medical Service Types ────────────────────────────────────
+
+export type FaqCategory = 'OPERATION' | 'RECOVERY' | 'COSTS' | 'CONSULTATION' | 'DIAGNOSTICS';
+export type ServiceCategory = 'INSTRUMENTAL' | 'LABORATORY' | 'OPERATION' | 'CONSULTATION' | 'DIAGNOSTICS';
+
+export interface FAQ {
+  id: string;
+  doctorId: string;
+  question: string;
+  questionRu?: string;
+  answer: string;
+  answerRu?: string;
+  category: FaqCategory;
+  sortOrder: number;
+  isActive: boolean;
+  viewCount: number;
+}
+
+export interface MedicalService {
+  id: string;
+  doctorId: string;
+  name: string;
+  nameRu?: string;
+  category: ServiceCategory;
+  price?: number;
+  priceFrom?: number;
+  priceTo?: number;
+  description?: string;
+  descriptionRu?: string;
+  targetAudience?: string;
+  preparation?: string;
+  duration?: string;
+  isActive: boolean;
+  sortOrder: number;
+}
+
+// ── TZ-05: Message Types ──────────────────────────────────────────────────
+
+export type MessageType = 'TEXT' | 'IMAGE' | 'FILE' | 'VOICE';
+export type PermissionStatus = 'ACTIVE' | 'EXPIRED' | 'REVOKED' | 'REQUESTED';
+
+export interface ChatMessage {
+  id: string;
+  senderId: number;
+  receiverId: number;
+  content?: string;
+  messageType: MessageType;
+  fileUrl?: string;
+  fileName?: string;
+  fileSize?: number;
+  isRead: boolean;
+  readAt?: string;
+  consultId?: string;
+  createdAt: string;
+  sender?: { id: number; fullName: string; avatar?: string };
+  receiver?: { id: number; fullName: string; avatar?: string };
+}
+
+export interface MessagePermission {
+  id: string;
+  patientId: number;
+  doctorId: string;
+  consultationId?: string;
+  grantedBy: string;
+  status: PermissionStatus;
+  expiresAt: string;
+}
+
+export interface Conversation {
+  partnerId: number;
+  partnerName: string;
+  partnerAvatar?: string;
+  lastMessage?: string;
+  lastMessageAt?: string;
+  unreadCount: number;
+}
+
+// ── TZ-04: Contact & Template Types ───────────────────────────────────────
+
+export type ContactRequestType = 'CONSULTATION' | 'COMPLAINT' | 'FOLLOW_UP' | 'OTHER';
+export type ContactRequestStatus = 'NEW' | 'READ' | 'REPLIED' | 'ARCHIVED';
+
+export interface ContactRequest {
+  id: string;
+  doctorId: string;
+  patientId?: number;
+  patientName: string;
+  patientPhone: string;
+  patientEmail?: string;
+  requestType: ContactRequestType;
+  message: string;
+  templateUsed?: string;
+  status: ContactRequestStatus;
+  doctorReply?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface MessageTemplate {
+  id: string;
+  doctorId: string;
+  category: string;
+  title: string;
+  content: string;
+  sortOrder: number;
+  isActive: boolean;
+  usageCount: number;
+}
+
+// ── TZ-02: Portfolio Types ─────────────────────────────────────────────────
+
+export type DegreeType = 'BACHELOR' | 'MASTER' | 'PHD' | 'DSC' | 'RESIDENCY' | 'ORDINATURA';
+export type AchievementGroup = 'SCIENTIFIC' | 'PRACTICAL' | 'ORGANIZATIONAL' | 'INTERNATIONAL' | 'STATE';
+export type StickerType = 'GOLD' | 'SILVER' | 'BRONZE' | 'SPECIAL';
+
+export interface Education {
+  id: string;
+  doctorId: string;
+  institutionName: string;
+  faculty?: string;
+  degree: DegreeType;
+  startYear: number;
+  endYear?: number;
+  diplomaNumber?: string;
+  isVerified: boolean;
+}
+
+export interface WorkExperience {
+  id: string;
+  doctorId: string;
+  organizationName: string;
+  position: string;
+  department?: string;
+  startYear: number;
+  endYear?: number;
+  description?: string;
+}
+
+export interface Achievement {
+  id: string;
+  doctorId: string;
+  name: string;
+  nameRu?: string;
+  group: AchievementGroup;
+  year: number;
+  description?: string;
+  documentUrl?: string;
+  stickerType?: StickerType;
+  isVerified: boolean;
+}
+
+export interface Certificate {
+  id: string;
+  doctorId: string;
+  name: string;
+  nameRu?: string;
+  organization: string;
+  direction: string;
+  year: number;
+  certificateNum?: string;
+  documentUrl?: string;
+  expiresAt?: string;
+  isVerified: boolean;
+}
+
+export interface DoctorProfile {
+  id: string;
+  userId: number;
+  bio?: string;
+  birthDate?: string;
+  experienceYears: number;
+  subSpecialties: string[];
+  qualificationCategory?: string;
+  qualificationDocUrl?: string;
+  licenseNumber?: string;
+  licenseDocUrl?: string;
+  licenseVerified: boolean;
+  qualificationVerified: boolean;
+  socialLinks?: {
+    telegram?: string;
+    instagram?: string;
+    youtube?: string;
+    facebook?: string;
+    linkedin?: string;
+  };
+  profileUrl?: string;
+  isPublic: boolean;
+  isBusinessAccount: boolean;
+  tariffId?: string;
+  tariff?: Tariff;
+  clinics: DoctorClinic[];
+  operationTypes: DoctorOperationType[];
+  education?: Education[];
+  workExperience?: WorkExperience[];
+  achievements?: Achievement[];
+  certificates?: Certificate[];
+  totalConsultations: number;
+  totalOperations: number;
+  onlineConsultations: number;
+  offlineConsultations: number;
+  averageRating: number;
+  totalRatings: number;
+  overallRank?: number;
+  specialtyRank?: number;
+  user?: {
+    id: number;
+    fullName: string;
+    specialty?: string;
+    avatar?: string;
+    isOnline: boolean;
+    lastSeenAt?: string;
+    phone?: string;
+    verificationStatus?: VerificationStatus;
+  };
+}
+
 export type Screen =
   | 'splash'
   | 'role_select'
@@ -452,4 +878,217 @@ export type Screen =
   | 'web_settings'
   | 'web_bemor_profili'
   | 'notifications'
-  | 'profile';
+  | 'profile'
+  // ── TZ-01: Shifokor Profil ekranlari ────────────────────────────────────────
+  | 'doctor_profile_setup'
+  | 'doctor_public_profile'
+  | 'doctor_private_panel'
+  | 'doctor_tariff_select'
+  | 'doctor_clinic_manage'
+  | 'doctor_verification'
+  // ── TZ-02: Portfolio ekranlari ──────────────────────────────────────────────
+  | 'doctor_portfolio'
+  | 'doctor_portfolio_edit'
+  // ── TZ-04: Ariza va Aloqa ekranlari ────────────────────────────────────────
+  | 'patient_contact_form'
+  | 'doctor_contact_requests'
+  | 'doctor_template_manager'
+  // ── TZ-05: Xabar tizimi ekranlari ──────────────────────────────────────────
+  | 'conversations_list'
+  | 'chat_screen'
+  // ── TZ-06: FAQ va Xizmatlar ekranlari ───────────────────────────────────────
+  | 'doctor_faq_view'
+  | 'doctor_faq_editor'
+  | 'doctor_services_view'
+  | 'doctor_services_editor'
+  // ── TZ-07: Qo'shimcha funksionallar ─────────────────────────────────────────
+  | 'doctor_anonymous_number'
+  | 'doctor_telegram_bot'
+  | 'doctor_ad_settings'
+  | 'doctor_share_profile'
+  // ── TZ-03: Kalendar ekranlari ───────────────────────────────────────────────
+  | 'doctor_calendar_view'
+  | 'doctor_calendar_settings'
+  | 'patient_booking_calendar'
+  | 'patient_booking_confirm'
+  // ── Web Admin ekranlari ─────────────────────────────────────────────────────
+  | 'web_doctor_profiles'
+  | 'web_tariff_manage'
+  | 'web_calendar_manage'
+  // ── Web Spravochnik (Ma'lumotnoma) ekranlari ────────────────────────────────
+  | 'web_ref_specialties'
+  | 'web_ref_regions'
+  | 'web_ref_diagnoses'
+  | 'web_ref_drugs'
+  | 'web_ref_lab_tests'
+  | 'web_ref_services'
+  | 'web_ref_templates'
+  | 'web_ref_exam_centers'
+  // ── Web Admin kengaytirilgan ekranlar ───────────────────────────────────────
+  | 'web_admin_dashboard'
+  | 'web_admin_users'
+  | 'web_admin_roles'
+  | 'web_admin_audit'
+  | 'web_admin_settings'
+  | 'web_admin_logs'
+  | 'web_admin_sessions'
+  | 'web_admin_payments'
+  | 'web_admin_doctors_report'
+  | 'web_admin_apps_report'
+  // ── Web Operator kengaytirilgan ekranlar ────────────────────────────────────
+  | 'web_op_dashboard'
+  | 'web_op_create_app'
+  | 'web_op_applications'
+  | 'web_op_patient_search'
+  | 'web_op_queue'
+  // ── Web Doctor kengaytirilgan ekranlar ──────────────────────────────────────
+  | 'web_doc_dashboard'
+  | 'web_doc_patients'
+  | 'web_doc_reception'
+  | 'web_doc_conclusion'
+  | 'web_doc_prescription'
+  | 'web_doc_lab_order'
+  | 'web_doc_emr'
+  | 'web_doc_statistics'
+  // ── Web Kassa kengaytirilgan ekranlar ───────────────────────────────────────
+  | 'web_kassa_dashboard'
+  | 'web_kassa_payment'
+  | 'web_kassa_receipt'
+  | 'web_kassa_shift_report'
+  | 'web_kassa_history';
+
+// ── Spravochnik (Ma'lumotnoma) interfeyslari ──────────────────────────────────
+
+export interface Specialty {
+  id: string;
+  name: string;
+  nameRu?: string;
+  code: string;
+  description?: string;
+  icon?: string;
+  isActive: boolean;
+  sortOrder: number;
+  doctorCount?: number;
+}
+
+export interface Region {
+  id: string;
+  name: string;
+  code: string;
+  parentId?: string;
+  type: 'VILOYAT' | 'TUMAN' | 'SHAHAR';
+  isActive: boolean;
+  children?: Region[];
+}
+
+export interface DiagnosisCode {
+  id: string;
+  code: string;
+  name: string;
+  nameRu?: string;
+  category: string;
+  icdVersion: string;
+  isActive: boolean;
+}
+
+export interface Drug {
+  id: string;
+  name: string;
+  genericName: string;
+  form: 'tablet' | 'kapsul' | 'sirop' | 'inektsiya' | 'malham' | 'tomchi' | 'boshqa';
+  dosage: string;
+  manufacturer: string;
+  category: string;
+  isActive: boolean;
+}
+
+export interface LabTest {
+  id: string;
+  name: string;
+  code: string;
+  category: string;
+  referenceRange: string;
+  unit: string;
+  price: number;
+  isActive: boolean;
+}
+
+export interface ServiceCategoryItem {
+  id: string;
+  name: string;
+  code?: string;
+  description?: string;
+  parentId?: string;
+  price?: number;
+  duration?: number;
+  isActive: boolean;
+  children?: ServiceCategoryItem[];
+}
+
+export interface DocumentTemplate {
+  id: string;
+  name: string;
+  type: 'xulosa' | 'retsept' | 'yollanma' | 'spravka' | 'shartnoma' | 'protokol';
+  content: string;
+  variables: string[];
+  isActive: boolean;
+  usageCount?: number;
+  updatedAt?: string;
+}
+
+export interface ExamCenter {
+  id: string;
+  name: string;
+  address: string;
+  region: string;
+  phone: string;
+  services: string[];
+  workHours: string;
+  isActive: boolean;
+  lat?: number;
+  lng?: number;
+}
+
+// ── Admin kengaytirilgan interfeyslari ────────────────────────────────────────
+
+export interface AuditLogEntry {
+  id: string;
+  timestamp: string;
+  actorId: string;
+  actorName: string;
+  actorRole: UserRole;
+  action: string;
+  targetType: string;
+  targetId?: string;
+  details?: string;
+  ip: string;
+}
+
+export interface SystemSettingItem {
+  id: string;
+  key: string;
+  value: string;
+  group: 'umumiy' | 'bildirishnoma' | 'xavfsizlik' | 'integratsiya' | 'tolov' | 'fayl' | 'kassa' | 'tizim';
+  description: string;
+  isEditable: boolean;
+  type: 'string' | 'number' | 'boolean' | 'select';
+  options?: string[];
+}
+
+export interface UserSessionItem {
+  id: string;
+  userId: string;
+  userName: string;
+  role: UserRole;
+  platform: 'mini-app' | 'web' | 'mobile';
+  deviceInfo: string;
+  ipAddress: string;
+  isActive: boolean;
+  loginAt: string;
+  lastActiveAt: string;
+}
+
+export interface RolePermissionItem {
+  resource: string;
+  actions: { [role in UserRole]?: ('C' | 'R' | 'U' | 'D')[] };
+}

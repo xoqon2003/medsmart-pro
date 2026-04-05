@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle, ChevronRight, Clock, CreditCard, X, XCircle } from 'lucide-react';
 import type { PaymentProvider } from '../../types';
-import { formatPrice } from '../data/mockData';
+import { formatPrice } from '../../utils/formatters';
 
 const PROVIDERS = [
   { id: 'personal_card' as PaymentProvider, name: 'Shaxsiy karta', logo: '💳', color: 'from-gray-800 to-gray-900', bg: 'bg-gray-50 border-gray-200' },
@@ -138,7 +138,7 @@ export function PaymentFlow(props: {
           <h2 className="text-gray-900 text-xl mb-2">To'lov muvaffaqiyatli!</h2>
           <p className="text-gray-500 text-sm mb-1">Ariza raqami: <span className="text-blue-600">{arizaNumber}</span></p>
           <p className="text-gray-500 text-sm mb-1">To'langan summa: <span className="text-gray-800">{formatPrice(amount)}</span></p>
-          <p className="text-gray-500 text-sm">Chek PDF Telegram ga yuborildi</p>
+          <p className="text-gray-500 text-sm">Chekni ariza holatida ko'rishingiz mumkin</p>
         </div>
 
         <button

@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
-  ArrowLeft, ChevronRight, Shield, CheckSquare, AlertCircle,
-  Clock, CheckCircle2, XCircle, Loader2, CalendarCheck,
+  ArrowLeft, Shield, CheckSquare, AlertCircle,
+  Loader2, CalendarCheck,
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import { authService } from '../../../../services';
-import { formatPrice } from '../../../data/mockData';
+import { formatPrice } from '../../../utils/formatters';
 import type { User } from '../../../types';
 
 function addMinutes(time: string, mins: number): string {
@@ -15,49 +15,23 @@ function addMinutes(time: string, mins: number): string {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 }
 
-function formatCountdown(s: number) {
-  const m = Math.floor(s / 60);
-  const sec = s % 60;
-  return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-}
-
-type Stage = 'idle' | 'booking' | 'booked' | 'cancelling';
+type Stage = 'idle' | 'booking';
 
 export function KonsultatsiyaConfirm() {
   const {
     currentUser, goBack, navigate,
-    draftConsultation, addApplication, updateApplicationStatus,
+    draftConsultation, addApplication,
   } = useApp();
 
   const [checks, setChecks]   = useState({ contract: false, pdpl: false, disclaimer: false });
   const [doctor, setDoctor]   = useState<User | null>(null);
   const [stage, setStage]     = useState<Stage>('idle');
-  const [bookedId, setBookedId] = useState<number | null>(null);
-  const [holdRemaining, setHoldRemaining] = useState(15 * 60); // 15 min
-  const [holdStarted, setHoldStarted]     = useState(false);
 
   useEffect(() => {
     const id = draftConsultation.selectedDoctorId;
     if (!id) return;
     authService.getUserById(id).then(setDoctor);
   }, [draftConsultation.selectedDoctorId]);
-
-  /* ── HOLD countdown ── */
-  useEffect(() => {
-    if (!holdStarted) return;
-    if (holdRemaining <= 0) return;
-    const t = setInterval(() => setHoldRemaining((p) => Math.max(0, p - 1)), 1000);
-    return () => clearInterval(t);
-  }, [holdStarted, holdRemaining]);
-
-  /* ── Hold tugaganda avtomatik bekor ── */
-  useEffect(() => {
-    if (!holdStarted || holdRemaining > 0) return;
-    if (bookedId !== null) {
-      updateApplicationStatus(bookedId, 'failed', "HOLD muddati tugadi (15 daqiqa)");
-    }
-    goBack();
-  }, [holdStarted, holdRemaining, bookedId, updateApplicationStatus, goBack]);
 
   const allChecked = checks.contract && checks.pdpl && checks.disclaimer;
   const price = draftConsultation.price || 150000;
@@ -102,7 +76,7 @@ export function KonsultatsiyaConfirm() {
       patient:     currentUser || undefined,
       doctorId:    doctor?.id,
       doctor:      doctor || undefined,
-      status:      'new' as const,
+      status:      'booked' as const,
       scanType:    'Konsultatsiya',
       organ:       doctor?.specialty || 'Mutaxassis',
       serviceType: 'consultation' as const,
@@ -118,28 +92,8 @@ export function KonsultatsiyaConfirm() {
       files: [],
     } as any);
 
-    setBookedId(id);
-    setHoldRemaining(15 * 60);
-    setHoldStarted(true);
-    setStage('booked');
+    navigate('patient_home');
   };
-
-  /* ── Bekor qilish ── */
-  const handleCancel = useCallback(() => {
-    setStage('cancelling');
-  }, []);
-
-  const confirmCancel = useCallback(() => {
-    if (bookedId !== null) {
-      updateApplicationStatus(bookedId, 'failed', 'Bemor tomonidan bekor qilindi');
-    }
-    setHoldStarted(false);
-    setStage('idle');
-    goBack();
-  }, [bookedId, updateApplicationStatus, goBack]);
-
-  /* ── To'lovga o'tish ── */
-  const handlePayment = () => navigate('patient_payment');
 
   /* ══════════════════════════════════════════ */
   return (
@@ -160,15 +114,6 @@ export function KonsultatsiyaConfirm() {
             <h1 className="text-white text-lg font-semibold">Tasdiqlash</h1>
           </div>
 
-          {/* HOLD badge */}
-          {stage === 'booked' && (
-            <div className="flex items-center gap-1.5 bg-amber-400/20 border border-amber-300/30 rounded-xl px-3 py-1.5">
-              <Clock className="w-3.5 h-3.5 text-amber-300" />
-              <span className={`text-xs font-mono font-bold ${holdRemaining < 60 ? 'text-red-300' : 'text-amber-200'}`}>
-                {formatCountdown(holdRemaining)}
-              </span>
-            </div>
-          )}
         </div>
         <p className="text-emerald-200/80 text-xs">
           {doctor ? `Dr. ${doctor.fullName}` : 'Shifokor tanlanmagan'} • {typeLabel}
@@ -176,27 +121,6 @@ export function KonsultatsiyaConfirm() {
       </div>
 
       <div className="flex-1 px-4 py-5 space-y-4 -mt-4 pb-8">
-
-        {/* ── HOLD eslatmasi (booked holatida) ── */}
-        <AnimatePresence>
-          {stage === 'booked' && (
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className={`rounded-xl p-3 flex items-center gap-2 border ${
-                holdRemaining < 60
-                  ? 'bg-red-50 border-red-200'
-                  : 'bg-amber-50 border-amber-200'
-              }`}
-            >
-              <Clock className={`w-4 h-4 flex-shrink-0 ${holdRemaining < 60 ? 'text-red-500' : 'text-amber-600'}`} />
-              <p className={`text-xs ${holdRemaining < 60 ? 'text-red-700' : 'text-amber-700'}`}>
-                Slot HOLD — <span className="font-bold font-mono">{formatCountdown(holdRemaining)}</span> ichida to'lov qilmasa, slot bo'shatiladi
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* ── Ma'lumotlar kartochkasi ── */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
@@ -247,47 +171,39 @@ export function KonsultatsiyaConfirm() {
         </div>
 
         {/* ── Roziliklar ── */}
-        <div className={`bg-white rounded-2xl shadow-sm border p-4 space-y-3 transition-all ${
-          stage === 'booked' ? 'border-emerald-100 opacity-70' : 'border-gray-100'
-        }`}>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-3 transition-all">
           <div className="flex items-center justify-between">
             <p className="text-gray-700 text-sm font-medium">
               Rozilik{' '}
               <span className="text-gray-400 font-normal">(barcha 3 ta majburiy)</span>
             </p>
-            {stage === 'idle' && (
-              <button
-                onClick={() =>
-                  setChecks(
-                    allChecked
-                      ? { contract: false, pdpl: false, disclaimer: false }
-                      : { contract: true, pdpl: true, disclaimer: true }
-                  )
-                }
-                className="flex items-center gap-1.5 group"
-              >
-                <div className={`w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+            <button
+              onClick={() =>
+                setChecks(
                   allChecked
-                    ? 'bg-emerald-600 border-emerald-600'
-                    : checks.contract || checks.pdpl || checks.disclaimer
-                      ? 'bg-white border-emerald-400'
-                      : 'bg-white border-gray-300 group-hover:border-emerald-300'
-                }`}>
-                  {allChecked && <CheckSquare className="w-3 h-3 text-white" strokeWidth={3} />}
-                  {!allChecked && (checks.contract || checks.pdpl || checks.disclaimer) && (
-                    <div className="w-2 h-0.5 bg-emerald-500 rounded-full" />
-                  )}
-                </div>
-                <span className={`text-xs font-medium ${allChecked ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-500'}`}>
-                  Barchasini belgilash
-                </span>
-              </button>
-            )}
-            {stage === 'booked' && (
-              <span className="flex items-center gap-1 text-emerald-600 text-xs font-medium">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Tasdiqlandi
+                    ? { contract: false, pdpl: false, disclaimer: false }
+                    : { contract: true, pdpl: true, disclaimer: true }
+                )
+              }
+              disabled={stage === 'booking'}
+              className="flex items-center gap-1.5 group"
+            >
+              <div className={`w-[18px] h-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all flex-shrink-0 ${
+                allChecked
+                  ? 'bg-emerald-600 border-emerald-600'
+                  : checks.contract || checks.pdpl || checks.disclaimer
+                    ? 'bg-white border-emerald-400'
+                    : 'bg-white border-gray-300 group-hover:border-emerald-300'
+              }`}>
+                {allChecked && <CheckSquare className="w-3 h-3 text-white" strokeWidth={3} />}
+                {!allChecked && (checks.contract || checks.pdpl || checks.disclaimer) && (
+                  <div className="w-2 h-0.5 bg-emerald-500 rounded-full" />
+                )}
+              </div>
+              <span className={`text-xs font-medium ${allChecked ? 'text-emerald-600' : 'text-gray-400 group-hover:text-emerald-500'}`}>
+                Barchasini belgilash
               </span>
-            )}
+            </button>
           </div>
 
           <div className="h-px bg-gray-100" />
@@ -304,16 +220,16 @@ export function KonsultatsiyaConfirm() {
               disabled={stage !== 'idle'}
             >
               <div className={`w-[18px] h-[18px] mt-0.5 rounded-[5px] border-2 flex items-center justify-center transition-all flex-shrink-0 ${
-                checks[item.key] || stage === 'booked'
+                checks[item.key]
                   ? 'bg-emerald-600 border-emerald-600'
                   : 'bg-white border-gray-300 group-hover:border-emerald-300'
               }`}>
-                {(checks[item.key] || stage === 'booked') && (
+                {checks[item.key] && (
                   <CheckSquare className="w-3 h-3 text-white" strokeWidth={3} />
                 )}
               </div>
               <span className={`text-sm leading-snug transition-colors ${
-                checks[item.key] || stage === 'booked' ? 'text-gray-800 font-medium' : 'text-gray-500'
+                checks[item.key] ? 'text-gray-800 font-medium' : 'text-gray-500'
               }`}>
                 {item.label}
               </span>
@@ -373,89 +289,8 @@ export function KonsultatsiyaConfirm() {
             </motion.div>
           )}
 
-          {/* BOOKED: "Band qilingan" + "Bekor qilish" + "To'lovga o'tish" */}
-          {stage === 'booked' && (
-            <motion.div
-              key="booked"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="space-y-3"
-            >
-              {/* Row: Band qilingan | Bekor qilish */}
-              <div className="flex gap-2">
-                <div className="flex-1 bg-emerald-50 border border-emerald-200 rounded-2xl py-3.5 flex items-center justify-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span className="text-emerald-700 text-sm font-semibold">Band qilingan</span>
-                </div>
-                <button
-                  onClick={handleCancel}
-                  className="flex-1 bg-red-50 border border-red-200 rounded-2xl py-3.5 flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
-                >
-                  <XCircle className="w-5 h-5 text-red-500" />
-                  <span className="text-red-600 text-sm font-medium">Bekor qilish</span>
-                </button>
-              </div>
-
-              {/* To'lovga o'tish */}
-              <motion.button
-                whileTap={{ scale: 0.99 }}
-                onClick={handlePayment}
-                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl py-4 flex items-center justify-center gap-2 shadow-lg shadow-blue-200"
-              >
-                <span className="font-medium">Tasdiqlash va To'lovga o'tish</span>
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
-            </motion.div>
-          )}
         </AnimatePresence>
       </div>
-
-      {/* ── Bekor qilish tasdiq modali ── */}
-      <AnimatePresence>
-        {stage === 'cancelling' && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center"
-            onClick={() => setStage('booked')}
-          >
-            <motion.div
-              initial={{ y: 60, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 60, opacity: 0 }}
-              transition={{ type: 'spring', stiffness: 260, damping: 26 }}
-              className="bg-white w-full max-w-md rounded-t-3xl p-6 pb-8"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="text-center mb-5">
-                <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <XCircle className="w-8 h-8 text-red-500" />
-                </div>
-                <h3 className="text-gray-900 text-base font-semibold">Bron bekor qilinsinmi?</h3>
-                <p className="text-gray-500 text-sm mt-1">
-                  Band qilingan slot bo'shatiladi. Bu amalni qaytarib bo'lmaydi.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setStage('booked')}
-                  className="flex-1 bg-gray-100 text-gray-700 rounded-2xl py-3.5 text-sm font-medium"
-                >
-                  Qaytish
-                </button>
-                <button
-                  onClick={confirmCancel}
-                  className="flex-1 bg-red-500 text-white rounded-2xl py-3.5 text-sm font-semibold"
-                >
-                  Ha, bekor qilish
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import {
   Edit2, CheckCircle, Activity
 } from 'lucide-react';
 import { useApp } from '../../store/appStore';
-import { formatDate } from '../../data/mockData';
+import { formatDate } from '../../utils/formatters';
 
 const ROLE_LABEL: Record<string, { label: string; color: string; bg: string; gradient: string }> = {
   patient:    { label: 'Bemor',      color: 'text-blue-200',   bg: 'bg-blue-500/30',   gradient: 'from-blue-900 to-indigo-900' },

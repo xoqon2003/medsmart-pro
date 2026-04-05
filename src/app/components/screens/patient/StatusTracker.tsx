@@ -2,12 +2,14 @@ import React, { useMemo, useState } from 'react';
 import { motion } from 'motion/react';
 import {
   ChevronRight, CheckCircle, Clock, AlertCircle, FileText,
-  Download, Star, RefreshCcw, Printer, Upload,
-  MapPin, Phone, Stethoscope, Car, Home, CreditCard, ClipboardCheck
+  Download, Star, RefreshCcw, Printer, Upload, Receipt,
+  MapPin, Phone, Stethoscope, Car, Home, CreditCard, ClipboardCheck,
+  XCircle, ChevronDown, ChevronUp, CalendarDays, User2
 } from 'lucide-react';
+import type { Payment } from '../../../types';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../data/mockData';
-import { downloadConclusionReport, printConclusionReport } from '../../../utils/pdfGenerator';
+import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../utils/formatters';
+import { downloadConclusionReport, printConclusionReport, downloadPaymentReceipt, printPaymentReceipt } from '../../../utils/pdfGenerator';
 
 type StepState = 'completed' | 'current' | 'pending' | 'error';
 type StepId = 'step1' | 'step2' | 'step3' | 'step4' | 'step5' | 'step6';
@@ -218,6 +220,82 @@ function HvInfoCard({ app }: { app: any }) {
   );
 }
 
+// ── Payment Info Card ──────────────────────────────────────────────────────
+const PROVIDER_LABELS: Record<string, string> = {
+  personal_card: 'Shaxsiy karta',
+  payme: 'Payme',
+  click: 'Click',
+  uzcard: 'Uzcard',
+  humo: 'Humo',
+  uzum: 'Uzum Bank',
+  cash: 'Naqd pul',
+};
+
+function PaymentInfoCard({ payment, arizaNumber, patientName }: { payment: Payment; arizaNumber: string; patientName?: string }) {
+  const [dlLoading, setDlLoading] = useState(false);
+
+  const handleDownload = () => {
+    setDlLoading(true);
+    try { downloadPaymentReceipt(payment, arizaNumber, patientName); }
+    finally { setTimeout(() => setDlLoading(false), 1000); }
+  };
+  const handlePrint = () => printPaymentReceipt(payment, arizaNumber, patientName);
+
+  return (
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="px-4 pt-3 pb-2 border-b border-gray-50 flex items-center gap-2">
+        <Receipt className="w-4 h-4 text-green-600" />
+        <p className="text-gray-700 text-sm font-semibold">To'lov ma'lumotlari</p>
+      </div>
+      <div className="px-4 py-3 space-y-2">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-500 text-xs">Holati</span>
+          <span className="text-xs px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-medium">✅ To'langan</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-xs">Summa</span>
+          <span className="text-gray-900 text-sm font-semibold">{formatPrice(payment.amount)}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500 text-xs">To'lov usuli</span>
+          <span className="text-gray-800 text-xs font-medium">{PROVIDER_LABELS[payment.provider] || payment.provider}</span>
+        </div>
+        {payment.paidAt && (
+          <div className="flex justify-between">
+            <span className="text-gray-500 text-xs">Sana</span>
+            <span className="text-gray-700 text-xs">{formatDateTime(payment.paidAt)}</span>
+          </div>
+        )}
+        {payment.providerTransactionId && (
+          <div className="flex justify-between">
+            <span className="text-gray-500 text-xs">Tranzaksiya ID</span>
+            <span className="text-gray-600 text-xs font-mono">{payment.providerTransactionId}</span>
+          </div>
+        )}
+      </div>
+      <div className="px-4 pb-3 flex gap-2">
+        <button
+          onClick={handleDownload}
+          disabled={dlLoading}
+          className="flex-1 bg-green-50 border border-green-200 text-green-700 rounded-xl py-2 flex items-center justify-center gap-1.5 text-xs font-medium hover:bg-green-100 transition-colors"
+        >
+          {dlLoading
+            ? <div className="w-3.5 h-3.5 border-2 border-green-200 border-t-green-600 rounded-full animate-spin" />
+            : <Download className="w-3.5 h-3.5" />}
+          <span>Chek yuklab olish</span>
+        </button>
+        <button
+          onClick={handlePrint}
+          className="flex-1 bg-gray-50 border border-gray-200 text-gray-600 rounded-xl py-2 flex items-center justify-center gap-1.5 text-xs font-medium hover:bg-gray-100 transition-colors"
+        >
+          <Printer className="w-3.5 h-3.5" />
+          <span>Chop etish</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main StatusTracker ──────────────────────────────────────────────────────
 export function StatusTracker() {
   const { selectedApplication, applications, navigate, goBack, updateApplicationStatus, updateApplication } = useApp();
@@ -227,6 +305,9 @@ export function StatusTracker() {
   const [extraInfo, setExtraInfo] = useState('');
   const [infoSent, setInfoSent] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
+  const [cancelModal, setCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   const app = applications.find(a => a.id === selectedApplication?.id) || selectedApplication;
 
@@ -248,9 +329,10 @@ export function StatusTracker() {
 
   // ── Standard RAD/KNS/TKS rendering ────────────────────────────────────────
   const derivedTopStatus = useMemo(() => {
-    if (app.payment?.status !== 'paid') return getStatusLabel(app.status === 'failed' ? 'failed' : 'new');
-    if (app.status === 'done') return getStatusLabel('done');
+    if (app.status === 'booked') return getStatusLabel('booked');
     if (app.status === 'failed') return getStatusLabel('failed');
+    if (app.payment?.status !== 'paid') return getStatusLabel('new');
+    if (app.status === 'done') return getStatusLabel('done');
     return { label: 'Jarayonda', color: 'text-indigo-700', bg: 'bg-indigo-50' };
   }, [app.payment?.status, app.status]);
   const urgency = getUrgencyLabel(app.urgency);
@@ -360,6 +442,25 @@ export function StatusTracker() {
             </div>
           ))}
         </div>
+        {/* KNS/TKS: Sana va Shifokor qo'shimcha info */}
+        {(kind === 'KNS' || kind === 'TKS') && (
+          <div className="grid grid-cols-2 gap-2 mt-2">
+            <div className="bg-white/10 rounded-xl p-2.5 flex items-center gap-2">
+              <CalendarDays className="w-4 h-4 text-white/50 flex-shrink-0" />
+              <div>
+                <p className="text-white/60 text-xs">Sana va vaqt</p>
+                <p className="text-white text-xs">{app.scanDate || '—'} {app.notes?.split('•').pop()?.trim() || ''}</p>
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-xl p-2.5 flex items-center gap-2">
+              <User2 className="w-4 h-4 text-white/50 flex-shrink-0" />
+              <div>
+                <p className="text-white/60 text-xs">Shifokor</p>
+                <p className="text-white text-xs">{app.doctor?.fullName ? `Dr. ${app.doctor.fullName}` : '—'}</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="flex-1 px-4 py-5 space-y-4 -mt-4 pb-24">
@@ -422,6 +523,10 @@ export function StatusTracker() {
             </div>
           </div>
         </div>
+
+        {app.payment?.status === 'paid' && (
+          <PaymentInfoCard payment={app.payment} arizaNumber={app.arizaNumber} patientName={app.patient?.fullName} />
+        )}
 
         {app.deadlineAt && app.status !== 'done' && (
           <div className="bg-white rounded-2xl shadow-sm p-4 flex items-center justify-between">
@@ -496,10 +601,120 @@ export function StatusTracker() {
           </div>
         )}
 
+        {/* KNS/TKS: Kengaytiladigan tafsilotlar */}
+        {(kind === 'KNS' || kind === 'TKS') && (
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            <button
+              onClick={() => setShowDetails(d => !d)}
+              className="w-full px-4 py-3 flex items-center justify-between"
+            >
+              <span className="text-gray-700 text-sm font-medium">Batafsil ma'lumot</span>
+              {showDetails
+                ? <ChevronUp className="w-4 h-4 text-gray-400" />
+                : <ChevronDown className="w-4 h-4 text-gray-400" />}
+            </button>
+            {showDetails && (
+              <div className="px-4 pb-4 space-y-2.5 border-t border-gray-50 pt-3">
+                {app.scanFacility && (
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-500 text-xs">Qayerga</p>
+                      <p className="text-gray-800 text-sm">{app.scanFacility}</p>
+                    </div>
+                  </div>
+                )}
+                {app.doctor?.phone && (
+                  <div className="flex items-start gap-2.5">
+                    <Phone className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-500 text-xs">Telefon</p>
+                      <p className="text-gray-800 text-sm">{app.doctor.phone}</p>
+                    </div>
+                  </div>
+                )}
+                {app.notes && (
+                  <div className="flex items-start gap-2.5">
+                    <FileText className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-gray-500 text-xs">Izoh</p>
+                      <p className="text-gray-800 text-sm">{app.notes}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* KNS/TKS: To'lovga o'tish tugmasi (booked holat) */}
+        {(kind === 'KNS' || kind === 'TKS') && app.status === 'booked' && (
+          <button
+            onClick={() => navigate('patient_payment')}
+            className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl py-3.5 flex items-center justify-center gap-2 shadow-lg shadow-emerald-200"
+          >
+            <CreditCard className="w-4 h-4" />
+            <span className="text-sm font-medium">To'lovga o'tish</span>
+          </button>
+        )}
+
+        {/* KNS/TKS: Bekor qilish tugmasi (booked yoki new holat) */}
+        {(kind === 'KNS' || kind === 'TKS') && ['booked', 'new'].includes(app.status) && (
+          <button
+            onClick={() => setCancelModal(true)}
+            className="w-full bg-white border border-red-200 text-red-600 rounded-2xl py-3 flex items-center justify-center gap-2"
+          >
+            <XCircle className="w-4 h-4" />
+            <span className="text-sm">Bekor qilish</span>
+          </button>
+        )}
+
         <button onClick={() => navigate('patient_home')} className="w-full bg-white border border-gray-200 text-gray-700 rounded-2xl py-3.5 flex items-center justify-center gap-2">
           <RefreshCcw className="w-4 h-4" /><span className="text-sm">Asosiy sahifaga qaytish</span>
         </button>
       </div>
+
+      {/* Bekor qilish modali */}
+      {cancelModal && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={() => setCancelModal(false)}>
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            onClick={e => e.stopPropagation()}
+            className="w-full max-w-md bg-white rounded-t-3xl p-5 pb-8"
+          >
+            <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4" />
+            <h3 className="text-gray-900 text-base font-semibold mb-1">Arizani bekor qilish</h3>
+            <p className="text-gray-500 text-sm mb-4">Bekor qilish sababini kiriting</p>
+            <textarea
+              value={cancelReason}
+              onChange={e => setCancelReason(e.target.value)}
+              placeholder="Sabab..."
+              rows={3}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-red-200 mb-4"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setCancelModal(false)}
+                className="flex-1 bg-gray-100 text-gray-700 rounded-xl py-3 text-sm font-medium"
+              >
+                Ortga
+              </button>
+              <button
+                onClick={() => {
+                  updateApplicationStatus(app.id, 'failed');
+                  setCancelModal(false);
+                  navigate('patient_home');
+                }}
+                disabled={!cancelReason.trim()}
+                className="flex-1 bg-red-600 text-white rounded-xl py-3 text-sm font-medium disabled:opacity-40"
+              >
+                Bekor qilish
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 }
@@ -621,6 +836,11 @@ function HVStatusTracker({ app, navigate, goBack, updateApplication }: {
             </div>
           </div>
         </div>
+
+        {/* Payment info */}
+        {app.payment?.status === 'paid' && (
+          <PaymentInfoCard payment={app.payment} arizaNumber={app.arizaNumber} patientName={app.patient?.fullName} />
+        )}
 
         {/* Done — rating */}
         {app.status === 'done' && (

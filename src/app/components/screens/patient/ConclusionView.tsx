@@ -5,7 +5,7 @@ import {
   AlertCircle, Brain, ChevronDown, ChevronUp, Printer, Copy, Check
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { formatDateTime, getConclusionTypeLabel } from '../../../data/mockData';
+import { formatDateTime, getConclusionTypeLabel } from '../../../utils/formatters';
 import { downloadConclusionReport, printConclusionReport, shareConclusion, downloadSingleConclusion } from '../../../utils/pdfGenerator';
 import type { Conclusion } from '../../../types';
 

@@ -1,4 +1,4 @@
-import type { Application, Conclusion } from '../types';
+import type { Application, Conclusion, Payment } from '../types';
 
 // ---- Helpers ----
 function safeText(str: string | undefined | null): string {
@@ -376,5 +376,151 @@ export async function shareConclusion(app: Application, conclusions?: Conclusion
     }
   } catch {
     return 'error';
+  }
+}
+
+// ---- Payment Receipt ----
+
+const PROVIDER_NAMES: Record<string, string> = {
+  personal_card: 'Shaxsiy karta',
+  payme: 'Payme',
+  click: 'Click',
+  uzcard: 'Uzcard',
+  humo: 'Humo',
+  uzum: 'Uzum Bank',
+  cash: 'Naqd pul',
+};
+
+function buildReceiptHtml(payment: Payment, arizaNumber: string, patientName?: string): string {
+  const providerName = PROVIDER_NAMES[payment.provider] || payment.provider;
+  const chekNumber = `CHK-${arizaNumber.replace(/^[A-Z]+-/, '')}`;
+
+  return `<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>${safeText(arizaNumber)} — To'lov cheki</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #111827; background: #f9fafb; }
+  .receipt { max-width: 420px; margin: 32px auto; background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,.08); overflow: hidden; }
+
+  .receipt-header { background: linear-gradient(135deg, #1d4ed8, #0369a1); padding: 24px 24px 20px; text-align: center; color: #fff; }
+  .receipt-logo { font-size: 24px; margin-bottom: 4px; }
+  .receipt-brand { font-size: 18px; font-weight: 700; }
+  .receipt-sub { font-size: 11px; opacity: .8; margin-top: 2px; }
+
+  .receipt-status { text-align: center; padding: 20px 24px 16px; }
+  .status-icon { font-size: 48px; margin-bottom: 8px; }
+  .status-text { font-size: 16px; font-weight: 700; color: #16a34a; }
+
+  .receipt-body { padding: 0 24px 20px; }
+  .receipt-divider { border: none; border-top: 2px dashed #e5e7eb; margin: 16px 0; }
+  .receipt-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; }
+  .receipt-row .label { color: #6b7280; font-size: 12px; }
+  .receipt-row .value { color: #111827; font-size: 13px; font-weight: 500; text-align: right; max-width: 60%; }
+  .receipt-total { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 12px 16px; margin: 12px 0; }
+  .receipt-total .label { font-size: 13px; color: #374151; font-weight: 600; }
+  .receipt-total .value { font-size: 20px; color: #16a34a; font-weight: 700; }
+
+  .receipt-footer { background: #f9fafb; padding: 16px 24px; text-align: center; border-top: 1px solid #e5e7eb; }
+  .receipt-footer p { font-size: 10px; color: #9ca3af; line-height: 1.6; }
+  .receipt-qr { width: 60px; height: 60px; background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px; margin: 8px auto; display: flex; align-items: center; justify-content: center; font-size: 8px; color: #9ca3af; }
+
+  @media print {
+    body { background: #fff; }
+    .receipt { box-shadow: none; margin: 0 auto; }
+    .no-print { display: none !important; }
+  }
+  .print-btn {
+    position: fixed; bottom: 24px; right: 24px; background: #2563eb; color: #fff; border: none;
+    border-radius: 12px; padding: 10px 20px; font-size: 14px; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,.2);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .print-btn:hover { background: #1d4ed8; }
+  @media print { .print-btn { display: none; } }
+</style>
+</head>
+<body>
+<div class="receipt">
+  <div class="receipt-header">
+    <div class="receipt-logo">🏥</div>
+    <div class="receipt-brand">MedSmartPro</div>
+    <div class="receipt-sub">Tibbiy xizmatlar platformasi</div>
+  </div>
+
+  <div class="receipt-status">
+    <div class="status-icon">✅</div>
+    <div class="status-text">To'lov tasdiqlandi</div>
+  </div>
+
+  <div class="receipt-body">
+    <hr class="receipt-divider" />
+    <div class="receipt-row"><span class="label">Chek raqami</span><span class="value">${safeText(chekNumber)}</span></div>
+    <div class="receipt-row"><span class="label">Ariza raqami</span><span class="value" style="color:#2563eb;">${safeText(arizaNumber)}</span></div>
+    ${patientName ? `<div class="receipt-row"><span class="label">Bemor</span><span class="value">${safeText(patientName)}</span></div>` : ''}
+    <div class="receipt-row"><span class="label">To'lov sanasi</span><span class="value">${payment.paidAt ? formatDateStr(payment.paidAt) : formatDateStr(payment.createdAt)}</span></div>
+    <div class="receipt-row"><span class="label">To'lov usuli</span><span class="value">${safeText(providerName)}</span></div>
+    ${payment.providerTransactionId ? `<div class="receipt-row"><span class="label">Tranzaksiya ID</span><span class="value" style="font-family:monospace;font-size:11px;">${safeText(payment.providerTransactionId)}</span></div>` : ''}
+    <hr class="receipt-divider" />
+    <div class="receipt-total">
+      <div class="receipt-row" style="padding:0;">
+        <span class="label">Jami to'langan</span>
+        <span class="value">${formatPriceStr(payment.amount)}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="receipt-footer">
+    <div class="receipt-qr">QR<br/>Tekshirish</div>
+    <p>Ushbu chek MedSmartPro platformasi tomonidan avtomatik yaratilgan.<br/>
+    ${formatDateStr(new Date().toISOString())} • ${safeText(arizaNumber)}</p>
+  </div>
+</div>
+
+<button class="print-btn no-print" onclick="window.print()">
+  🖨️ Chop etish / PDF saqlash
+</button>
+</body>
+</html>`;
+}
+
+/**
+ * Download payment receipt as HTML file.
+ */
+export function downloadPaymentReceipt(
+  payment: Payment,
+  arizaNumber: string,
+  patientName?: string,
+): void {
+  const html = buildReceiptHtml(payment, arizaNumber, patientName);
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${arizaNumber}-tolov-cheki.html`;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 1000);
+}
+
+/**
+ * Open payment receipt in new tab for printing.
+ */
+export function printPaymentReceipt(
+  payment: Payment,
+  arizaNumber: string,
+  patientName?: string,
+): void {
+  const html = buildReceiptHtml(payment, arizaNumber, patientName);
+  const win = window.open('', '_blank');
+  if (win) {
+    win.document.write(html);
+    win.document.close();
+    setTimeout(() => win.print(), 800);
   }
 }

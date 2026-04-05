@@ -20,6 +20,20 @@ export default defineConfig({
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
   assetsInclude: ['**/*.svg', '**/*.csv'],
 
+  // Backend API proxy (development)
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+        timeout: 3000,
+        configure: (proxy) => {
+          proxy.on('error', () => {});
+        },
+      },
+    },
+  },
+
   // Multi-page app: Mini App (/) va Web Platform (/web)
   build: {
     rollupOptions: {

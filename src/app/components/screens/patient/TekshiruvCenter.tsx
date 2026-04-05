@@ -4,7 +4,7 @@ import { ArrowLeft, ChevronRight, MapPin, Star, SlidersHorizontal } from 'lucide
 import { useApp } from '../../../store/appStore';
 import { examinationService } from '../../../../services';
 import type { Center } from '../../../../services';
-import { formatPrice } from '../../../data/mockData';
+import { formatPrice } from '../../../utils/formatters';
 import {
   Select,
   SelectContent,

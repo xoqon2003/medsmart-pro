@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ArrowLeft, ChevronRight, Shield, CheckSquare, Square, AlertCircle } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { formatPrice } from '../../../data/mockData';
+import { formatPrice } from '../../../utils/formatters';
 
 export function TekshiruvConfirm() {
   const { currentUser, goBack, navigate, draftExamination, addApplication } = useApp();

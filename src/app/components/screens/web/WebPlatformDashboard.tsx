@@ -19,8 +19,8 @@ import {
 } from 'recharts';
 import { WebPlatformLayout } from './WebPlatformLayout';
 import { useApp } from '../../../store/appStore';
-import { mockApplications, mockUsers } from '../../../data/mockData';
-import { mockKassaTolovlar } from '../../../data/mockData';
+// TODO: Real API dan olish — hozircha seed data
+import { mockApplications, mockUsers, mockKassaTolovlar } from '../../../data/mockData';
 
 // ── Mock grafik ma'lumotlari ────────────────────────────────────────────────
 

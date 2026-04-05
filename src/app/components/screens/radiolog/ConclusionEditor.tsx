@@ -5,7 +5,7 @@ import {
   Zap, Send, Brain, AlertCircle, Upload, Check, Sparkles, Download, Printer
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { CONCLUSION_TEMPLATES, formatDateTime } from '../../../data/mockData';
+import { CONCLUSION_TEMPLATES, formatDateTime } from '../../../utils/formatters';
 import { downloadConclusionReport, printConclusionReport } from '../../../utils/pdfGenerator';
 import type { Conclusion } from '../../../types';
 

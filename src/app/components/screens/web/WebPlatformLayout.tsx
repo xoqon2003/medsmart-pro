@@ -7,9 +7,15 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   LayoutDashboard, FileText, Banknote, Settings,
-  Bell, LogOut, ChevronDown, Search, Menu, X,
+  Bell, LogOut, ChevronDown, ChevronRight, Search, Menu, X,
   Activity, BarChart3, Stethoscope, Layers,
   ClipboardList, UserCheck, HelpCircle, Globe,
+  Crown, Calendar, Users, BookOpen, MapPin, Pill,
+  TestTube, Building2, FileSearch, ScrollText, Terminal,
+  MonitorSmartphone, FileBarChart, Shield, Wallet,
+  UserPlus, ListOrdered, PenTool, FlaskConical, Heart,
+  Receipt, Clock, History, FolderOpen, GraduationCap,
+  Syringe, Tags, FilePlus, UserSearch, Columns3,
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import type { Screen, UserRole } from '../../../types';
@@ -34,8 +40,6 @@ const NAV_GROUPS: NavGroup[] = [
     label: 'Asosiy',
     items: [
       { screen: 'web_dashboard',  icon: LayoutDashboard, label: 'Dashboard',    roles: ['admin', 'operator', 'kassir', 'radiolog', 'specialist', 'doctor'] },
-      { screen: 'web_admin',      icon: BarChart3,       label: 'Admin Panel',  roles: ['admin'] },
-      { screen: 'web_operator',   icon: Layers,          label: 'Operatorlar',  roles: ['admin', 'operator'] },
     ],
   },
   {
@@ -49,9 +53,72 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
-    label: 'Moliya',
+    label: 'Admin boshqaruvi',
     items: [
-      { screen: 'web_kassir', icon: Banknote, label: 'Kassa', roles: ['admin', 'kassir', 'operator'] },
+      { screen: 'web_admin_dashboard',      icon: BarChart3,          label: 'Admin Dashboard',   roles: ['admin'] },
+      { screen: 'web_admin_users',          icon: Users,              label: 'Foydalanuvchilar',  roles: ['admin'] },
+      { screen: 'web_admin_roles',          icon: Shield,             label: 'Rollar va ruxsatlar', roles: ['admin'] },
+      { screen: 'web_admin_audit',          icon: ScrollText,         label: 'Audit log',         roles: ['admin'] },
+      { screen: 'web_admin_settings',       icon: Settings,           label: 'Tizim sozlamalari', roles: ['admin'] },
+      { screen: 'web_admin_logs',           icon: Terminal,           label: 'Tizim loglar',      roles: ['admin'] },
+      { screen: 'web_admin_sessions',       icon: MonitorSmartphone,  label: 'Sessiyalar',        roles: ['admin'] },
+      { screen: 'web_admin_payments',       icon: Wallet,             label: 'To\'lovlar hisoboti', roles: ['admin'] },
+      { screen: 'web_admin_doctors_report', icon: FileBarChart,       label: 'Shifokorlar hisoboti', roles: ['admin'] },
+      { screen: 'web_admin_apps_report',    icon: FileSearch,         label: 'Arizalar hisoboti', roles: ['admin'] },
+    ],
+  },
+  {
+    label: 'Operator panel',
+    items: [
+      { screen: 'web_op_dashboard',      icon: Layers,     label: 'Operator Dashboard', roles: ['admin', 'operator'] },
+      { screen: 'web_op_create_app',     icon: FilePlus,   label: 'Ariza yaratish',     roles: ['admin', 'operator'] },
+      { screen: 'web_op_applications',   icon: FileText,   label: 'Arizalar',           roles: ['admin', 'operator'] },
+      { screen: 'web_op_patient_search', icon: UserSearch,  label: 'Bemor qidirish',     roles: ['admin', 'operator'] },
+      { screen: 'web_op_queue',          icon: Columns3,   label: 'Navbat boshqaruvi',  roles: ['admin', 'operator'] },
+    ],
+  },
+  {
+    label: 'Shifokor panel',
+    items: [
+      { screen: 'web_doc_dashboard',    icon: Stethoscope,   label: 'Shifokor Dashboard', roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_patients',     icon: Users,          label: 'Bemorlar',           roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_reception',    icon: ClipboardList,  label: 'Qabulxona',          roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_conclusion',   icon: PenTool,        label: 'Xulosa yozish',      roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_prescription', icon: Syringe,        label: 'Retsept',            roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_lab_order',    icon: FlaskConical,   label: 'Lab buyurtma',       roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_emr',          icon: Heart,          label: 'Tibbiy karta (EMR)', roles: ['admin', 'doctor'] },
+      { screen: 'web_doc_statistics',   icon: BarChart3,      label: 'Statistika',         roles: ['admin', 'doctor'] },
+    ],
+  },
+  {
+    label: 'Shifokor boshqaruvi',
+    items: [
+      { screen: 'web_doctor_profiles', icon: GraduationCap, label: 'Shifokor profillari', roles: ['admin'] },
+      { screen: 'web_tariff_manage',   icon: Crown,         label: 'Tariflar',            roles: ['admin'] },
+      { screen: 'web_calendar_manage', icon: Calendar,       label: 'Kalendar',            roles: ['admin', 'doctor'] },
+    ],
+  },
+  {
+    label: 'Kassa panel',
+    items: [
+      { screen: 'web_kassa_dashboard',     icon: Banknote, label: 'Kassa Dashboard',   roles: ['admin', 'kassir'] },
+      { screen: 'web_kassa_payment',       icon: Wallet,   label: 'To\'lov qabul',    roles: ['admin', 'kassir'] },
+      { screen: 'web_kassa_receipt',       icon: Receipt,  label: 'Chek chop etish',   roles: ['admin', 'kassir'] },
+      { screen: 'web_kassa_shift_report',  icon: FileBarChart, label: 'Smena hisoboti', roles: ['admin', 'kassir'] },
+      { screen: 'web_kassa_history',       icon: History,  label: 'To\'lovlar tarixi', roles: ['admin', 'kassir'] },
+    ],
+  },
+  {
+    label: 'Spravochnik',
+    items: [
+      { screen: 'web_ref_specialties',  icon: BookOpen,   label: 'Mutaxassisliklar',   roles: ['admin'] },
+      { screen: 'web_ref_regions',      icon: MapPin,     label: 'Hududlar',           roles: ['admin'] },
+      { screen: 'web_ref_diagnoses',    icon: Tags,       label: 'ICD-10 kodlar',      roles: ['admin'] },
+      { screen: 'web_ref_drugs',        icon: Pill,       label: 'Dori katalogi',      roles: ['admin'] },
+      { screen: 'web_ref_lab_tests',    icon: TestTube,   label: 'Lab testlar',        roles: ['admin'] },
+      { screen: 'web_ref_services',     icon: FolderOpen, label: 'Xizmat kategoriyalari', roles: ['admin'] },
+      { screen: 'web_ref_templates',    icon: FileText,   label: 'Hujjat shablonlari', roles: ['admin'] },
+      { screen: 'web_ref_exam_centers', icon: Building2,  label: 'Tekshiruv markazlari', roles: ['admin'] },
     ],
   },
   {
@@ -92,8 +159,13 @@ export function WebPlatformLayout({ children, title, subtitle }: WebPlatformLayo
   const [searchOpen, setSearchOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const role = currentUser?.role ?? 'admin';
   const roleGradient = ROLE_COLORS[role] || ROLE_COLORS.admin;
+
+  const toggleGroup = (label: string) => {
+    setCollapsedGroups(prev => ({ ...prev, [label]: !prev[label] }));
+  };
 
   const visibleGroups = useMemo(() =>
     NAV_GROUPS.map(g => ({
@@ -146,17 +218,27 @@ export function WebPlatformLayout({ children, title, subtitle }: WebPlatformLayo
         </div>
 
         {/* Nav */}
-        <div className="flex-1 overflow-y-auto py-4 space-y-6 px-2">
-          {visibleGroups.map(group => (
+        <div className="flex-1 overflow-y-auto py-4 space-y-1 px-2">
+          {visibleGroups.map(group => {
+            const isCollapsed = collapsedGroups[group.label];
+            const hasActiveItem = group.items.some(item => currentScreen === item.screen);
+            return (
             <div key={group.label}>
               <AnimatePresence>
                 {sidebarOpen && (
-                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className={`text-xs font-semibold uppercase tracking-widest px-3 mb-2 ${dark ? 'text-slate-500' : 'text-gray-400'}`}>
+                  <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    onClick={() => toggleGroup(group.label)}
+                    className={`w-full flex items-center justify-between text-xs font-semibold uppercase tracking-widest px-3 py-1.5 mb-0.5 rounded-lg transition-colors
+                      ${hasActiveItem && isCollapsed ? (dark ? 'text-indigo-400' : 'text-indigo-600') : (dark ? 'text-slate-500 hover:text-slate-400' : 'text-gray-400 hover:text-gray-500')}`}>
                     {group.label}
-                  </motion.p>
+                    <ChevronRight className={`w-3 h-3 transition-transform ${isCollapsed ? '' : 'rotate-90'}`} />
+                  </motion.button>
                 )}
               </AnimatePresence>
+              <AnimatePresence initial={false}>
+              {!isCollapsed && (
+              <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }} className="overflow-hidden">
               <div className="space-y-0.5">
                 {group.items.map(item => {
                   const Icon = item.icon;
@@ -206,8 +288,12 @@ export function WebPlatformLayout({ children, title, subtitle }: WebPlatformLayo
                   );
                 })}
               </div>
+              </motion.div>
+              )}
+              </AnimatePresence>
             </div>
-          ))}
+          );
+          })}
         </div>
 
         {/* Foydalanuvchi profil qismi */}

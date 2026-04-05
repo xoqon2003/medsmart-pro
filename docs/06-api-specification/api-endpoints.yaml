@@ -1,0 +1,1292 @@
+openapi: "3.0.3"
+info:
+  title: MedSmart Pro API
+  description: |
+    MedSmart Pro tibbiy axborot tizimi API spetsifikatsiyasi.
+    Mini App (Telegram) va Web Panel uchun yagona backend.
+
+    ## Autentifikatsiya
+    Ko'pgina endpoint lar JWT Bearer token talab qiladi.
+    Token `/auth/verify-otp` yoki `/auth/login` orqali olinadi.
+
+    ## Server URL
+    - Production: `https://medsmart-pro.vercel.app/api/v1`
+    - Development: `http://localhost:3000/api/v1`
+  version: "1.0.0"
+  contact:
+    name: MedSmart Pro Team
+
+servers:
+  - url: https://medsmart-pro.vercel.app/api/v1
+    description: Production (Vercel)
+  - url: http://localhost:3000/api/v1
+    description: Local Development
+
+tags:
+  - name: Auth
+    description: Autentifikatsiya va avtorizatsiya (4 endpoint)
+  - name: Users
+    description: Foydalanuvchilar boshqaruvi (3 endpoint)
+  - name: Applications
+    description: Arizalar - tibbiy xizmat so'rovlari (5 endpoint)
+  - name: Conclusions
+    description: Tibbiy xulosalar (2 endpoint)
+  - name: Payments
+    description: To'lovlar (3 endpoint)
+  - name: Notifications
+    description: Bildirishnomalar (3 endpoint)
+  - name: Booking
+    description: Shifokor band qilish (4 endpoint)
+  - name: Examinations
+    description: Tekshiruv markazlari (2 endpoint)
+  - name: Kassa
+    description: Kassa operatsiyalari (5 endpoint)
+
+paths:
+  # ==========================================
+  # AUTH ENDPOINTS (auth.controller.ts)
+  # ==========================================
+  /auth/send-otp:
+    post:
+      tags: [Auth]
+      summary: OTP yuborish
+      description: Telefon raqamiga SMS orqali OTP kod yuboradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone]
+              properties:
+                phone:
+                  type: string
+                  example: "+998901234567"
+      responses:
+        "200":
+          description: OTP muvaffaqiyatli yuborildi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  phone:
+                    type: string
+
+  /auth/verify-otp:
+    post:
+      tags: [Auth]
+      summary: OTP tasdiqlash
+      description: SMS orqali kelgan OTP kodni tekshiradi, JWT token qaytaradi
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, otp]
+              properties:
+                phone:
+                  type: string
+                  example: "+998901234567"
+                otp:
+                  type: string
+                  example: "123456"
+      responses:
+        "200":
+          description: OTP to'g'ri - JWT token va user qaytariladi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: OTP noto'g'ri yoki muddati o'tgan
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: PIN orqali kirish
+      description: Web Panel uchun telefon + PIN orqali tizimga kirish
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [phone, pin]
+              properties:
+                phone:
+                  type: string
+                  example: "+998901234567"
+                pin:
+                  type: string
+                  example: "1234"
+      responses:
+        "200":
+          description: Muvaffaqiyatli kirish
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Telefon yoki PIN noto'g'ri
+
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Joriy foydalanuvchi profili
+      description: JWT token asosida foydalanuvchi ma'lumotlarini qaytaradi (PIN siz)
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Foydalanuvchi ma'lumotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "401":
+          description: Token yaroqsiz
+
+  # ==========================================
+  # USERS ENDPOINTS (users.controller.ts)
+  # ==========================================
+  /users:
+    get:
+      tags: [Users]
+      summary: Foydalanuvchilar ro'yxati
+      description: Barcha foydalanuvchilar yoki role bo'yicha filtrlash
+      parameters:
+        - name: role
+          in: query
+          description: Foydalanuvchi rolini filtrlash
+          schema:
+            $ref: "#/components/schemas/UserRole"
+      responses:
+        "200":
+          description: Foydalanuvchilar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Foydalanuvchi ma'lumotlari (ID bo'yicha)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Foydalanuvchi topildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Foydalanuvchi topilmadi
+    put:
+      tags: [Users]
+      summary: Foydalanuvchi ma'lumotlarini yangilash
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserUpdate"
+      responses:
+        "200":
+          description: Yangilangan foydalanuvchi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+
+  # ==========================================
+  # APPLICATIONS ENDPOINTS (applications.controller.ts)
+  # ==========================================
+  /applications:
+    get:
+      tags: [Applications]
+      summary: Arizalar ro'yxati (sahifalangan)
+      description: Statuslar, bemor ID, radiolog ID bo'yicha filtrlash mumkin
+      parameters:
+        - name: status
+          in: query
+          schema:
+            $ref: "#/components/schemas/AppStatus"
+        - name: patientId
+          in: query
+          schema:
+            type: string
+        - name: radiologId
+          in: query
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        "200":
+          description: Sahifalangan arizalar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Application"
+                  meta:
+                    type: object
+                    properties:
+                      page:
+                        type: integer
+                      limit:
+                        type: integer
+                      total:
+                        type: integer
+
+    post:
+      tags: [Applications]
+      summary: Yangi ariza yaratish
+      description: Bemor yoki operator yangi ariza yaratadi
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationCreate"
+      responses:
+        "201":
+          description: Ariza muvaffaqiyatli yaratildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Application"
+
+  /applications/{id}:
+    get:
+      tags: [Applications]
+      summary: Ariza to'liq ma'lumotlari
+      description: |
+        Ariza bilan birga barcha bog'liq ma'lumotlar qaytariladi:
+        patient, radiolog, specialist, doctor, anamnez, files,
+        payment, conclusions, auditLog, examinations
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Ariza to'liq tafsilotlari
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationFull"
+        "404":
+          description: Ariza topilmadi
+
+    put:
+      tags: [Applications]
+      summary: Ariza ma'lumotlarini yangilash
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationUpdate"
+      responses:
+        "200":
+          description: Ariza yangilandi
+
+  /applications/{id}/status:
+    patch:
+      tags: [Applications]
+      summary: Ariza holatini o'zgartirish
+      description: Ariza statusini workflow bo'yicha o'zgartiradi va audit log yozadi
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  $ref: "#/components/schemas/AppStatus"
+                notes:
+                  type: string
+                  description: Status o'zgarishi izohi
+      responses:
+        "200":
+          description: Status yangilandi
+
+  # ==========================================
+  # CONCLUSIONS ENDPOINTS (conclusions.controller.ts)
+  # ==========================================
+  /applications/{appId}/conclusions:
+    get:
+      tags: [Conclusions]
+      summary: Ariza xulosalari ro'yxati
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Xulosalar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Conclusion"
+
+    post:
+      tags: [Conclusions]
+      summary: Yangi xulosa yaratish
+      description: AI, radiolog, mutaxassis yoki shifokor xulosasini qo'shish
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConclusionCreate"
+      responses:
+        "201":
+          description: Xulosa yaratildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Conclusion"
+
+  # ==========================================
+  # PAYMENTS ENDPOINTS (payments.controller.ts)
+  # ==========================================
+  /payments:
+    post:
+      tags: [Payments]
+      summary: To'lov yaratish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [applicationId, amount, provider]
+              properties:
+                applicationId:
+                  type: string
+                amount:
+                  type: number
+                  example: 150000
+                provider:
+                  $ref: "#/components/schemas/PaymentProvider"
+      responses:
+        "201":
+          description: To'lov yaratildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{id}/confirm:
+    post:
+      tags: [Payments]
+      summary: To'lovni tasdiqlash
+      description: To'lov provayderidan tasdiqlash kelganda
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: To'lov tasdiqlandi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+
+  /payments/{id}/refund:
+    post:
+      tags: [Payments]
+      summary: To'lovni qaytarish (refund)
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: To'lov qaytarildi
+
+  # ==========================================
+  # NOTIFICATIONS ENDPOINTS (notifications.controller.ts)
+  # ==========================================
+  /notifications:
+    get:
+      tags: [Notifications]
+      summary: Bildirishnomalar ro'yxati
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Bildirishnomalar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      tags: [Notifications]
+      summary: Bildirishnomani o'qilgan deb belgilash
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: O'qilgan deb belgilandi
+
+  /notifications/read-all:
+    patch:
+      tags: [Notifications]
+      summary: Barcha bildirishnomalarni o'qilgan deb belgilash
+      description: JWT token dagi user ning barcha bildirishnomalarini o'qilgan qiladi
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Barchasi o'qilgan
+
+  # ==========================================
+  # BOOKING ENDPOINTS (booking.controller.ts)
+  # ==========================================
+  /booking/doctors:
+    get:
+      tags: [Booking]
+      summary: Shifokorlar qidirish
+      parameters:
+        - name: query
+          in: query
+          description: Ism bo'yicha qidirish
+          schema:
+            type: string
+        - name: specialties
+          in: query
+          description: Vergul bilan ajratilgan mutaxassisliklar (masalan "Kardiolog,Nevrolog")
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Shifokorlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+
+  /booking/doctors/{id}/slots:
+    get:
+      tags: [Booking]
+      summary: Shifokor bo'sh vaqtlari
+      description: Berilgan sanada shifokorning soatlik bo'sh/band holatini qaytaradi
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: date
+          in: query
+          required: true
+          description: "Format: YYYY-MM-DD"
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: "Soatlik slotlar (key: soat, value: free|busy)"
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+                  enum: [free, busy]
+                example:
+                  "09:00": "free"
+                  "10:00": "busy"
+                  "11:00": "free"
+
+  /booking/geo:
+    get:
+      tags: [Booking]
+      summary: Geografik hududlar (viloyat va tumanlar)
+      responses:
+        "200":
+          description: Hududlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GeoRegion"
+
+  /booking/specialties:
+    get:
+      tags: [Booking]
+      summary: Mutaxassisliklar ro'yxati
+      responses:
+        "200":
+          description: Barcha mutaxassisliklar
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example: ["Kardiolog", "Nevrolog", "Radiolog", "Terapevt"]
+
+  # ==========================================
+  # EXAMINATIONS ENDPOINTS (examinations.controller.ts)
+  # ==========================================
+  /examinations/centers:
+    get:
+      tags: [Examinations]
+      summary: Tekshiruv markazlari ro'yxati
+      parameters:
+        - name: region
+          in: query
+          schema:
+            type: string
+        - name: district
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Markazlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ExaminationCenter"
+
+  /examinations/exams/{category}:
+    get:
+      tags: [Examinations]
+      summary: Kategoriya bo'yicha tekshiruvlar
+      description: "Masalan: xray, mri, ct, ultrasound"
+      parameters:
+        - name: category
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Tekshiruvlar nomi ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  # ==========================================
+  # KASSA ENDPOINTS (kassa.controller.ts)
+  # ==========================================
+  /kassa/smena:
+    post:
+      tags: [Kassa]
+      summary: Kassir smenasini ochish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [kassirIsmi]
+              properties:
+                kassirIsmi:
+                  type: string
+                  example: "Karimov A."
+                boshlanghichQoldiq:
+                  type: number
+                  default: 0
+                  description: Smena boshidagi kassa qoldig'i (so'm)
+      responses:
+        "201":
+          description: Smena ochildi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KassaSmena"
+
+  /kassa/smena/{id}:
+    put:
+      tags: [Kassa]
+      summary: Smenani yopish
+      description: Smena yopilganda jami, naqd, karta avtomatik hisoblanadi
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Smena yopildi (hisob-kitob bilan)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KassaSmena"
+
+  /kassa/smena/active:
+    get:
+      tags: [Kassa]
+      summary: Joriy kassirning faol smenasi
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Faol smena (to'lovlar bilan)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KassaSmena"
+        "404":
+          description: Faol smena yo'q
+
+  /kassa/tolov:
+    post:
+      tags: [Kassa]
+      summary: Kassa orqali to'lov yaratish
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KassaTolovCreate"
+      responses:
+        "201":
+          description: To'lov yaratildi
+    get:
+      tags: [Kassa]
+      summary: Smena to'lovlari ro'yxati
+      parameters:
+        - name: smenaId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: To'lovlar ro'yxati
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/KassaTolov"
+
+# ==========================================
+# COMPONENTS
+# ==========================================
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Authorization: Bearer <JWT token>"
+
+  schemas:
+    # --- ENUMS ---
+    UserRole:
+      type: string
+      enum: [PATIENT, DOCTOR, RADIOLOG, SPECIALIST, OPERATOR, ADMIN, CASHIER]
+      description: |
+        - PATIENT: Bemor (mini app foydalanuvchisi)
+        - DOCTOR: Shifokor (yo'llanma beruvchi)
+        - RADIOLOG: Radiolog (tasvir tahlilchi)
+        - SPECIALIST: Tor mutaxassis (maslahatchi)
+        - OPERATOR: Operator (ariza qabul qiluvchi)
+        - ADMIN: Administrator (tizim boshqaruvchi)
+        - CASHIER: Kassir (to'lov qabul qiluvchi)
+
+    AppStatus:
+      type: string
+      enum: [NEW, PAID_PENDING, ACCEPTED, ASSIGNED, IN_PROGRESS, WAITING_RESULT, RESULT_READY, CONSULTATION, COMPLETED, REJECTED, DONE]
+      description: |
+        Ariza holatlari workflow:
+        NEW → PAID_PENDING → ACCEPTED → ASSIGNED → IN_PROGRESS →
+        WAITING_RESULT → RESULT_READY → CONSULTATION → COMPLETED → DONE
+
+    ServiceType:
+      type: string
+      enum: [XRAY, MRI, CT, ULTRASOUND, FLUOROGRAPHY]
+
+    Urgency:
+      type: string
+      enum: [NORMAL, URGENT, EMERGENCY]
+
+    PaymentProvider:
+      type: string
+      enum: [PAYME, CLICK, UZUM, CASH, CARD, TRANSFER, INSURANCE]
+
+    PaymentStatus:
+      type: string
+      enum: [PENDING, COMPLETED, FAILED, REFUNDED]
+
+    ConclusionType:
+      type: string
+      enum: [AI, RADIOLOG, SPECIALIST, DOCTOR]
+
+    FileType:
+      type: string
+      enum: [DICOM, IMAGE, PDF, OTHER]
+
+    # --- MAIN SCHEMAS ---
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        phone:
+          type: string
+        fullName:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        specialty:
+          type: string
+          nullable: true
+        region:
+          type: string
+          nullable: true
+        district:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT access token (Bearer formatda ishlatiladi)
+        user:
+          $ref: "#/components/schemas/User"
+
+    UserUpdate:
+      type: object
+      properties:
+        fullName:
+          type: string
+        specialty:
+          type: string
+        region:
+          type: string
+        district:
+          type: string
+        avatarUrl:
+          type: string
+
+    Application:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        serviceType:
+          $ref: "#/components/schemas/ServiceType"
+        urgency:
+          $ref: "#/components/schemas/Urgency"
+        status:
+          $ref: "#/components/schemas/AppStatus"
+        bodyPart:
+          type: string
+        diagnosis:
+          type: string
+        notes:
+          type: string
+        patientId:
+          type: string
+        radiologId:
+          type: string
+          nullable: true
+        specialistId:
+          type: string
+          nullable: true
+        doctorId:
+          type: string
+          nullable: true
+        homeVisit:
+          type: boolean
+          default: false
+        homeAddress:
+          type: string
+          nullable: true
+        homePhone:
+          type: string
+          nullable: true
+        homeDate:
+          type: string
+          format: date-time
+          nullable: true
+        price:
+          type: number
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ApplicationFull:
+      allOf:
+        - $ref: "#/components/schemas/Application"
+        - type: object
+          properties:
+            patient:
+              $ref: "#/components/schemas/User"
+            radiolog:
+              $ref: "#/components/schemas/User"
+            specialist:
+              $ref: "#/components/schemas/User"
+            doctor:
+              $ref: "#/components/schemas/User"
+            anamnez:
+              $ref: "#/components/schemas/Anamnez"
+            files:
+              type: array
+              items:
+                $ref: "#/components/schemas/FileRecord"
+            payment:
+              $ref: "#/components/schemas/Payment"
+            conclusions:
+              type: array
+              items:
+                $ref: "#/components/schemas/Conclusion"
+            auditLog:
+              type: array
+              items:
+                $ref: "#/components/schemas/AuditEvent"
+            examinations:
+              type: array
+              items:
+                $ref: "#/components/schemas/Examination"
+
+    ApplicationCreate:
+      type: object
+      required: [serviceType, urgency, patientId]
+      properties:
+        serviceType:
+          $ref: "#/components/schemas/ServiceType"
+        urgency:
+          $ref: "#/components/schemas/Urgency"
+        bodyPart:
+          type: string
+        diagnosis:
+          type: string
+        notes:
+          type: string
+        patientId:
+          type: string
+        doctorId:
+          type: string
+        homeVisit:
+          type: boolean
+        homeAddress:
+          type: string
+        homePhone:
+          type: string
+        homeDate:
+          type: string
+          format: date-time
+        price:
+          type: number
+
+    ApplicationUpdate:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/AppStatus"
+        radiologId:
+          type: string
+        specialistId:
+          type: string
+        notes:
+          type: string
+        diagnosis:
+          type: string
+        price:
+          type: number
+
+    Anamnez:
+      type: object
+      properties:
+        id:
+          type: string
+        complaints:
+          type: string
+        history:
+          type: string
+        allergies:
+          type: string
+        medications:
+          type: string
+
+    FileRecord:
+      type: object
+      properties:
+        id:
+          type: string
+        fileName:
+          type: string
+        fileType:
+          $ref: "#/components/schemas/FileType"
+        fileUrl:
+          type: string
+        fileSize:
+          type: integer
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        provider:
+          $ref: "#/components/schemas/PaymentProvider"
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        transactionId:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    Conclusion:
+      type: object
+      properties:
+        id:
+          type: string
+        conclusionType:
+          $ref: "#/components/schemas/ConclusionType"
+        description:
+          type: string
+        findings:
+          type: string
+        impression:
+          type: string
+        recommendations:
+          type: string
+          nullable: true
+        source:
+          type: string
+          nullable: true
+        aiAnalysis:
+          type: string
+          nullable: true
+        pdfUrl:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+
+    ConclusionCreate:
+      type: object
+      required: [conclusionType, description, findings, impression]
+      properties:
+        conclusionType:
+          $ref: "#/components/schemas/ConclusionType"
+        description:
+          type: string
+        findings:
+          type: string
+        impression:
+          type: string
+        recommendations:
+          type: string
+        source:
+          type: string
+        aiAnalysis:
+          type: string
+        pdfUrl:
+          type: string
+
+    AuditEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        action:
+          type: string
+        details:
+          type: string
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    Examination:
+      type: object
+      properties:
+        id:
+          type: string
+        examType:
+          type: string
+        result:
+          type: string
+          nullable: true
+        centerId:
+          type: string
+          nullable: true
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        message:
+          type: string
+        type:
+          type: string
+        read:
+          type: boolean
+          default: false
+        userId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    ExaminationCenter:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+        district:
+          type: string
+        rating:
+          type: number
+        price:
+          type: number
+        distanceKm:
+          type: number
+
+    GeoRegion:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        districts:
+          type: array
+          items:
+            type: string
+
+    KassaSmena:
+      type: object
+      properties:
+        id:
+          type: string
+        kassirId:
+          type: string
+        kassirIsmi:
+          type: string
+        boshlanghichQoldiq:
+          type: number
+        jami:
+          type: number
+        naqd:
+          type: number
+        karta:
+          type: number
+        status:
+          type: string
+          enum: [OCHIQ, YOPIQ]
+        ochilganVaqt:
+          type: string
+          format: date-time
+        yopilganVaqt:
+          type: string
+          format: date-time
+          nullable: true
+        tolovlar:
+          type: array
+          items:
+            $ref: "#/components/schemas/KassaTolov"
+
+    KassaTolov:
+      type: object
+      properties:
+        id:
+          type: string
+        smenaId:
+          type: string
+        applicationId:
+          type: string
+        bemorIsmi:
+          type: string
+        xizmatNomi:
+          type: string
+        summa:
+          type: number
+        chegirma:
+          type: number
+        tolashKerak:
+          type: number
+        tolanganSumma:
+          type: number
+        qaytim:
+          type: number
+        tolovUsuli:
+          type: string
+          enum: [NAQD, KARTA, ARALASH]
+        kassirId:
+          type: string
+        izoh:
+          type: string
+          nullable: true
+        yaratilganVaqt:
+          type: string
+          format: date-time
+
+    KassaTolovCreate:
+      type: object
+      required: [smenaId, applicationId, bemorIsmi, xizmatNomi, summa, tolashKerak, tolanganSumma, tolovUsuli, kassirId]
+      properties:
+        smenaId:
+          type: string
+        applicationId:
+          type: string
+        bemorIsmi:
+          type: string
+        xizmatNomi:
+          type: string
+        summa:
+          type: number
+          description: "Xizmat narxi (so'm)"
+        chegirma:
+          type: number
+          default: 0
+          description: "Chegirma foizi yoki summasi"
+        tolashKerak:
+          type: number
+          description: "Chegirmadan keyin to'lash kerak summa"
+        tolanganSumma:
+          type: number
+        qaytim:
+          type: number
+          default: 0
+        tolovUsuli:
+          type: string
+          enum: [NAQD, KARTA, ARALASH]
+        kassirId:
+          type: string
+        izoh:
+          type: string

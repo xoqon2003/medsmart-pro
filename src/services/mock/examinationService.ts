@@ -25,7 +25,7 @@ const CENTERS: Center[] = [
   { id: 4, name: 'ProLab', region: 'Toshkent', district: 'Chilonzor', rating: 4.4, price: 120000, distanceKm: 6.0 },
 ];
 
-const EXAMS_BY_CATEGORY: Record<string, string[]> = {
+export const EXAMS_BY_CATEGORY: Record<string, string[]> = {
   visual: ["Bosh miya MRT", "Ko\u02BCkrak KT", "Umurtqa rentgen", "Qorin bo\u02BClig\u02BCi KT"],
   ultrasound: ["Qorin bo\u02BCligi UZI", "Yurak ExoKG", "Qalqonsimon bez UZI"],
   laboratory: ['Umumiy qon tahlili', 'Biokimyoviy tahlil', 'Gormonal tahlil'],

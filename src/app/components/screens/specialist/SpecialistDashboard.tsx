@@ -5,7 +5,7 @@ import {
   AlertCircle, Star, Send, Eye, X, Brain, Download, Stethoscope, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
-import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel } from '../../../data/mockData';
+import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel } from '../../../utils/formatters';
 import { downloadConclusionReport, downloadSingleConclusion } from '../../../utils/pdfGenerator';
 import type { Application, Conclusion } from '../../../types';
 
