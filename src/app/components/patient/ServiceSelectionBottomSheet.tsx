@@ -1,8 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Brain, Stethoscope, Microscope, ChevronRight, X } from 'lucide-react';
+import { Brain, Stethoscope, Microscope, Sparkles, ChevronRight, X } from 'lucide-react';
 
-type ServiceKey = 'radiology' | 'konsultatsiya' | 'tekshiruv';
+type ServiceKey = 'radiology' | 'konsultatsiya' | 'tekshiruv' | 'ai_tavsiya';
 
 const items: Array<{
   key: ServiceKey;
@@ -31,6 +31,13 @@ const items: Array<{
     description: 'Laboratoriya, diagnostik tekshiruvlarga (MRT/KT/UZI) yozilish',
     icon: <Microscope className="w-5 h-5 text-sky-600" />,
     iconBg: 'bg-sky-50 border-sky-100',
+  },
+  {
+    key: 'ai_tavsiya',
+    title: 'AI Tavsiya — shikoyatim bor',
+    description: 'Shikoyatingizni kiriting — qaysi shifokor va qaysi tahlilga yo\'naltiramiz',
+    icon: <Sparkles className="w-5 h-5 text-violet-600" />,
+    iconBg: 'bg-violet-50 border-violet-100',
   },
 ];
 
@@ -94,7 +101,7 @@ export function ServiceSelectionBottomSheet(props: {
                 <div className="flex items-start justify-between mb-5">
                   <div>
                     <h2 className="text-gray-900 text-base font-bold">Qabul turini tanlang</h2>
-                    <p className="text-gray-400 text-xs mt-0.5">Quyidagi 3 yo'nalishdan birini tanlang</p>
+                    <p className="text-gray-400 text-xs mt-0.5">Quyidagi yo'nalishlardan birini tanlang</p>
                   </div>
                   <button
                     onClick={() => onOpenChange(false)}

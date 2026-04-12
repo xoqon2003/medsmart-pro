@@ -34,6 +34,10 @@ import { WebRefLabTestsScreen } from './components/screens/web/WebRefLabTestsScr
 import { WebRefServicesScreen } from './components/screens/web/WebRefServicesScreen';
 import { WebRefTemplatesScreen } from './components/screens/web/WebRefTemplatesScreen';
 import { WebRefExamCentersScreen } from './components/screens/web/WebRefExamCentersScreen';
+import { WebRefKBDiseasesScreen } from './components/screens/web/WebRefKBDiseasesScreen';
+import { WebRefKBSymptomsScreen } from './components/screens/web/WebRefKBSymptomsScreen';
+import { WebRefKBProtocolsScreen } from './components/screens/web/WebRefKBProtocolsScreen';
+import { WebRefKBDrugsScreen } from './components/screens/web/WebRefKBDrugsScreen';
 
 // ── Admin kengaytirilgan ──
 import { WebAdminDashboardScreen } from './components/screens/web/WebAdminDashboardScreen';
@@ -151,6 +155,16 @@ function WebAppContent() {
       return <WebRefTemplatesScreen />;
     case 'web_ref_exam_centers':
       return <WebRefExamCentersScreen />;
+
+    // ══════ KLINIK BILIM BAZASI ══════
+    case 'web_ref_kb_diseases':
+      return <WebRefKBDiseasesScreen />;
+    case 'web_ref_kb_symptoms':
+      return <WebRefKBSymptomsScreen />;
+    case 'web_ref_kb_protocols':
+      return <WebRefKBProtocolsScreen />;
+    case 'web_ref_kb_drugs':
+      return <WebRefKBDrugsScreen />;
 
     // ══════ ADMIN KENGAYTIRILGAN ══════
     case 'web_admin_dashboard':

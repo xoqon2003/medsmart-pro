@@ -1,6 +1,6 @@
 export type ViewMode = 'card' | 'table';
 
-export type UserRole = 'patient' | 'radiolog' | 'operator' | 'admin' | 'specialist' | 'doctor' | 'kassir';
+export type UserRole = 'patient' | 'radiolog' | 'operator' | 'admin' | 'specialist' | 'doctor' | 'kassir' | 'tibbiy_ekspert';
 
 export type ApplicantType = 'self' | 'relative' | 'doctor' | 'organization';
 
@@ -924,6 +924,11 @@ export type Screen =
   | 'web_ref_services'
   | 'web_ref_templates'
   | 'web_ref_exam_centers'
+  // ── Klinik Bilim Bazasi ekranlari ───────────────────────────────────────────
+  | 'web_ref_kb_diseases'
+  | 'web_ref_kb_symptoms'
+  | 'web_ref_kb_protocols'
+  | 'web_ref_kb_drugs'
   // ── Web Admin kengaytirilgan ekranlar ───────────────────────────────────────
   | 'web_admin_dashboard'
   | 'web_admin_users'
@@ -955,7 +960,11 @@ export type Screen =
   | 'web_kassa_payment'
   | 'web_kassa_receipt'
   | 'web_kassa_shift_report'
-  | 'web_kassa_history';
+  | 'web_kassa_history'
+  // ── AI Tavsiya (Simptom tahlili) ekranlari ──────────────────────────────────
+  | 'patient_symptom_input'
+  | 'patient_adaptive_questions'
+  | 'patient_diagnosis_results';
 
 // ── Spravochnik (Ma'lumotnoma) interfeyslari ──────────────────────────────────
 
@@ -1091,4 +1100,162 @@ export interface UserSessionItem {
 export interface RolePermissionItem {
   resource: string;
   actions: { [role in UserRole]?: ('C' | 'R' | 'U' | 'D')[] };
+}
+
+// ── AI Tavsiya (Simptom tahlili) tiplariga ────────────────────────────────────
+
+export type SymptomInputMethod = 'text' | 'list' | 'body_map' | 'voice';
+export type SymptomConsultationStatus = 'active' | 'archived' | 'deleted';
+
+export interface BodyZone {
+  id: string;
+  label: string;
+  region: string; // 'head' | 'neck' | 'chest' | 'abdomen' | 'back' | 'left_arm' | 'right_arm' | 'left_leg' | 'right_leg' | 'pelvis' | 'whole_body'
+}
+
+export interface AdaptiveQuestion {
+  id: string;
+  question: string;
+  type: 'radio' | 'checkbox' | 'slider' | 'text';
+  options?: string[];
+  sliderMin?: number;
+  sliderMax?: number;
+  /** Qaysi javob qaysi keyingi savolga olib boradi (decision tree) */
+  next?: Record<string, string>; // answer → next question id
+}
+
+export interface AdaptiveAnswer {
+  questionId: string;
+  question: string;
+  answer: string | string[] | number;
+}
+
+export interface DiagnosisResult {
+  diseaseId: string;
+  nameUz: string;
+  nameLat: string;
+  icd10: string;
+  probability: number; // 0-100
+  matchingSymptoms: string[];
+  specialist: string;
+  tests: string[];
+  source: string;
+  description?: string;
+}
+
+export interface DraftSymptomSession {
+  inputMethod?: SymptomInputMethod;
+  symptoms: string[];
+  bodyZones: string[];
+  freeText?: string;
+  answers: AdaptiveAnswer[];
+  startedAt?: string;
+}
+
+export interface SymptomConsultation {
+  id: string;
+  date: string;
+  inputMethod: SymptomInputMethod;
+  symptoms: string[];
+  bodyZones: string[];
+  freeText?: string;
+  answers: AdaptiveAnswer[];
+  results: DiagnosisResult[];
+  status: SymptomConsultationStatus;
+  specialistRecommended?: string;
+}
+
+export interface ClinicalKBEntry {
+  id: string;
+  nameUz: string;
+  nameLat: string;
+  icd10: string;
+  description: string;
+  symptoms: string[];
+  requiredSymptoms: string[];
+  supportingSymptoms: string[];
+  excludingSymptoms: string[];
+  specialist: string;
+  tests: string[];
+  source: string;
+  ageRange?: [number, number];
+  genderBias?: 'M' | 'F' | null;
+  bodyZones: string[];
+  adaptiveQuestions: AdaptiveQuestion[];
+}
+
+// ── Klinik Bilim Bazasi (KB) boshqaruv tiplariga ─────────────────────────────
+
+export type KBApprovalStatus = 'draft' | 'review' | 'approved' | 'rejected';
+export type EvidenceLevel = 'A' | 'B' | 'C' | 'D';
+
+export interface DiagnosticProtocol {
+  diagnosticSteps: string[];
+  treatmentGuidelines: string[];
+  redFlags: string[];
+  source: string;
+  sourceUrl?: string;
+  evidenceLevel?: EvidenceLevel;
+  lastReviewed?: string;
+}
+
+export interface DrugRecommendation {
+  id: string;
+  drugId?: string;
+  drugName: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  contraindications: string[];
+  sideEffects: string[];
+  source: string;
+  isFirstLine: boolean;
+}
+
+export interface KBDisease {
+  id: string;
+  nameUz: string;
+  nameLat: string;
+  icd10: string;
+  description: string;
+  category: string;
+  symptoms: string[];
+  requiredSymptoms: string[];
+  supportingSymptoms: string[];
+  excludingSymptoms: string[];
+  specialist: string;
+  relatedSpecialists: string[];
+  tests: string[];
+  ageRange?: [number, number];
+  genderBias?: 'M' | 'F' | null;
+  bodyZones: string[];
+  adaptiveQuestions: AdaptiveQuestion[];
+  diagnosticProtocol?: DiagnosticProtocol;
+  drugRecommendations: DrugRecommendation[];
+  createdBy: string;
+  createdByName: string;
+  createdAt: string;
+  updatedBy?: string;
+  updatedByName?: string;
+  updatedAt?: string;
+  approvalStatus: KBApprovalStatus;
+  approvedBy?: string;
+  approvedByName?: string;
+  isActive: boolean;
+}
+
+export interface KBSymptom {
+  id: string;
+  nameUz: string;
+  nameRu?: string;
+  nameLat?: string;
+  category: string;
+  bodyZone: string;
+  severity?: 'mild' | 'moderate' | 'severe' | 'critical';
+  relatedDiseases: string[];
+  isRedFlag: boolean;
+  isActive: boolean;
+  createdBy: string;
+  createdByName?: string;
+  createdAt: string;
 }

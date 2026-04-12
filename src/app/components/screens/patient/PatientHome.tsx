@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download, LayoutGrid, List } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download, LayoutGrid, List, Sparkles, Archive, Trash2, Eye } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../utils/formatters';
 import { downloadConclusionReport } from '../../../utils/pdfGenerator';
@@ -8,8 +8,8 @@ import { PatientApplicationsTable } from './PatientApplicationsTable';
 import type { ViewMode } from '../../../types';
 
 export function PatientHome() {
-  const { currentUser, applications, navigate, setSelectedApplication, unreadCount, openServiceSheet } = useApp();
-  const [activeTab, setActiveTab] = useState<'active' | 'done'>('active');
+  const { currentUser, applications, navigate, setSelectedApplication, unreadCount, openServiceSheet, symptomHistory, updateSymptomStatus } = useApp();
+  const [activeTab, setActiveTab] = useState<'active' | 'done' | 'symptoms'>('active');
   const [downloading, setDownloading] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
     (localStorage.getItem('patientViewMode') as ViewMode) || 'card'
@@ -106,6 +106,7 @@ export function PatientHome() {
             {[
               { id: 'active', label: 'Faol arizalar', count: activeApps.length },
               { id: 'done', label: 'Tarix', count: doneApps.length },
+              { id: 'symptoms', label: 'Tavsiyalar', count: symptomHistory.filter(s => s.status === 'active').length },
             ].map(tab => (
               <button
                 key={tab.id}
@@ -149,8 +150,84 @@ export function PatientHome() {
           </div>
         </div>
 
+        {/* Symptom consultations (AI Tavsiya tarixi) */}
+        {activeTab === 'symptoms' && (
+          <div className="space-y-3 pb-24">
+            {symptomHistory.filter(s => s.status !== 'deleted').length === 0 ? (
+              <div className="text-center py-12">
+                <Sparkles className="w-12 h-12 text-gray-200 mx-auto mb-3" />
+                <p className="text-gray-400 text-sm">AI Tavsiya tarixi bo'sh</p>
+                <p className="text-gray-300 text-xs mt-1">Yangi ariza → AI Tavsiya dan boshlang</p>
+              </div>
+            ) : (
+              symptomHistory.filter(s => s.status !== 'deleted').map((consultation, i) => {
+                const topResult = consultation.results[0];
+                const isArchived = consultation.status === 'archived';
+                return (
+                  <motion.div
+                    key={consultation.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className={`bg-white rounded-2xl shadow-sm p-4 ${isArchived ? 'opacity-60' : ''}`}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className="text-gray-900 text-sm font-medium">
+                          {new Date(consultation.date).toLocaleDateString('uz-UZ', { year: 'numeric', month: '2-digit', day: '2-digit' })}
+                        </p>
+                        <p className="text-gray-400 text-xs">
+                          {consultation.symptoms.slice(0, 3).join(', ')}
+                          {consultation.symptoms.length > 3 ? ` +${consultation.symptoms.length - 3}` : ''}
+                        </p>
+                      </div>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        isArchived ? 'bg-gray-100 text-gray-500' : 'bg-violet-50 text-violet-600'
+                      }`}>
+                        {isArchived ? 'Arxiv' : 'Faol'}
+                      </span>
+                    </div>
+
+                    {topResult && (
+                      <div className="bg-gray-50 rounded-xl px-3 py-2 mb-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium text-gray-800">{topResult.nameUz}</p>
+                            <p className="text-xs text-gray-500">{topResult.specialist}</p>
+                          </div>
+                          <span className="text-xs font-bold text-violet-600">{topResult.probability}%</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      {!isArchived && (
+                        <button
+                          onClick={() => updateSymptomStatus(consultation.id, 'archived')}
+                          className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-gray-500 bg-gray-50 rounded-lg border border-gray-100"
+                        >
+                          <Archive className="w-3 h-3" />
+                          Arxivlash
+                        </button>
+                      )}
+                      <button
+                        onClick={() => updateSymptomStatus(consultation.id, 'deleted')}
+                        className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-red-500 bg-red-50 rounded-lg border border-red-100"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        O'chirish
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
+        )}
+
         {/* Applications list */}
-        <div className="space-y-3 pb-24">
+        {activeTab !== 'symptoms' && (
+          <div className="space-y-3 pb-24">
           {displayApps.length === 0 ? (
             <div className="text-center py-12">
               <FileText className="w-12 h-12 text-gray-200 mx-auto mb-3" />
@@ -257,7 +334,8 @@ export function PatientHome() {
               );
             })
           )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

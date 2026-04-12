@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   ArrowLeft, ChevronRight, Video, Phone, MessageCircle,
   Hospital, Home, Bed, Trees, MapPin, Stethoscope,
-  User as UserIcon, Search, Star, Clock, Building2,
+  User as UserIcon, Search, Star, Building2,
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import { bookingService } from '../../../../services';
@@ -13,6 +13,7 @@ import { ClinicSearchBar } from '../../patient/ClinicSearchBar';
 import { ClinicAdvancedFilter } from '../../patient/ClinicAdvancedFilter';
 import { TopClinicCarousel } from '../../patient/TopClinicCarousel';
 import { ClinicCard } from '../../patient/ClinicCard';
+import { DoctorList, getPrice } from '../../patient/DoctorList';
 
 /* ── Tibbiy mutaxassisliklar (emoji bilan) ── */
 const SPECIALTY_ICONS: Record<string, string> = {
@@ -30,15 +31,6 @@ const MODES: { key: SearchMode; icon: React.ReactNode; label: string }[] = [
   { key: 'name',      icon: <UserIcon className="w-3.5 h-3.5" />,     label: 'Shifokor'    },
 ];
 
-/* ── Demo narxlar ── */
-const DEMO_PRICES: Record<number, number> = {};
-function getPrice(doctorId: number): number {
-  if (!DEMO_PRICES[doctorId]) DEMO_PRICES[doctorId] = [120000, 150000, 180000, 200000][doctorId % 4];
-  return DEMO_PRICES[doctorId];
-}
-function formatPrice(n: number) { return n.toLocaleString('uz-UZ') + " so'm"; }
-const NEXT_SLOTS = ['Bugun 14:00', 'Bugun 16:00', 'Ertaga 09:00', 'Ertaga 11:00', 'Ertaga 14:00'];
-function nextSlot(id: number) { return NEXT_SLOTS[id % NEXT_SLOTS.length]; }
 
 /* ════════════════════════════════════════════ */
 export function KonsultatsiyaSubType() {
@@ -375,30 +367,76 @@ export function KonsultatsiyaSubType() {
           {searchMode === 'specialty' && isOffline && (
             <motion.div key="spec" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }} className="space-y-3">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <p className="text-gray-700 text-sm font-medium mb-1">Mutaxassislikni tanlang</p>
-                <p className="text-gray-400 text-xs mb-3">Shifokorni yo'nalishi bo'yicha toping</p>
-                <div className="grid grid-cols-3 gap-2">
-                  {specialties.map((s) => {
-                    const active = activeSpecs.includes(s);
-                    const icon = SPECIALTY_ICONS[s] || '\uD83C\uDFE5';
-                    return (
-                      <button key={s}
-                        onClick={() => setActiveSpecs(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])}
-                        className={`flex flex-col items-center gap-1 py-3 px-2 rounded-xl border text-xs transition-all ${active ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm' : 'bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-200 hover:bg-emerald-50'}`}
-                      >
-                        <span className="text-lg">{icon}</span>
-                        <span className="font-medium leading-tight text-center">{s}</span>
-                      </button>
-                    );
-                  })}
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-gray-700 text-sm font-medium">Mutaxassislikni tanlang</p>
+                  {activeSpecs.length > 0 && (
+                    <button
+                      onClick={() => setActiveSpecs([])}
+                      className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400 hover:bg-red-50 hover:text-red-400 transition-colors"
+                      aria-label="Tozalash"
+                    >
+                      <span className="text-sm leading-none">×</span>
+                    </button>
+                  )}
                 </div>
-                {activeSpecs.length === 0 && <p className="text-gray-400 text-xs mt-3 text-center">Kamida 1 ta mutaxassislikni tanlang</p>}
-                {activeSpecs.length > 0 && (
-                  <div className="mt-3 flex items-center justify-between">
-                    <p className="text-emerald-700 text-xs font-medium">{activeSpecs.length} ta tanlangan</p>
-                    <button onClick={() => setActiveSpecs([])} className="text-gray-400 text-xs underline">Tozalash</button>
-                  </div>
-                )}
+
+                <AnimatePresence mode="wait">
+                  {activeSpecs.length === 0 ? (
+                    <motion.div
+                      key="grid"
+                      initial={{ opacity: 0, scale: 0.97 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.97 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      <div className="grid grid-cols-3 gap-2">
+                        {specialties.map((s) => {
+                          const icon = SPECIALTY_ICONS[s] || '\uD83C\uDFE5';
+                          return (
+                            <button key={s}
+                              onClick={() => setActiveSpecs([s])}
+                              className="flex flex-col items-center gap-1 py-3 px-2 rounded-xl border bg-gray-50 border-gray-200 text-gray-600 hover:border-emerald-200 hover:bg-emerald-50 text-xs transition-all"
+                            >
+                              <span className="text-lg">{icon}</span>
+                              <span className="font-medium leading-tight text-center">{s}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <p className="text-gray-400 text-xs mt-3 text-center">Kamida 1 ta mutaxassislikni tanlang</p>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={`selected-${activeSpecs[0]}`}
+                      initial={{ opacity: 0, scale: 0.96 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.18 }}
+                    >
+                      <motion.button
+                        whileTap={{ scale: 0.98 }}
+                        onClick={() => setActiveSpecs([])}
+                        className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-5 flex flex-col items-center mb-3"
+                      >
+                        <span className="text-4xl mb-1">{SPECIALTY_ICONS[activeSpecs[0]] || '\uD83C\uDFE5'}</span>
+                        <span className="text-white text-base font-semibold">{activeSpecs[0]}</span>
+                      </motion.button>
+
+                      <div className="flex gap-2 overflow-x-auto pb-1">
+                        {specialties.filter(s => s !== activeSpecs[0]).map(s => (
+                          <button
+                            key={s}
+                            onClick={() => setActiveSpecs([s])}
+                            className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-lg flex-shrink-0 hover:border-emerald-300 hover:bg-emerald-50 transition-all"
+                            title={s}
+                          >
+                            {SPECIALTY_ICONS[s] || '\uD83C\uDFE5'}
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               {activeSpecs.length > 0 && <DoctorList doctors={doctors} onPick={pickDoctor} />}
             </motion.div>
@@ -434,45 +472,3 @@ export function KonsultatsiyaSubType() {
   );
 }
 
-/* ════════════════════════════════════════════ */
-function DoctorList({ doctors, onPick }: { doctors: User[]; onPick: (d: User) => void }) {
-  if (doctors.length === 0) {
-    return (
-      <div className="text-center py-10">
-        <p className="text-4xl mb-3">{'\uD83C\uDFE5'}</p>
-        <p className="text-gray-500 text-sm font-medium">Shifokor topilmadi</p>
-        <p className="text-gray-400 text-xs mt-1">Boshqa filtr yoki hudud tanlang</p>
-      </div>
-    );
-  }
-  return (
-    <div className="space-y-2.5">
-      <p className="text-gray-500 text-xs px-1">{doctors.length} ta shifokor topildi</p>
-      {doctors.map((d, i) => (
-        <motion.button key={d.id} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05 }} onClick={() => onPick(d)}
-          className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 p-4 text-left active:scale-[0.99] transition-transform">
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-800 text-sm font-bold flex-shrink-0">
-              {(d.avatar || d.fullName.slice(0, 2)).slice(0, 2).toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-gray-900 text-sm font-semibold leading-snug">Dr. {d.fullName}</p>
-              <p className="text-emerald-700 text-xs mt-0.5 font-medium">{d.specialty || 'Mutaxassis'}</p>
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2">
-                <span className="flex items-center gap-1 text-xs text-gray-500"><Star className="w-3 h-3 text-yellow-400 fill-yellow-400" /><span className="font-medium text-gray-700">{d.rating?.toFixed(1) ?? '4.5'}</span></span>
-                {d.experience && <span className="text-xs text-gray-500">{d.experience} yil tajriba</span>}
-                <span className="text-xs font-semibold text-blue-700">{formatPrice(getPrice(d.id))}</span>
-              </div>
-              <div className="flex items-center gap-1 mt-1.5">
-                <Clock className="w-3 h-3 text-emerald-500" />
-                <span className="text-xs text-emerald-700">Bo'sh vaqt: {nextSlot(d.id)}</span>
-              </div>
-            </div>
-            <ChevronRight className="w-5 h-5 text-gray-300 mt-1 flex-shrink-0" />
-          </div>
-        </motion.button>
-      ))}
-    </div>
-  );
-}

@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../../../store/appStore';
 import { doctorService } from '../../../../services/api/doctorService';
+import { bookingService } from '../../../../services';
 import {
   ChevronLeft, Star, MapPin, Phone, Calendar, MessageCircle,
   CheckCircle2, Clock, Award, Users, Stethoscope,
   Send, Instagram, Youtube, Globe, Share2, Loader2,
   GraduationCap, Briefcase, FileCheck, Medal,
+  Edit3, Settings, HelpCircle, Building2, Crown,
 } from 'lucide-react';
 import type { DoctorProfile } from '../../../types';
 
@@ -14,18 +16,127 @@ const COMPLEXITY_LABELS: Record<string, string> = {
 };
 
 export function DoctorPublicProfile() {
-  const { navigate, goBack } = useApp();
-  const [tab, setTab] = useState<'about' | 'portfolio' | 'operations' | 'reviews'>('about');
+  const { navigate, goBack, viewingDoctorId, setViewingDoctorId, currentUser } = useApp();
+  const isPatientView = viewingDoctorId !== null;
+  const isOwnProfile = !isPatientView && currentUser?.role === 'doctor';
+  const [tab, setTab] = useState<'about' | 'portfolio' | 'operations' | 'reviews'>(isPatientView ? 'portfolio' : 'about');
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const handleGoBack = () => {
+    if (isPatientView) setViewingDoctorId(null);
+    goBack();
+  };
+
   useEffect(() => {
-    doctorService.getMyProfile()
-      .then(setProfile)
-      .catch((err: any) => setError(err.message || 'Profil yuklanmadi'))
-      .finally(() => setLoading(false));
-  }, []);
+    if (isPatientView && viewingDoctorId) {
+      // Demo rejim: bookingService dan shifokorni topib mock profil yaratish
+      bookingService.getDoctors({ query: '', specialities: [] }).then(doctors => {
+        const doc = doctors.find(d => d.id === viewingDoctorId);
+        if (doc) {
+          const mockProfile: DoctorProfile = {
+            id: String(doc.id),
+            userId: doc.id,
+            bio: `${doc.fullName} — ${doc.specialty || 'Mutaxassis'} yo'nalishida ${doc.experience || 5} yillik tajribaga ega malakali shifokor.`,
+            experienceYears: doc.experience || 5,
+            subSpecialties: doc.specialty ? [doc.specialty] : [],
+            qualificationCategory: (doc.rating || 0) >= 4.9 ? 'Oliy toifa' : (doc.rating || 0) >= 4.7 ? '1-toifa' : '2-toifa',
+            licenseVerified: true,
+            qualificationVerified: true,
+            clinics: [],
+            operationTypes: [],
+            education: [
+              { id: '1', doctorId: String(doc.id), institutionName: 'Toshkent Tibbiyot Akademiyasi', faculty: 'Davolash fakulteti', degree: 'MASTER' as any, startYear: 2010 - (doc.experience || 5), endYear: 2016 - (doc.experience || 5) + 6, isVerified: true },
+              { id: '2', doctorId: String(doc.id), institutionName: 'Toshkent Tibbiyot Akademiyasi', faculty: doc.specialty || 'Klinik rezidentura', degree: 'RESIDENCY' as any, startYear: 2016, endYear: 2018, isVerified: true },
+            ],
+            workExperience: [
+              { id: '1', doctorId: String(doc.id), organizationName: 'Respublika ixtisoslashtirilgan markazi', position: doc.specialty || 'Shifokor', startYear: 2018, description: 'Asosiy ish joyi' },
+            ],
+            achievements: [
+              { id: '1', doctorId: String(doc.id), name: 'Eng yaxshi yosh mutaxassis', group: 'PRACTICAL' as any, year: 2022, stickerType: 'GOLD' as any, isVerified: true },
+            ],
+            certificates: [
+              { id: '1', doctorId: String(doc.id), name: `${doc.specialty || 'Tibbiyot'} bo'yicha malaka oshirish`, organization: 'Toshkent TTA', direction: doc.specialty || 'Umumiy', year: 2023, isVerified: true },
+            ],
+            totalConsultations: doc.totalConclusions || 100,
+            totalOperations: Math.floor((doc.totalConclusions || 100) / 3),
+            averageRating: doc.rating || 4.5,
+            totalRatings: Math.floor((doc.totalConclusions || 100) * 0.6),
+            user: { id: doc.id, fullName: doc.fullName, specialty: doc.specialty, avatar: doc.avatar, isOnline: true, verificationStatus: 'verified' as any },
+          };
+          setProfile(mockProfile);
+        } else {
+          setError('Shifokor topilmadi');
+        }
+        setLoading(false);
+      });
+    } else {
+      doctorService.getMyProfile()
+        .then(setProfile)
+        .catch(() => {
+          // Demo fallback: currentUser dan mock profil
+          if (currentUser) {
+            const mockOwn: DoctorProfile = {
+              id: String(currentUser.id),
+              userId: currentUser.id,
+              bio: `${currentUser.fullName} — ${currentUser.specialty || 'Mutaxassis'} yo'nalishida ${currentUser.experience || 10} yillik tajribaga ega malakali shifokor.`,
+              experienceYears: currentUser.experience || 10,
+              subSpecialties: currentUser.specialty ? [currentUser.specialty, 'Umumiy amaliyot'] : [],
+              qualificationCategory: 'Oliy toifa',
+              licenseVerified: true,
+              qualificationVerified: true,
+              socialLinks: { telegram: '@dr_medsmart', instagram: '@dr_medsmart' },
+              clinics: [],
+              operationTypes: [],
+              education: [
+                { id: '1', doctorId: String(currentUser.id), institutionName: 'Toshkent Tibbiyot Akademiyasi', faculty: 'Davolash fakulteti', degree: 'MASTER' as any, startYear: 2005, endYear: 2011, isVerified: true },
+                { id: '2', doctorId: String(currentUser.id), institutionName: 'Toshkent Tibbiyot Akademiyasi', faculty: currentUser.specialty || 'Klinik rezidentura', degree: 'RESIDENCY' as any, startYear: 2011, endYear: 2014, isVerified: true },
+              ],
+              workExperience: [
+                { id: '1', doctorId: String(currentUser.id), organizationName: 'Respublika ixtisoslashtirilgan markazi', position: currentUser.specialty || 'Shifokor', startYear: 2014, description: 'Asosiy ish joyi' },
+              ],
+              achievements: [
+                { id: '1', doctorId: String(currentUser.id), name: 'Eng yaxshi mutaxassis', group: 'PRACTICAL' as any, year: 2021, stickerType: 'GOLD' as any, isVerified: true },
+              ],
+              certificates: [
+                { id: '1', doctorId: String(currentUser.id), name: `${currentUser.specialty || 'Tibbiyot'} bo'yicha malaka oshirish`, organization: 'Toshkent TTA', direction: currentUser.specialty || 'Umumiy', year: 2023, isVerified: true },
+              ],
+              totalConsultations: currentUser.totalConclusions || 312,
+              totalOperations: Math.floor((currentUser.totalConclusions || 312) / 3),
+              averageRating: currentUser.rating || 4.85,
+              totalRatings: Math.floor((currentUser.totalConclusions || 312) * 0.6),
+              user: { id: currentUser.id, fullName: currentUser.fullName, specialty: currentUser.specialty, avatar: currentUser.avatar, isOnline: true, verificationStatus: 'verified' as any },
+            };
+            setProfile(mockOwn);
+          } else {
+            setError('Profil yuklanmadi');
+          }
+        })
+        .finally(() => setLoading(false));
+    }
+  }, [isPatientView, viewingDoctorId]);
+
+  const [shared, setShared] = useState(false);
+
+  const handleShare = async () => {
+    const doctorName = profile?.user?.fullName || 'Shifokor';
+    const specialty = profile?.user?.specialty || '';
+    const shareUrl = `https://medsmart-pro.vercel.app/d/${profile?.user?.fullName?.toLowerCase().replace(/\s+/g, '-') || 'doctor'}`;
+    const shareText = `${doctorName} — ${specialty}. MedSmart Pro platformasida profili`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: doctorName, text: shareText, url: shareUrl });
+      } catch { /* user cancelled */ }
+    } else {
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+      } catch { /* fallback */ }
+    }
+  };
 
   const renderStars = (rating: number) => (
     <div className="flex gap-0.5">
@@ -51,7 +162,7 @@ export function DoctorPublicProfile() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
         <p className="text-gray-500 text-sm text-center mb-4">{error || 'Profil topilmadi'}</p>
-        <button onClick={goBack} className="text-blue-600 text-sm font-medium">Orqaga</button>
+        <button onClick={handleGoBack} className="text-blue-600 text-sm font-medium">Orqaga</button>
       </div>
     );
   }
@@ -63,11 +174,20 @@ export function DoctorPublicProfile() {
       {/* Header */}
       <div className="bg-gradient-to-br from-blue-600 to-blue-700 px-4 pt-4 pb-6">
         <div className="flex items-center justify-between mb-4">
-          <button onClick={goBack} className="p-2 rounded-full bg-white/20">
+          <button onClick={handleGoBack} className="p-2 rounded-full bg-white/20">
             <ChevronLeft size={20} className="text-white" />
           </button>
-          <button className="p-2 rounded-full bg-white/20">
+          <button
+            onClick={handleShare}
+            title="Ulashish"
+            className="p-2 rounded-full bg-white/20 relative"
+          >
             <Share2 size={18} className="text-white" />
+            {shared && (
+              <span className="absolute -bottom-8 right-0 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg whitespace-nowrap">
+                Link nusxalandi!
+              </span>
+            )}
           </button>
         </div>
 
@@ -123,20 +243,41 @@ export function DoctorPublicProfile() {
 
       {/* CTA buttons */}
       <div className="px-4 -mt-3 flex gap-3">
-        <button
-          onClick={() => navigate('patient_kons_calendar')}
-          className="flex-1 bg-white shadow-md rounded-2xl py-3 flex items-center justify-center gap-2 text-blue-600 font-semibold text-sm"
-        >
-          <Calendar size={16} />
-          Yozilish
-        </button>
-        <button
-          onClick={() => navigate('patient_kons_type')}
-          className="flex-1 bg-blue-600 rounded-2xl py-3 flex items-center justify-center gap-2 text-white font-semibold text-sm"
-        >
-          <MessageCircle size={16} />
-          Konsultatsiya
-        </button>
+        {isOwnProfile ? (
+          <>
+            <button
+              onClick={() => navigate('doctor_profile_setup')}
+              className="flex-1 bg-white shadow-md rounded-2xl py-3 flex items-center justify-center gap-2 text-blue-600 font-semibold text-sm"
+            >
+              <Edit3 size={16} />
+              Profilni tahrirlash
+            </button>
+            <button
+              onClick={() => navigate('doctor_calendar_settings')}
+              className="flex-1 bg-blue-600 rounded-2xl py-3 flex items-center justify-center gap-2 text-white font-semibold text-sm"
+            >
+              <Calendar size={16} />
+              Kalendar sozlash
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={() => navigate('patient_kons_calendar')}
+              className="flex-1 bg-white shadow-md rounded-2xl py-3 flex items-center justify-center gap-2 text-blue-600 font-semibold text-sm"
+            >
+              <Calendar size={16} />
+              Yozilish
+            </button>
+            <button
+              onClick={() => navigate('patient_kons_type')}
+              className="flex-1 bg-blue-600 rounded-2xl py-3 flex items-center justify-center gap-2 text-white font-semibold text-sm"
+            >
+              <MessageCircle size={16} />
+              Konsultatsiya
+            </button>
+          </>
+        )}
       </div>
 
       {/* Tabs */}
@@ -161,11 +302,17 @@ export function DoctorPublicProfile() {
         {tab === 'about' && (
           <>
             {/* Bio */}
-            {profile.bio && (
+            {(profile.bio || isOwnProfile) && (
               <div className="bg-white rounded-2xl p-4">
                 <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
                   <Stethoscope size={16} className="text-blue-500" />
                   Haqida
+                  <div className="flex-1" />
+                  {isOwnProfile && (
+                    <button onClick={() => navigate('doctor_profile_setup')} className="p-1.5 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors">
+                      <Edit3 size={14} />
+                    </button>
+                  )}
                 </h3>
                 <p className="text-sm text-gray-600 leading-relaxed">{profile.bio}</p>
               </div>
@@ -189,11 +336,17 @@ export function DoctorPublicProfile() {
             )}
 
             {/* Clinics */}
-            {profile.clinics && profile.clinics.length > 0 && (
+            {(profile.clinics?.length > 0 || isOwnProfile) && (
               <div className="bg-white rounded-2xl p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <MapPin size={16} className="text-red-500" />
                   Ish joylari
+                  <div className="flex-1" />
+                  {isOwnProfile && (
+                    <button onClick={() => navigate('doctor_clinic_manage')} className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors">
+                      <Edit3 size={14} />
+                    </button>
+                  )}
                 </h3>
                 <div className="space-y-3">
                   {profile.clinics.map(dc => (
@@ -219,11 +372,17 @@ export function DoctorPublicProfile() {
             )}
 
             {/* Social links */}
-            {profile.socialLinks && Object.values(profile.socialLinks).some(Boolean) && (
+            {((profile.socialLinks && Object.values(profile.socialLinks).some(Boolean)) || isOwnProfile) && (
               <div className="bg-white rounded-2xl p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Globe size={16} className="text-blue-500" />
                   Ijtimoiy tarmoqlar
+                  <div className="flex-1" />
+                  {isOwnProfile && (
+                    <button onClick={() => navigate('doctor_profile_setup')} className="p-1.5 rounded-lg bg-blue-50 text-blue-500 hover:bg-blue-100 transition-colors">
+                      <Edit3 size={14} />
+                    </button>
+                  )}
                 </h3>
                 <div className="flex gap-3">
                   {profile.socialLinks.telegram && (
@@ -253,6 +412,17 @@ export function DoctorPublicProfile() {
         {/* Portfolio tab */}
         {tab === 'portfolio' && (
           <>
+            {/* Portfolio edit button */}
+            {isOwnProfile && (
+              <div className="flex justify-end">
+                <button onClick={() => navigate('doctor_portfolio_edit')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-50 text-purple-600 hover:bg-purple-100 rounded-lg text-xs font-medium transition-colors">
+                  <Edit3 size={12} />
+                  Portfolioni tahrirlash
+                </button>
+              </div>
+            )}
+
             {/* Education */}
             {profile.education && profile.education.length > 0 && (
               <div className="bg-white rounded-2xl p-4">
@@ -402,6 +572,33 @@ export function DoctorPublicProfile() {
             <p className="text-sm text-gray-400 text-center py-4">
               Baholar faqat konsultatsiyadan keyin ko'rsatiladi
             </p>
+          </div>
+        )}
+
+        {/* Quick management links (faqat shifokor uchun) */}
+        {isOwnProfile && (
+          <div className="bg-white rounded-2xl p-4">
+            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <Settings size={16} className="text-gray-500" />
+              Tezkor boshqaruv
+            </h3>
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { icon: HelpCircle, label: 'FAQ', route: 'doctor_faq_editor' as const, color: 'violet' },
+                { icon: Stethoscope, label: 'Xizmatlar', route: 'doctor_services_editor' as const, color: 'emerald' },
+                { icon: Crown, label: 'Tarif', route: 'doctor_tariff_select' as const, color: 'amber' },
+                { icon: Building2, label: 'Klinika', route: 'doctor_clinic_manage' as const, color: 'red' },
+              ].map(item => (
+                <button
+                  key={item.route}
+                  onClick={() => navigate(item.route)}
+                  className={`flex flex-col items-center gap-1.5 py-3 rounded-xl border border-gray-100 hover:shadow-sm transition-all bg-${item.color}-50/50`}
+                >
+                  <item.icon size={18} className={`text-${item.color}-500`} />
+                  <span className="text-[10px] font-medium text-gray-700">{item.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         )}
       </div>

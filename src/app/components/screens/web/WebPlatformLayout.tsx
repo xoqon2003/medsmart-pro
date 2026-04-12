@@ -16,6 +16,7 @@ import {
   UserPlus, ListOrdered, PenTool, FlaskConical, Heart,
   Receipt, Clock, History, FolderOpen, GraduationCap,
   Syringe, Tags, FilePlus, UserSearch, Columns3,
+  AlertTriangle, Database,
 } from 'lucide-react';
 import { useApp } from '../../../store/appStore';
 import type { Screen, UserRole } from '../../../types';
@@ -122,6 +123,15 @@ const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: 'Klinik Baza',
+    items: [
+      { screen: 'web_ref_kb_diseases',  icon: Database,        label: 'Kasalliklar bazasi',     roles: ['admin', 'tibbiy_ekspert'] },
+      { screen: 'web_ref_kb_symptoms',  icon: AlertTriangle,   label: 'Simptomlar lug\'ati',    roles: ['admin', 'tibbiy_ekspert'] },
+      { screen: 'web_ref_kb_protocols', icon: BookOpen,        label: 'Diagnostik protokollar', roles: ['admin', 'tibbiy_ekspert'] },
+      { screen: 'web_ref_kb_drugs',     icon: Pill,            label: 'Dori tavsiylari',        roles: ['admin', 'tibbiy_ekspert'] },
+    ],
+  },
+  {
     label: 'Tizim',
     items: [
       { screen: 'web_notifications', icon: Bell,     label: 'Xabarlar'   },
@@ -133,12 +143,14 @@ const NAV_GROUPS: NavGroup[] = [
 const ROLE_LABELS: Record<UserRole, string> = {
   admin: 'Administrator', operator: 'Operator', kassir: 'Kassir',
   radiolog: 'Radiolog', specialist: 'Mutaxassis', doctor: 'Shifokor', patient: 'Bemor',
+  tibbiy_ekspert: 'Tibbiy ekspert',
 };
 const ROLE_COLORS: Record<UserRole, string> = {
   admin: 'from-rose-500 to-pink-600', operator: 'from-violet-500 to-purple-600',
   kassir: 'from-sky-500 to-blue-600', radiolog: 'from-emerald-500 to-teal-600',
   specialist: 'from-purple-500 to-indigo-600', doctor: 'from-blue-500 to-cyan-600',
   patient: 'from-indigo-500 to-blue-600',
+  tibbiy_ekspert: 'from-amber-500 to-orange-600',
 };
 
 // ── Props ───────────────────────────────────────────────────────────────────

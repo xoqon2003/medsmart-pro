@@ -27,7 +27,7 @@ const RADIOLOG_NAV: NavItem[] = [
 const DOCTOR_NAV: NavItem[] = [
   { screen: 'doctor_dashboard', icon: Stethoscope, label: 'Dashboard', matchScreens: ['doctor_dashboard', 'doctor_patient_view'] },
   { screen: 'notifications', icon: Bell, label: 'Xabarlar' },
-  { screen: 'profile', icon: User, label: 'Profil' },
+  { screen: 'doctor_public_profile', icon: User, label: 'Profil', matchScreens: ['doctor_public_profile', 'profile'] },
 ];
 
 const SPECIALIST_NAV: NavItem[] = [
@@ -67,7 +67,7 @@ const NAV_BY_ROLE: Record<string, NavItem[]> = {
 export const SHOW_NAV_ON: Screen[] = [
   'patient_home', 'patient_status', 'patient_conclusion',
   'radiolog_dashboard',
-  'doctor_dashboard', 'doctor_patient_view',
+  'doctor_dashboard', 'doctor_patient_view', 'doctor_public_profile',
   'specialist_dashboard',
   'operator_dashboard',
   'admin_dashboard',

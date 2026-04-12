@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { User, Application, Screen, DraftApplication, DraftConsultation, DraftExamination, Notification, Conclusion, AuditEvent, RelativeInfo, SavedPatient } from '../types';
-import { applicationService, notificationService } from '../../services';
+import type { User, Application, Screen, DraftApplication, DraftConsultation, DraftExamination, DraftSymptomSession, SymptomConsultation, SymptomConsultationStatus, KBDisease, KBSymptom, Notification, Conclusion, AuditEvent, RelativeInfo, SavedPatient } from '../types';
+import { applicationService, notificationService, bookingService } from '../../services';
 
 interface AppState {
   currentUser: User | null;
@@ -39,9 +39,44 @@ interface AppState {
   addApplication: (app: Application) => void;
   addNotification: (notif: Omit<Notification, 'id'>) => void;
   addConclusionToApp: (appId: number, conclusion: Conclusion) => void;
+  viewingDoctorId: number | null;
+  setViewingDoctorId: (id: number | null) => void;
+  // ── AI Tavsiya (Simptom tahlili) ──────────────────────────────
+  draftSymptom: DraftSymptomSession;
+  symptomHistory: SymptomConsultation[];
+  updateDraftSymptom: (data: Partial<DraftSymptomSession>) => void;
+  clearDraftSymptom: () => void;
+  addSymptomConsultation: (consultation: SymptomConsultation) => void;
+  updateSymptomStatus: (id: string, status: SymptomConsultationStatus) => void;
+  // ── Klinik Bilim Bazasi (Web KB ↔ AI Tavsiya) ────────────────
+  clinicalKBData: KBDisease[];
+  clinicalKBSymptoms: KBSymptom[];
+  setKBDiseases: (data: KBDisease[]) => void;
+  addKBDisease: (disease: KBDisease) => void;
+  updateKBDisease: (id: string, updates: Partial<KBDisease>) => void;
+  removeKBDisease: (id: string) => void;
+  setKBSymptoms: (data: KBSymptom[]) => void;
+  addKBSymptom: (symptom: KBSymptom) => void;
+  updateKBSymptom: (id: string, updates: Partial<KBSymptom>) => void;
+  removeKBSymptom: (id: string) => void;
 }
 
 const AppContext = createContext<AppState | null>(null);
+
+// ── localStorage helpers ────────────────────────────────────────
+const KB_DISEASES_KEY = 'medsmart_kb_diseases';
+const KB_SYMPTOMS_KEY = 'medsmart_kb_symptoms';
+
+function loadFromStorage<T>(key: string, fallback: T): T {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch { return fallback; }
+}
+
+function saveToStorage(key: string, data: unknown): void {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+}
 
 export function AppProvider({ children, initialScreen = 'splash' }: { children: ReactNode; initialScreen?: Screen }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -57,6 +92,26 @@ export function AppProvider({ children, initialScreen = 'splash' }: { children: 
     applicationService.getAll().then(setApplications);
     notificationService.getAll().then(setNotifications);
   }, []);
+
+  // Deep-link: /d/{slug} URL orqali shifokor profilini ochish
+  useEffect(() => {
+    const path = window.location.pathname;
+    const match = path.match(/^\/d\/(.+)$/);
+    if (!match) return;
+    const slug = decodeURIComponent(match[1]);
+
+    // Slug bo'yicha mock shifokorlardan qidirish (ismi slug ga mos)
+    bookingService.getDoctors({ query: '', specialities: [] }).then(doctors => {
+      const doctor = doctors.find(d => {
+        const nameSlug = d.fullName.toLowerCase().replace(/\s+/g, '-');
+        return nameSlug === slug || String(d.id) === slug;
+      });
+      if (doctor) {
+        setViewingDoctorIdState(doctor.id);
+        setCurrentScreen('doctor_public_profile');
+      }
+    });
+  }, []);
   const [selectedApplication, setSelectedApplicationState] = useState<Application | null>(null);
   const [draftApplication, setDraftApplication] = useState<DraftApplication>({});
   const [draftConsultation, setDraftConsultation] = useState<DraftConsultation>({});
@@ -64,6 +119,13 @@ export function AppProvider({ children, initialScreen = 'splash' }: { children: 
   const [savedRelatives, setSavedRelatives] = useState<RelativeInfo[]>([]);
   const [savedPatients, setSavedPatients] = useState<SavedPatient[]>([]);
   const [isLoading] = useState(false);
+  const [viewingDoctorId, setViewingDoctorIdState] = useState<number | null>(null);
+  const setViewingDoctorId = useCallback((id: number | null) => setViewingDoctorIdState(id), []);
+  const [draftSymptom, setDraftSymptom] = useState<DraftSymptomSession>({ symptoms: [], bodyZones: [], answers: [] });
+  const [symptomHistory, setSymptomHistory] = useState<SymptomConsultation[]>([]);
+  // ── Klinik KB (localStorage dan yuklanadi) ──
+  const [clinicalKBData, setClinicalKBDataState] = useState<KBDisease[]>(() => loadFromStorage<KBDisease[]>(KB_DISEASES_KEY, []));
+  const [clinicalKBSymptoms, setClinicalKBSymptomsState] = useState<KBSymptom[]>(() => loadFromStorage<KBSymptom[]>(KB_SYMPTOMS_KEY, []));
 
   const setUser = useCallback((user: User | null) => {
     setCurrentUser(user);
@@ -247,6 +309,81 @@ export function AppProvider({ children, initialScreen = 'splash' }: { children: 
     );
   }, [makeAuditEvent]);
 
+  const updateDraftSymptom = useCallback((data: Partial<DraftSymptomSession>) => {
+    setDraftSymptom(prev => ({ ...prev, ...data }));
+  }, []);
+
+  const clearDraftSymptom = useCallback(() => {
+    setDraftSymptom({ symptoms: [], bodyZones: [], answers: [] });
+  }, []);
+
+  const addSymptomConsultation = useCallback((consultation: SymptomConsultation) => {
+    setSymptomHistory(prev => [consultation, ...prev]);
+  }, []);
+
+  const updateSymptomStatus = useCallback((id: string, status: SymptomConsultationStatus) => {
+    setSymptomHistory(prev => prev.map(c => c.id === id ? { ...c, status } : c));
+  }, []);
+
+  // ── Klinik KB CRUD (localStorage ga persist) ──
+  const setKBDiseases = useCallback((data: KBDisease[]) => {
+    setClinicalKBDataState(data);
+    saveToStorage(KB_DISEASES_KEY, data);
+  }, []);
+
+  const addKBDisease = useCallback((disease: KBDisease) => {
+    setClinicalKBDataState(prev => {
+      const updated = [disease, ...prev.filter(d => d.id !== disease.id)];
+      saveToStorage(KB_DISEASES_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const updateKBDisease = useCallback((id: string, updates: Partial<KBDisease>) => {
+    setClinicalKBDataState(prev => {
+      const updated = prev.map(d => d.id === id ? { ...d, ...updates, updatedAt: new Date().toISOString() } : d);
+      saveToStorage(KB_DISEASES_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const removeKBDisease = useCallback((id: string) => {
+    setClinicalKBDataState(prev => {
+      const updated = prev.filter(d => d.id !== id);
+      saveToStorage(KB_DISEASES_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const setKBSymptoms = useCallback((data: KBSymptom[]) => {
+    setClinicalKBSymptomsState(data);
+    saveToStorage(KB_SYMPTOMS_KEY, data);
+  }, []);
+
+  const addKBSymptom = useCallback((symptom: KBSymptom) => {
+    setClinicalKBSymptomsState(prev => {
+      const updated = [symptom, ...prev.filter(s => s.id !== symptom.id)];
+      saveToStorage(KB_SYMPTOMS_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const updateKBSymptom = useCallback((id: string, updates: Partial<KBSymptom>) => {
+    setClinicalKBSymptomsState(prev => {
+      const updated = prev.map(s => s.id === id ? { ...s, ...updates } : s);
+      saveToStorage(KB_SYMPTOMS_KEY, updated);
+      return updated;
+    });
+  }, []);
+
+  const removeKBSymptom = useCallback((id: string) => {
+    setClinicalKBSymptomsState(prev => {
+      const updated = prev.filter(s => s.id !== id);
+      saveToStorage(KB_SYMPTOMS_KEY, updated);
+      return updated;
+    });
+  }, []);
+
   const unreadCount = notifications.filter(
     (n) => !n.isRead && (!currentUser || n.userId === currentUser.id)
   ).length;
@@ -287,6 +424,24 @@ export function AppProvider({ children, initialScreen = 'splash' }: { children: 
     addSavedPatient,
     addNotification,
     addConclusionToApp,
+    viewingDoctorId,
+    setViewingDoctorId,
+    draftSymptom,
+    symptomHistory,
+    updateDraftSymptom,
+    clearDraftSymptom,
+    addSymptomConsultation,
+    updateSymptomStatus,
+    clinicalKBData,
+    clinicalKBSymptoms,
+    setKBDiseases,
+    addKBDisease,
+    updateKBDisease,
+    removeKBDisease,
+    setKBSymptoms,
+    addKBSymptom,
+    updateKBSymptom,
+    removeKBSymptom,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

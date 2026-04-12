@@ -42,6 +42,7 @@ import { DoctorPrivatePanel } from './components/screens/doctor/DoctorPrivatePan
 import { TariffSelection } from './components/screens/doctor/TariffSelection';
 import { DoctorPortfolio } from './components/screens/doctor/DoctorPortfolio';
 import { DoctorPortfolioEdit } from './components/screens/doctor/DoctorPortfolioEdit';
+import { DoctorClinicManage } from './components/screens/doctor/DoctorClinicManage';
 import { PatientContactForm } from './components/screens/patient/PatientContactForm';
 import { DoctorContactRequests } from './components/screens/doctor/DoctorContactRequests';
 import { DoctorTemplateManager } from './components/screens/doctor/DoctorTemplateManager';
@@ -63,6 +64,9 @@ import { WebDoctorProfilesScreen } from './components/screens/web/WebDoctorProfi
 import { WebTariffManageScreen } from './components/screens/web/WebTariffManageScreen';
 import { WebCalendarManageScreen } from './components/screens/web/WebCalendarManageScreen';
 import { KassirDashboard } from './components/screens/kassir/KassirDashboard';
+import { SymptomInput } from './components/screens/patient/SymptomInput';
+import { AdaptiveQuestions } from './components/screens/patient/AdaptiveQuestions';
+import { DiagnosisResults } from './components/screens/patient/DiagnosisResults';
 import { WebPlatformLogin } from './components/screens/web/WebPlatformLogin';
 import { WebPlatformDashboard } from './components/screens/web/WebPlatformDashboard';
 import { NotificationsScreen } from './components/screens/NotificationsScreen';
@@ -107,6 +111,10 @@ function AppContent() {
       case 'patient_tks_center':     return <TekshiruvCenter />;
       case 'patient_tks_calendar':   return <TekshiruvCalendar />;
       case 'patient_tks_confirm':    return <TekshiruvConfirm />;
+      // ── AI Tavsiya (Simptom tahlili) ─────────────────────────
+      case 'patient_symptom_input':       return <SymptomInput />;
+      case 'patient_adaptive_questions':  return <AdaptiveQuestions />;
+      case 'patient_diagnosis_results':   return <DiagnosisResults />;
       case 'radiolog_dashboard':  return <RadiologDashboard />;
       case 'radiolog_view':       return <ApplicationView />;
       case 'radiolog_conclude':   return <ConclusionEditor />;
@@ -122,7 +130,7 @@ function AppContent() {
       case 'doctor_public_profile':  return <DoctorPublicProfile />;
       case 'doctor_private_panel':   return <DoctorPrivatePanel />;
       case 'doctor_tariff_select':   return <TariffSelection />;
-      case 'doctor_clinic_manage':   return <DoctorPrivatePanel />;
+      case 'doctor_clinic_manage':   return <DoctorClinicManage />;
       case 'doctor_verification':    return <DoctorPrivatePanel />;
       case 'doctor_portfolio':       return <DoctorPortfolio />;
       case 'doctor_portfolio_edit':  return <DoctorPortfolioEdit />;
@@ -182,6 +190,7 @@ function AppContent() {
           if (key === 'radiology')     navigate('patient_upload');
           if (key === 'konsultatsiya') navigate('patient_konsultatsiya');
           if (key === 'tekshiruv')     navigate('patient_tks_category');
+          if (key === 'ai_tavsiya')    navigate('patient_symptom_input');
         }}
       />
     </div>

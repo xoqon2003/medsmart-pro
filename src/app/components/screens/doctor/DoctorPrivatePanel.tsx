@@ -102,9 +102,9 @@ export function DoctorPrivatePanel() {
   };
 
   const profileUrl = profile?.profileUrl
-    ? `medsmart-pro.uz/d/${profile.profileUrl}`
+    ? `medsmart-pro.vercel.app/d/${profile.profileUrl}`
     : currentUser?.fullName
-      ? `medsmart-pro.uz/d/${currentUser.fullName.toLowerCase().replace(/\s+/g, '-')}`
+      ? `medsmart-pro.vercel.app/d/${currentUser.fullName.toLowerCase().replace(/\s+/g, '-')}`
       : '';
 
   if (loading) {

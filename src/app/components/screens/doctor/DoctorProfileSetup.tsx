@@ -321,7 +321,7 @@ export function DoctorProfileSetup() {
               </label>
               <div className="flex items-center border border-gray-200 rounded-xl overflow-hidden">
                 <span className="px-3 py-2.5 bg-gray-50 border-r border-gray-200 text-xs text-gray-500 whitespace-nowrap">
-                  medsmart-pro.uz/d/
+                  medsmart-pro.vercel.app/d/
                 </span>
                 <input
                   type="text"
@@ -334,7 +334,7 @@ export function DoctorProfileSetup() {
               {form.profileUrl && (
                 <p className="text-xs text-blue-600 mt-1 flex items-center gap-1">
                   <CheckCircle2 size={12} />
-                  medsmart-pro.uz/d/{form.profileUrl}
+                  medsmart-pro.vercel.app/d/{form.profileUrl}
                 </p>
               )}
             </div>
