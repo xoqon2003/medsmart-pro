@@ -275,12 +275,13 @@ export class AuthService {
     return { accessToken, refreshToken: refreshTokenStr };
   }
 
-  private sanitizeUser(user: any) {
-    const { pin, ...rest } = user;
-    // BigInt ni string ga aylantirish (JSON serialization uchun)
-    if (rest.telegramId) {
-      rest.telegramId = rest.telegramId.toString();
-    }
-    return rest;
+  private sanitizeUser(user: import('@prisma/client').User) {
+    // pin maydoni tashlab yuboriladi (xavfsizlik uchun)
+    // BigInt telegramId ni string ga aylantiramiz (JSON serialization uchun)
+    const { pin: _pin, telegramId, ...rest } = user;
+    return {
+      ...rest,
+      telegramId: telegramId?.toString() ?? null,
+    };
   }
 }

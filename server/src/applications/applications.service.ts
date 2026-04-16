@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { Prisma, AppStatus, ServiceType, Urgency } from '@prisma/client';
 import { PrismaService } from '../config/prisma.service';
-import { AppStatus } from '@prisma/client';
+import type { CreateApplicationDto } from './dto/create-application.dto';
 
 const applicationIncludes = {
-  patient: { select: { id: true, fullName: true, phone: true, avatar: true } },
+  patient:  { select: { id: true, fullName: true, phone: true, avatar: true } },
   radiolog: { select: { id: true, fullName: true, specialty: true, avatar: true } },
   specialist: { select: { id: true, fullName: true, specialty: true, avatar: true } },
-  doctor: { select: { id: true, fullName: true, specialty: true, avatar: true } },
+  doctor:   { select: { id: true, fullName: true, specialty: true, avatar: true } },
   anamnez: true,
   files: true,
   payment: true,
@@ -15,18 +16,26 @@ const applicationIncludes = {
   // GET /applications/:id/audit-log endpointi bilan to'liq tarix ko'rsatilsin.
   auditLog: { orderBy: { createdAt: 'desc' as const }, take: 50 },
   examinations: true,
-};
+} satisfies Prisma.ApplicationInclude;
 
 @Injectable()
 export class ApplicationsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(filters: { status?: string; patientId?: number; radiologId?: number; page?: number; limit?: number }) {
+  async findAll(filters: {
+    status?: string;
+    patientId?: number;
+    radiologId?: number;
+    page?: number;
+    limit?: number;
+  }) {
     const { status, patientId, radiologId, page = 1, limit = 20 } = filters;
-    const where: any = {};
-    if (status) where.status = status.toUpperCase() as AppStatus;
-    if (patientId) where.patientId = patientId;
-    if (radiologId) where.radiologId = radiologId;
+
+    const where: Prisma.ApplicationWhereInput = {
+      ...(status    && { status:    status.toUpperCase() as AppStatus }),
+      ...(patientId  && { patientId }),
+      ...(radiologId && { radiologId }),
+    };
 
     const [data, total] = await Promise.all([
       this.prisma.application.findMany({
@@ -51,15 +60,23 @@ export class ApplicationsService {
     return app;
   }
 
-  async create(data: any) {
+  async create(data: CreateApplicationDto & { patientId: number }) {
     const count = await this.prisma.application.count();
     const arizaNumber = `MSP-${new Date().getFullYear()}-${String(count + 1).padStart(5, '0')}`;
 
     const app = await this.prisma.application.create({
       data: {
-        ...data,
         arizaNumber,
-      },
+        serviceType: data.serviceType as unknown as ServiceType,
+        urgency:     (data.urgency ?? 'NORMAL') as unknown as Urgency,
+        scanType:    data.scanType,
+        organ:       data.organ,
+        scanDate:    data.scanDate,
+        price:       data.price,
+        notes:       data.notes,
+        patientId:   data.patientId,
+        radiologId:  data.radiologId,
+      } as Prisma.ApplicationUncheckedCreateInput,
       include: applicationIncludes,
     });
 
@@ -68,16 +85,16 @@ export class ApplicationsService {
       data: {
         applicationId: app.id,
         action: 'APPLICATION_CREATED',
-        actorId: data.patientId,
+        actorId:   data.patientId,
         actorRole: 'PATIENT',
-        details: { serviceType: data.serviceType, urgency: data.urgency },
+        details:   { serviceType: data.serviceType, urgency: data.urgency },
       },
     });
 
     return app;
   }
 
-  async update(id: number, data: any) {
+  async update(id: number, data: Prisma.ApplicationUncheckedUpdateInput) {
     return this.prisma.application.update({
       where: { id },
       data,
@@ -85,14 +102,24 @@ export class ApplicationsService {
     });
   }
 
-  async updateStatus(id: number, status: string, actorId?: number, actorRole?: string, notes?: string) {
+  async updateStatus(
+    id: number,
+    status: string,
+    actorId?: number,
+    actorRole?: string,
+    notes?: string,
+  ) {
     const oldApp = await this.prisma.application.findUnique({ where: { id } });
     if (!oldApp) throw new NotFoundException('Ariza topilmadi');
 
-    const updateData: any = { status: status.toUpperCase() as AppStatus };
-    if (status === 'ACCEPTED' || status === 'accepted') updateData.acceptedAt = new Date();
-    if (status === 'DONE' || status === 'done') updateData.completedAt = new Date();
-    if (notes) updateData.notes = notes;
+    const upperStatus = status.toUpperCase() as AppStatus;
+
+    const updateData: Prisma.ApplicationUncheckedUpdateInput = {
+      status: upperStatus,
+      ...(upperStatus === 'ACCEPTED' && { acceptedAt:  new Date() }),
+      ...(upperStatus === 'DONE'     && { completedAt: new Date() }),
+      ...(notes && { notes }),
+    };
 
     const app = await this.prisma.application.update({
       where: { id },
@@ -107,7 +134,7 @@ export class ApplicationsService {
         action: 'STATUS_CHANGED',
         actorId,
         actorRole,
-        details: { from: oldApp.status, to: status.toUpperCase() },
+        details: { from: oldApp.status, to: upperStatus },
       },
     });
 

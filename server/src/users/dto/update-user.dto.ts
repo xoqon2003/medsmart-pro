@@ -18,7 +18,7 @@ enum GenderEnum {
 enum LanguageEnum {
   UZ = 'UZ',
   RU = 'RU',
-  EN = 'EN',
+  // Prisma schema'da faqat UZ va RU bor — EN qo'shilganda migration kerak bo'ladi
 }
 
 /**
