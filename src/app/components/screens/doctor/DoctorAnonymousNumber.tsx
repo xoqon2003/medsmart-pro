@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { extrasService } from '../../../../services/api/extrasService';
 import type { AnonymousNumber, CallSchedule } from '../../../types';
 import { ChevronLeft, Phone, Clock, Shield, Loader2, Save } from 'lucide-react';
@@ -7,7 +7,7 @@ import { ChevronLeft, Phone, Clock, Shield, Loader2, Save } from 'lucide-react';
 const DAYS = ['Du', 'Se', 'Ch', 'Pa', 'Ju', 'Sh', 'Ya'];
 
 export function DoctorAnonymousNumber() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [anonNum, setAnonNum] = useState<AnonymousNumber | null>(null);
   const [schedule, setSchedule] = useState<CallSchedule | null>(null);
   const [loading, setLoading] = useState(true);

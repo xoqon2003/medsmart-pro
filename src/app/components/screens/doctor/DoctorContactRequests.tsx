@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { contactService } from '../../../../services/api/contactService';
 import type { ContactRequest, ContactRequestStatus } from '../../../types';
 import {
@@ -22,7 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 export function DoctorContactRequests() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [requests, setRequests] = useState<ContactRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('');

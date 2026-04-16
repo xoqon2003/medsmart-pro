@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Search, Download, ChevronRight } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 
 const MOCK = [
   { id: 'P001', name: 'Karimov Aziz', phone: '+998901234567', age: 36, gender: 'Erkak', apps: 5, lastVisit: '2026-04-03', diagnosis: 'I10 Gipertenziya' },
@@ -20,7 +20,7 @@ const MOCK = [
 ];
 
 export function WebDocPatientsScreen() {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
   const [search, setSearch] = useState('');
   const filtered = MOCK.filter(p => p.name.toLowerCase().includes(search.toLowerCase()) || p.phone.includes(search) || p.diagnosis.toLowerCase().includes(search.toLowerCase()));
 

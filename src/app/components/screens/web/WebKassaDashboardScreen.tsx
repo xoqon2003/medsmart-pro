@@ -9,7 +9,7 @@ import {
   Play, Square, RefreshCw,
 } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 // ── Mock data ──
@@ -49,7 +49,7 @@ const fmt = (n: number) => {
 };
 
 export function WebKassaDashboardScreen() {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
   const [shiftOpen] = useState(true);
 
   const kpis = [

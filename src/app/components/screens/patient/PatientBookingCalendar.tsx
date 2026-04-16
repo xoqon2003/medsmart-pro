@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { calendarService } from '../../../../services/api/calendarService';
 import type { CalendarSlot, CalendarSetting } from '../../../types';
 import { ChevronLeft, ChevronRight, Clock, Loader2 } from 'lucide-react';
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function PatientBookingCalendar({ doctorProfileId }: Props) {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack } = useNavigation();
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<CalendarSetting | null>(null);
   const [slots, setSlots] = useState<CalendarSlot[]>([]);

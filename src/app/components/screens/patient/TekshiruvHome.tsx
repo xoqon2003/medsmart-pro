@@ -1,10 +1,10 @@
 import React from 'react';
 import { ArrowLeft, Microscope } from 'lucide-react';
 import { motion } from 'motion/react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 
 export function TekshiruvHome() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -14,7 +14,7 @@ import {
   Ruler, Weight, Thermometer, HeartPulse, MessageSquare,
 } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -441,7 +441,7 @@ function TabHujjatlar() {
 
 export function WebBemorProfiliScreen() {
   const [activeTab, setActiveTab] = useState<EMKTab>('shaxsiy');
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
 
   const tabs: { key: EMKTab; label: string; icon: React.ReactNode; count?: number }[] = [
     { key: 'shaxsiy',   label: 'Shaxsiy',      icon: <User className="w-4 h-4" /> },

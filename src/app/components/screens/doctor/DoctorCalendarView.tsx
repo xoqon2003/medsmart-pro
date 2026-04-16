@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { calendarService } from '../../../../services/api/calendarService';
 import { doctorService } from '../../../../services/api/doctorService';
 import type { CalendarSlot } from '../../../types';
@@ -18,7 +18,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export function DoctorCalendarView() {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack } = useNavigation();
   const [loading, setLoading] = useState(true);
   const [slots, setSlots] = useState<CalendarSlot[]>([]);
   const [profileId, setProfileId] = useState('');

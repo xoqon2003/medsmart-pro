@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { doctorService } from '../../../../services/api/doctorService';
 import { ChevronLeft, Check, Star, Zap, Crown, Gift } from 'lucide-react';
 import type { TariffCode } from '../../../types';
@@ -103,7 +103,7 @@ const PLANS: TariffPlan[] = [
 ];
 
 export function TariffSelection() {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack } = useNavigation();
   const [selected, setSelected] = useState<TariffCode>('LITE');
   const [loading, setLoading] = useState(false);
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { doctorService } from '../../../../services/api/doctorService';
 import type { DoctorProfile, Education, WorkExperience, Achievement, Certificate } from '../../../types';
 import {
@@ -33,7 +33,7 @@ const STICKER_COLORS: Record<string, string> = {
 };
 
 export function DoctorPortfolio() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'education' | 'experience' | 'achievements' | 'certificates'>('education');

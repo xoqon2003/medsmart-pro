@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { contactService } from '../../../../services/api/contactService';
 import type { MessageTemplate } from '../../../types';
 import {
@@ -13,7 +13,7 @@ const CATEGORIES = [
 ];
 
 export function DoctorTemplateManager() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [templates, setTemplates] = useState<MessageTemplate[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; item?: MessageTemplate } | null>(null);

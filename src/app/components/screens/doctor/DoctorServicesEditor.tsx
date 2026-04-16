@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { faqService } from '../../../../services/api/faqService';
 import { doctorService } from '../../../../services/api/doctorService';
 import type { MedicalService } from '../../../types';
@@ -14,7 +14,7 @@ const CATEGORIES = [
 ];
 
 export function DoctorServicesEditor() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [services, setServices] = useState<MedicalService[]>([]);
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<{ mode: 'add' | 'edit'; item?: MedicalService } | null>(null);

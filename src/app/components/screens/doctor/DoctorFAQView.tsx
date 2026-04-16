@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { faqService } from '../../../../services/api/faqService';
 import { doctorService } from '../../../../services/api/doctorService';
 import type { FAQ } from '../../../types';
@@ -15,7 +15,7 @@ const CATEGORIES = [
 ];
 
 export function DoctorFAQView() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('');

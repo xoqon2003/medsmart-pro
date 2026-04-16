@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { calendarService } from '../../../../services/api/calendarService';
 import type { CalendarSetting } from '../../../types';
 import { ChevronLeft, Save, Loader2, Clock, MapPin, DollarSign, Calendar } from 'lucide-react';
@@ -15,7 +15,7 @@ const CONSULT_TYPES = [
 ];
 
 export function DoctorCalendarSettings() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState<Partial<CalendarSetting>>({

@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Users, Clock, CheckCircle, Timer, Play, PenTool, Syringe, FlaskConical } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 const WEEK = [{ d: 'Dush', v: 8 }, { d: 'Sesh', v: 12 }, { d: 'Chor', v: 6 }, { d: 'Pay', v: 10 }, { d: 'Jum', v: 9 }, { d: 'Shan', v: 5 }, { d: 'Yak', v: 0 }];
@@ -18,7 +18,7 @@ const QUEUE = [
 ];
 
 export function WebDocDashboardScreen() {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
   const waiting = QUEUE.filter(q => q.status === 'waiting');
   const done = QUEUE.filter(q => q.status === 'done');
 

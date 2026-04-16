@@ -2,10 +2,10 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Printer, Download, ArrowLeft } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 
 export function WebKassaReceiptScreen() {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
 
   return (
     <WebPlatformLayout title="Chek chop etish" subtitle="Kvitansiya va chek generatsiya">

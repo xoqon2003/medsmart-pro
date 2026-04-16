@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { Construction, ArrowLeft } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 
 interface WebComingSoonProps {
   title: string;
@@ -12,7 +12,7 @@ interface WebComingSoonProps {
 }
 
 export function WebComingSoon({ title, subtitle, icon: Icon = Construction, features = [] }: WebComingSoonProps) {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
 
   return (
     <WebPlatformLayout title={title} subtitle={subtitle ?? "Ishlab chiqilmoqda"}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { messageService } from '../../../../services/api/messageService';
 import type { Conversation } from '../../../types';
 import {
@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 
 export function ConversationsList() {
-  const { navigate, goBack } = useApp();
+  const { navigate, goBack } = useNavigation();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');

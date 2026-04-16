@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { doctorService } from '../../../../services/api/doctorService';
 import { portfolioService } from '../../../../services/api/portfolioService';
 import type { DoctorProfile, Education, WorkExperience, Achievement, Certificate } from '../../../types';
@@ -29,7 +29,7 @@ const ACHIEVEMENT_GROUPS = [
 ];
 
 export function DoctorPortfolioEdit() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [profile, setProfile] = useState<DoctorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

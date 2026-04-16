@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { extrasService } from '../../../../services/api/extrasService';
 import type { AdSetting } from '../../../types';
 import { ChevronLeft, Loader2, Save, Eye, EyeOff } from 'lucide-react';
 
 export function DoctorAdSettings() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [settings, setSettings] = useState<AdSetting | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

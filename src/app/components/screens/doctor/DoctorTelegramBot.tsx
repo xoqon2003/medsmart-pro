@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { extrasService } from '../../../../services/api/extrasService';
 import type { TelegramBotConfig } from '../../../types';
 import { ChevronLeft, Send, Loader2, Save, Link, Radio } from 'lucide-react';
 
 export function DoctorTelegramBot() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [config, setConfig] = useState<TelegramBotConfig | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

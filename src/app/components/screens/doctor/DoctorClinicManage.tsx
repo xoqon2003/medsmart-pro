@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { doctorService } from '../../../../services/api/doctorService';
 import { bookingService } from '../../../../services';
 import type { DoctorClinic, ClinicSearchResult } from '../../../types';
@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export function DoctorClinicManage() {
-  const { goBack } = useApp();
+  const { goBack } = useNavigation();
   const [linkedClinics, setLinkedClinics] = useState<DoctorClinic[]>([]);
   const [loading, setLoading] = useState(true);
 

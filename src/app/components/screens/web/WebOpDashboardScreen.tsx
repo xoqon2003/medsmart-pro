@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { FileText, Clock, CheckCircle, AlertTriangle, ArrowUpRight, FilePlus, UserSearch, ListOrdered, BarChart3 } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
-import { useApp } from '../../../store/appStore';
+import { useNavigation } from '../../../store/navigationContext';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 const WEEK = [{ d: 'Dush', v: 18 }, { d: 'Sesh', v: 24 }, { d: 'Chor', v: 15 }, { d: 'Pay', v: 28 }, { d: 'Jum', v: 22 }, { d: 'Shan', v: 14 }, { d: 'Yak', v: 8 }];
@@ -18,7 +18,7 @@ const ST_BADGE: Record<string, string> = { new: 'bg-indigo-500/10 text-indigo-40
 const ST_LABEL: Record<string, string> = { new: 'Yangi', paid_pending: 'To\'lov kutilmoqda', accepted: 'Qabul qilindi', conclusion_writing: 'Xulosa', done: 'Bajarildi' };
 
 export function WebOpDashboardScreen() {
-  const { navigate } = useApp();
+  const { navigate } = useNavigation();
   const kpis = [
     { label: 'Yangi arizalar', value: 12, icon: FileText, color: 'from-indigo-500 to-blue-600', change: '+3' },
     { label: 'Jarayonda', value: 34, icon: Clock, color: 'from-amber-500 to-orange-600' },
