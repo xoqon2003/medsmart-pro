@@ -1,16 +1,15 @@
 import React, { Suspense, lazy } from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router';
 import { AppProvider, useApp } from './store/appStore';
 import { BottomNav, SHOW_NAV_ON } from './components/ui/BottomNav';
 import { ServiceSelectionBottomSheet } from './components/patient/ServiceSelectionBottomSheet';
 import type { Screen } from './types';
 
 // ── Eager (darhol yuklanadi) ──────────────────────────────────────────────────
-// Foydalanuvchi ilovani ochganda darhol ko'radigan ekranlar.
 import { SplashScreen } from './components/screens/SplashScreen';
 import { RoleSelect }   from './components/screens/RoleSelect';
 
 // ── Lazy (ekranga o'tgandagina yuklanadi) ────────────────────────────────────
-// Vite har birini alohida chunk qiladi — initial bundle ~60-70% kichrayadi.
 const lazy$ = <T extends React.ComponentType<any>>(
   factory: () => Promise<{ [key: string]: T }>,
   name: string,
@@ -58,7 +57,7 @@ const ApplicationView        = lazy$(() => import('./components/screens/radiolog
 const ConclusionEditor       = lazy$(() => import('./components/screens/radiolog/ConclusionEditor'),           'ConclusionEditor');
 const SpecialistReferral     = lazy$(() => import('./components/screens/radiolog/SpecialistReferral'),         'SpecialistReferral');
 
-// Operator / Admin
+// Operator / Admin / Specialist
 const OperatorPanel          = lazy$(() => import('./components/screens/operator/OperatorPanel'),              'OperatorPanel');
 const AdminPanel             = lazy$(() => import('./components/screens/admin/AdminPanel'),                    'AdminPanel');
 const SpecialistDashboard    = lazy$(() => import('./components/screens/specialist/SpecialistDashboard'),      'SpecialistDashboard');
@@ -110,98 +109,124 @@ function ScreenLoader() {
   );
 }
 
+// ── URL Routes ────────────────────────────────────────────────────────────────
+// Har bir URL path → komponent. Screen tipi va SCREEN_TO_PATH bilan 1-to-1.
+function AppRoutes() {
+  return (
+    <Routes>
+      {/* Eager */}
+      <Route path="/"    element={<SplashScreen />} />
+      <Route path="/rol" element={<RoleSelect />} />
+
+      {/* Bemor (Patient) */}
+      <Route path="/bemor"                           element={<PatientHome />} />
+      <Route path="/bemor/profil"                    element={<PatientProfile />} />
+      <Route path="/bemor/fayl-yuklash"              element={<FileUpload />} />
+      <Route path="/bemor/anamnez"                   element={<Anamnez />} />
+      <Route path="/bemor/xizmat"                    element={<ServiceSelect />} />
+      <Route path="/bemor/shartnoma"                 element={<Contract />} />
+      <Route path="/bemor/tolov"                     element={<Payment />} />
+      <Route path="/bemor/status"                    element={<StatusTracker />} />
+      <Route path="/bemor/xulosa"                    element={<ConclusionView />} />
+
+      {/* Konsultatsiya */}
+      <Route path="/bemor/konsultatsiya"             element={<KonsultatsiyaType />} />
+      <Route path="/bemor/konsultatsiya/tur"         element={<KonsultatsiyaType />} />
+      <Route path="/bemor/konsultatsiya/subtur"      element={<KonsultatsiyaSubType />} />
+      <Route path="/bemor/konsultatsiya/shifokor"    element={<KonsultatsiyaDoctor />} />
+      <Route path="/bemor/konsultatsiya/kalendar"    element={<KonsultatsiyaCalendar />} />
+      <Route path="/bemor/konsultatsiya/sanatoriy"   element={<KonsultatsiyaSanatorium />} />
+      <Route path="/bemor/konsultatsiya/anamnez"     element={<KonsultatsiyaAnamnez />} />
+      <Route path="/bemor/konsultatsiya/tasdiqlash"  element={<KonsultatsiyaConfirm />} />
+
+      {/* Tekshiruv */}
+      <Route path="/bemor/tekshiruv"                 element={<TekshiruvCategory />} />
+      <Route path="/bemor/tekshiruv/kategoriya"      element={<TekshiruvCategory />} />
+      <Route path="/bemor/tekshiruv/turi"            element={<TekshiruvExam />} />
+      <Route path="/bemor/tekshiruv/markaz"          element={<TekshiruvCenter />} />
+      <Route path="/bemor/tekshiruv/kalendar"        element={<TekshiruvCalendar />} />
+      <Route path="/bemor/tekshiruv/tasdiqlash"      element={<TekshiruvConfirm />} />
+
+      {/* Uyga chaqirish */}
+      <Route path="/bemor/uyga-chaqirish/manzil"     element={<UygaChaqirishManzil />} />
+      <Route path="/bemor/uyga-chaqirish/aloqa"      element={<UygaChaqirishAloqa />} />
+      <Route path="/bemor/uyga-chaqirish/vaqt"       element={<UygaChaqirishVaqt />} />
+      <Route path="/bemor/uyga-chaqirish/mutaxassis" element={<UygaChaqirishMutaxassis />} />
+      <Route path="/bemor/uyga-chaqirish/tasdiqlash" element={<UygaChaqirishTasdiqlash />} />
+
+      {/* AI Tavsiya */}
+      <Route path="/bemor/ai/simptomlar"             element={<SymptomInput />} />
+      <Route path="/bemor/ai/savollar"               element={<AdaptiveQuestions />} />
+      <Route path="/bemor/ai/natija"                 element={<DiagnosisResults />} />
+
+      {/* Aloqa va Booking */}
+      <Route path="/bemor/aloqa-shakli"              element={<PatientContactForm />} />
+      <Route path="/bemor/booking/kalendar"          element={<PatientBookingCalendar />} />
+      <Route path="/bemor/booking/tasdiqlash"        element={<PatientBookingConfirm />} />
+
+      {/* Radiolog */}
+      <Route path="/radiolog"                        element={<RadiologDashboard />} />
+      <Route path="/radiolog/ariza"                  element={<ApplicationView />} />
+      <Route path="/radiolog/xulosa"                 element={<ConclusionEditor />} />
+      <Route path="/radiolog/yuborish"               element={<SpecialistReferral />} />
+
+      {/* Shifokor (Doctor) */}
+      <Route path="/shifokor"                        element={<DoctorDashboard />} />
+      <Route path="/shifokor/bemor"                  element={<DoctorDashboard />} />
+      <Route path="/shifokor/profil-sozlash"         element={<DoctorProfileSetup />} />
+      <Route path="/shifokor/panel"                  element={<DoctorPrivatePanel />} />
+      <Route path="/shifokor/tarif"                  element={<TariffSelection />} />
+      <Route path="/shifokor/klinika"                element={<DoctorClinicManage />} />
+      <Route path="/shifokor/tasdiqlash"             element={<DoctorPrivatePanel />} />
+      <Route path="/shifokor/portfolio"              element={<DoctorPortfolio />} />
+      <Route path="/shifokor/portfolio/tahrirlash"   element={<DoctorPortfolioEdit />} />
+      <Route path="/shifokor/aloqa-sorovlari"        element={<DoctorContactRequests />} />
+      <Route path="/shifokor/shablonlar"             element={<DoctorTemplateManager />} />
+      <Route path="/shifokor/faq"                    element={<DoctorFAQView />} />
+      <Route path="/shifokor/faq/tahrirlash"         element={<DoctorFAQEditor />} />
+      <Route path="/shifokor/xizmatlar"              element={<DoctorServicesView />} />
+      <Route path="/shifokor/xizmatlar/tahrirlash"   element={<DoctorServicesEditor />} />
+      <Route path="/shifokor/anonim-raqam"           element={<DoctorAnonymousNumber />} />
+      <Route path="/shifokor/telegram-bot"           element={<DoctorTelegramBot />} />
+      <Route path="/shifokor/reklama"                element={<DoctorAdSettings />} />
+      <Route path="/shifokor/ulashish"               element={<DoctorShareProfile />} />
+      <Route path="/shifokor/kalendar"               element={<DoctorCalendarView />} />
+      <Route path="/shifokor/kalendar/sozlamalar"    element={<DoctorCalendarSettings />} />
+
+      {/* Doctor deep-link (jamoat profili) */}
+      <Route path="/d/:slug"                         element={<DoctorPublicProfile />} />
+
+      {/* Operator, Admin, Specialist, Kassir */}
+      <Route path="/operator"                        element={<OperatorPanel />} />
+      <Route path="/admin"                           element={<AdminPanel />} />
+      <Route path="/mutaxassis"                      element={<SpecialistDashboard />} />
+      <Route path="/kassir"                          element={<KassirDashboard />} />
+
+      {/* Shared */}
+      <Route path="/bildirishnomalar"                element={<NotificationsScreen />} />
+      <Route path="/profil"                          element={<ProfileScreen />} />
+      <Route path="/suhbatlar"                       element={<ConversationsList />} />
+      <Route path="/suhbat"                          element={<ChatScreen />} />
+
+      {/* Web Platform (desktop) — asosiy */}
+      <Route path="/web/login"                       element={<WebPlatformLogin />} />
+      <Route path="/web"                             element={<WebPlatformDashboard />} />
+
+      {/* Web Admin */}
+      <Route path="/web/admin/shifokorlar"           element={<WebDoctorProfilesScreen />} />
+      <Route path="/web/admin/tariflar"              element={<WebTariffManageScreen />} />
+      <Route path="/web/admin/kalendar"              element={<WebCalendarManageScreen />} />
+
+      {/* Fallback — noma'lum URL splash ga yuboriladi */}
+      <Route path="*" element={<SplashScreen />} />
+    </Routes>
+  );
+}
+
 // ── App content ───────────────────────────────────────────────────────────────
 function AppContent() {
   const { currentScreen, navigate, currentUser, serviceSheetOpen, closeServiceSheet } = useApp();
   const showNav = SHOW_NAV_ON.includes(currentScreen as Screen);
-
-  const renderScreen = () => {
-    switch (currentScreen) {
-      // Eager ekranlar
-      case 'splash':              return <SplashScreen />;
-      case 'role_select':         return <RoleSelect />;
-      // Patient
-      case 'patient_profile':     return <PatientProfile />;
-      case 'patient_home':        return <PatientHome />;
-      case 'patient_upload':      return <FileUpload />;
-      case 'patient_anamnez':     return <Anamnez />;
-      case 'patient_service':     return <ServiceSelect />;
-      case 'patient_contract':    return <Contract />;
-      case 'patient_payment':     return <Payment />;
-      case 'patient_status':      return <StatusTracker />;
-      case 'patient_conclusion':  return <ConclusionView />;
-      case 'patient_konsultatsiya': return <KonsultatsiyaType />;
-      case 'patient_kons_type':     return <KonsultatsiyaType />;
-      case 'patient_kons_subtype':  return <KonsultatsiyaSubType />;
-      case 'patient_kons_doctor':   return <KonsultatsiyaDoctor />;
-      case 'patient_kons_calendar': return <KonsultatsiyaCalendar />;
-      case 'patient_kons_sanatorium': return <KonsultatsiyaSanatorium />;
-      case 'patient_kons_anamnez':  return <KonsultatsiyaAnamnez />;
-      case 'patient_kons_confirm':  return <KonsultatsiyaConfirm />;
-      case 'home_visit_address':    return <UygaChaqirishManzil />;
-      case 'home_visit_contact':    return <UygaChaqirishAloqa />;
-      case 'home_visit_time':       return <UygaChaqirishVaqt />;
-      case 'home_visit_specialist': return <UygaChaqirishMutaxassis />;
-      case 'home_visit_confirm':    return <UygaChaqirishTasdiqlash />;
-      case 'patient_tekshiruv':      return <TekshiruvCategory />;
-      case 'patient_tks_category':   return <TekshiruvCategory />;
-      case 'patient_tks_exam':       return <TekshiruvExam />;
-      case 'patient_tks_center':     return <TekshiruvCenter />;
-      case 'patient_tks_calendar':   return <TekshiruvCalendar />;
-      case 'patient_tks_confirm':    return <TekshiruvConfirm />;
-      case 'patient_symptom_input':       return <SymptomInput />;
-      case 'patient_adaptive_questions':  return <AdaptiveQuestions />;
-      case 'patient_diagnosis_results':   return <DiagnosisResults />;
-      // Radiolog
-      case 'radiolog_dashboard':  return <RadiologDashboard />;
-      case 'radiolog_view':       return <ApplicationView />;
-      case 'radiolog_conclude':   return <ConclusionEditor />;
-      case 'radiolog_specialist': return <SpecialistReferral />;
-      // Operator / Admin
-      case 'operator_dashboard':   return <OperatorPanel />;
-      case 'admin_dashboard':      return <AdminPanel />;
-      case 'specialist_dashboard': return <SpecialistDashboard />;
-      // Doctor
-      case 'doctor_dashboard':        return <DoctorDashboard />;
-      case 'doctor_patient_view':     return <DoctorDashboard />;
-      case 'doctor_profile_setup':    return <DoctorProfileSetup />;
-      case 'doctor_public_profile':   return <DoctorPublicProfile />;
-      case 'doctor_private_panel':    return <DoctorPrivatePanel />;
-      case 'doctor_tariff_select':    return <TariffSelection />;
-      case 'doctor_clinic_manage':    return <DoctorClinicManage />;
-      case 'doctor_verification':     return <DoctorPrivatePanel />;
-      case 'doctor_portfolio':        return <DoctorPortfolio />;
-      case 'doctor_portfolio_edit':   return <DoctorPortfolioEdit />;
-      case 'patient_contact_form':    return <PatientContactForm />;
-      case 'doctor_contact_requests': return <DoctorContactRequests />;
-      case 'doctor_template_manager': return <DoctorTemplateManager />;
-      case 'conversations_list':      return <ConversationsList />;
-      case 'chat_screen':             return <ChatScreen />;
-      case 'doctor_faq_view':         return <DoctorFAQView />;
-      case 'doctor_faq_editor':       return <DoctorFAQEditor />;
-      case 'doctor_services_view':    return <DoctorServicesView />;
-      case 'doctor_services_editor':  return <DoctorServicesEditor />;
-      case 'doctor_anonymous_number': return <DoctorAnonymousNumber />;
-      case 'doctor_telegram_bot':     return <DoctorTelegramBot />;
-      case 'doctor_ad_settings':      return <DoctorAdSettings />;
-      case 'doctor_share_profile':    return <DoctorShareProfile />;
-      case 'doctor_calendar_view':    return <DoctorCalendarView />;
-      case 'doctor_calendar_settings':return <DoctorCalendarSettings />;
-      case 'patient_booking_calendar':return <PatientBookingCalendar />;
-      case 'patient_booking_confirm': return <PatientBookingConfirm />;
-      // Web Platform
-      case 'web_doctor_profiles':     return <WebDoctorProfilesScreen />;
-      case 'web_tariff_manage':       return <WebTariffManageScreen />;
-      case 'web_calendar_manage':     return <WebCalendarManageScreen />;
-      case 'kassir_dashboard':        return <KassirDashboard />;
-      case 'web_login':               return <WebPlatformLogin />;
-      case 'web_dashboard':           return <WebPlatformDashboard />;
-      // Shared
-      case 'notifications':           return <NotificationsScreen />;
-      case 'profile':                 return <ProfileScreen />;
-      default:                        return <SplashScreen />;
-    }
-  };
 
   // Web platform sahifalarida max-w-md cheklash yo'q
   const isWebScreen = currentScreen.startsWith('web_');
@@ -212,13 +237,13 @@ function AppContent() {
         // Full-screen desktop layout — max-w-md yo'q
         <div className="min-h-screen relative">
           <Suspense fallback={<ScreenLoader />}>
-            {renderScreen()}
+            <AppRoutes />
           </Suspense>
         </div>
       ) : (
         <div className={`max-w-md mx-auto min-h-screen bg-gray-50 relative overflow-hidden ${showNav ? 'pb-[64px]' : ''}`}>
           <Suspense fallback={<ScreenLoader />}>
-            {renderScreen()}
+            <AppRoutes />
           </Suspense>
         </div>
       )}
@@ -241,10 +266,15 @@ function AppContent() {
   );
 }
 
+// ── Root ──────────────────────────────────────────────────────────────────────
+// BrowserRouter AppProvider dan yuqorida bo'lishi SHART —
+// NavigationProvider ichida useNavigate() chaqiradi.
 export default function App() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <BrowserRouter>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </BrowserRouter>
   );
 }

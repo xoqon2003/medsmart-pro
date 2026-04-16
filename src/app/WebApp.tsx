@@ -6,6 +6,7 @@
  */
 
 import React, { lazy, Suspense } from 'react';
+import { BrowserRouter } from 'react-router';
 import { AppProvider, useApp } from './store/appStore';
 import { WebPlatformLogin } from './components/screens/web/WebPlatformLogin';
 import { WebPlatformDashboard } from './components/screens/web/WebPlatformDashboard';
@@ -241,10 +242,12 @@ function WebAppContent() {
 
 export default function WebApp() {
   return (
-    <AppProvider initialScreen="web_login">
-      <div className="min-h-screen font-sans antialiased">
-        <WebAppContent />
-      </div>
-    </AppProvider>
+    <BrowserRouter>
+      <AppProvider initialScreen="web_login">
+        <div className="min-h-screen font-sans antialiased">
+          <WebAppContent />
+        </div>
+      </AppProvider>
+    </BrowserRouter>
   );
 }

@@ -1,86 +1,113 @@
 /**
  * NavigationContext — ekranlar orasidagi o'tish holati.
  *
- * Nima uchun ajratildi?
- *   appStore.tsx da barcha 47 ta maydon bitta Context edi.
- *   Navigatsiya (currentScreen) har bir ekran o'tishida o'zgaradi,
- *   bu esa barcha consumer komponentlarni qayta render qilardi —
- *   hatto foydalanuvchi ma'lumoti va arizalar o'zgarmagan bo'lsa ham.
+ * HOZIRGI IMPLEMENTATSIYA: React Router v7 bilan integratsiya.
  *
- * Facade:
- *   `useApp()` hali ham barcha maydonlarni qaytaradi (hech qanday
- *   mavjud komponent o'zgarmaydi). Yangi komponentlar yoki faqat
- *   navigatsiya kerak bo'lganlar `useNavigation()` ishlatib, faqat
- *   ekran o'zgarishida render bo'ladi.
+ * Nima uchun wrap qilingan?
+ *   Ilovada 84 ta consumer `useApp()` yoki `useNavigation()` orqali
+ *   `navigate('screen')` chaqiradi. Ularni o'zgartirish — 3-4 kun ish.
+ *   Buning o'rniga string-based API ni saqlab, ichida React Router
+ *   ishlatamiz. Natijada:
+ *     ✅ Browser back/forward ishlaydi
+ *     ✅ URL o'zgaradi, bookmark mumkin
+ *     ✅ Deep link (/d/:slug) avtomatik
+ *     ✅ Consumer kodlari tegmaydi
+ *
+ * API:
+ *   const { navigate, goBack, currentScreen, screenHistory } = useNavigation();
+ *   navigate('patient_home')          // URL: /bemor
+ *   navigate('doctor_public_profile') // URL: /d/:slug — lekin slug yo'q bo'lsa /shifokor
+ *   goBack()                          // browser.back()
+ *   currentScreen                     // location.pathname dan derive
  */
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  useRef,
-} from 'react';
+import { createContext, useContext, useMemo, useCallback, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { useNavigate, useLocation } from 'react-router';
 import type { Screen } from '../types';
+import { pathToScreen, screenToPath } from '../router/screen-routes';
 
 export interface NavigationState {
   currentScreen: Screen;
   screenHistory: Screen[];
-  navigate: (screen: Screen) => void;
+  navigate: (screen: Screen, params?: Record<string, string>) => void;
   goBack: () => void;
 }
 
 const NavigationContext = createContext<NavigationState | null>(null);
 
+/**
+ * NavigationProvider — React Router ning BrowserRouter ichida ishlaydi.
+ *
+ * Muhim: bu Provider React Router uchun BrowserRouter (yoki HashRouter)
+ * ichida bo'lishi shart. App.tsx da:
+ *
+ *   <BrowserRouter>
+ *     <AppProvider>  ← NavigationProvider bu yerda
+ *       <AppContent />
+ *     </AppProvider>
+ *   </BrowserRouter>
+ */
 export function NavigationProvider({
   children,
-  initialScreen = 'splash',
+  initialScreen: _initialScreen = 'splash', // ignore qilinadi — URL dan derive
 }: {
   children: ReactNode;
   initialScreen?: Screen;
 }) {
-  const [currentScreen, setCurrentScreen] = useState<Screen>(initialScreen);
-  const [screenHistory, setScreenHistory] = useState<Screen[]>([]);
+  const routerNavigate = useNavigate();
+  const location = useLocation();
 
-  // Ref trick: navigate uchun stable (o'zgarmaydigan) referens.
-  // Eski pattern: useCallback([currentScreen]) — har bir ekran o'tishida navigate o'zgarardi.
-  // Yangi pattern: ref orqali currentScreen ni o'qiymiz → deps bo'sh → navigate barqaror.
-  const currentScreenRef = useRef(currentScreen);
-  currentScreenRef.current = currentScreen;
+  // currentScreen URL dan derive qilinadi.
+  // Bu ReactRouter location.pathname ga subscribe bo'ladi.
+  const currentScreen = useMemo(
+    () => pathToScreen(location.pathname),
+    [location.pathname],
+  );
 
-  const navigate = useCallback((screen: Screen) => {
-    setScreenHistory((prev) => [...prev, currentScreenRef.current]);
-    setCurrentScreen(screen);
-  }, []); // Stable — hech qachon o'zgarmaydi
+  // screenHistory — ref orqali saqlanadi, render trigger qilmaydi.
+  // Eski API bilan mosligi uchun qoldirildi, lekin amalda brauzer history ishlatamiz.
+  const historyRef = useRef<Screen[]>([]);
+
+  useEffect(() => {
+    // Har navigatsiyada historyRef ga oldingi ekran qo'shiladi.
+    const prev = historyRef.current[historyRef.current.length - 1];
+    if (prev !== currentScreen) {
+      historyRef.current = [...historyRef.current, currentScreen].slice(-20);
+    }
+  }, [currentScreen]);
+
+  const navigate = useCallback(
+    (screen: Screen, params?: Record<string, string>) => {
+      const path = screenToPath(screen, params);
+      routerNavigate(path);
+    },
+    [routerNavigate],
+  );
 
   const goBack = useCallback(() => {
-    setScreenHistory((prev) => {
-      if (prev.length === 0) return prev;
-      const newHistory = [...prev];
-      const prevScreen = newHistory.pop()!;
-      setCurrentScreen(prevScreen);
-      return newHistory;
-    });
-  }, []); // Stable — functional updater pattern
+    // Brauzer history orqali — bu eng to'g'ri yondashuv.
+    routerNavigate(-1);
+  }, [routerNavigate]);
 
-  return (
-    <NavigationContext.Provider
-      value={{ currentScreen, screenHistory, navigate, goBack }}
-    >
-      {children}
-    </NavigationContext.Provider>
+  const value = useMemo<NavigationState>(
+    () => ({
+      currentScreen,
+      screenHistory: historyRef.current,
+      navigate,
+      goBack,
+    }),
+    [currentScreen, navigate, goBack],
   );
+
+  return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
 }
 
 /**
  * Faqat navigatsiya maydonlari kerak bo'lsa shu hookni ishlating.
  *
- * Afzallik: bu hook faqat `currentScreen` o'zgarganda render bo'ladi,
- * `applications`, `currentUser` va boshqa maydonlar o'zgarganda emas.
- *
  * @example
- * const { goBack } = useNavigation();
+ * const { goBack, navigate, currentScreen } = useNavigation();
  */
 export function useNavigation(): NavigationState {
   const ctx = useContext(NavigationContext);

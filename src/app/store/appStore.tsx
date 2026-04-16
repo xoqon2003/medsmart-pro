@@ -88,7 +88,8 @@ const AppDataContext = createContext<AppDataState | null>(null);
 
 // ── AppDataProvider (ichki, NavigationProvider ichida ishlaydi) ───────────────
 function AppDataProvider({ children }: { children: ReactNode }) {
-  const { navigate } = useNavigation(); // NavigationContext dan
+  // Navigation hozircha AppDataProvider ichida ishlatilmayapti
+  // (deep-link endi React Router tomonidan boshqariladi).
 
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
@@ -108,7 +109,9 @@ function AppDataProvider({ children }: { children: ReactNode }) {
     notificationService.getAll().then(setNotifications);
   }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Deep-link: /d/{slug} URL orqali shifokor profilini ochish
+  // Deep-link /d/:slug — React Router endi URL ni avtomatik match qiladi
+  // va DoctorPublicProfile ni render qiladi. Bu effect faqat slug dan
+  // viewingDoctorId ni topib qo'yishga xizmat qiladi (navigate chaqirilmaydi).
   useEffect(() => {
     const path = window.location.pathname;
     const match = path.match(/^\/d\/(.+)$/);
@@ -122,10 +125,9 @@ function AppDataProvider({ children }: { children: ReactNode }) {
       });
       if (doctor) {
         setViewingDoctorIdState(doctor.id);
-        navigate('doctor_public_profile');
       }
     });
-  }, [navigate]); // navigate barqaror referens (ref pattern)
+  }, []); // faqat mount da — router URL ni avtomatik boshqaradi
 
   const [selectedApplication, setSelectedApplicationState] = useState<Application | null>(null);
   const [draftApplication, setDraftApplication]   = useState<DraftApplication>({});

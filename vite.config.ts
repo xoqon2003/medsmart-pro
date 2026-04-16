@@ -22,12 +22,15 @@ export default defineConfig(({ command }) => ({
       // Natijada mockData.ts production bundle'ga KIRMAYDI.
       // Dev rejimida ('vite dev') bu aliaslar ISHLAMAYDI — mock ma'lumotlar saqlanadi.
       ...(command === 'build' ? [
+        // Regex BUTUN import specifier ni match qiladi (^ dan $ gacha) —
+        // aks holda faqat oxirgi qismi replace bo'lib, prefix (../../..)
+        // qolib ketadi va Windows yo'llarida broken path beradi.
         {
-          find: /.*core-switch\.mock$/,
+          find: /^(\.{1,2}\/)+(services\/)?core-switch\.mock$/,
           replacement: path.resolve(__dirname, 'src/services/core-switch.prod.ts'),
         },
         {
-          find: /[/\\]data[/\\]mockData$/,
+          find: /^(\.{1,2}\/)+.*data\/mockData$/,
           replacement: path.resolve(__dirname, 'src/app/data/mockData.prod.ts'),
         },
       ] : []),
