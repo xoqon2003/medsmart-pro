@@ -6,10 +6,16 @@ node_modules/
 dist/
 dist-ssr/
 
-# Environment variables
+# Environment variables (defense in depth — har qanday subfolder'da ham ignore)
 .env
 .env.local
 .env.*.local
+**/.env
+**/.env.local
+**/.env.*.local
+# Template fayllar tracked bo'lishi kerak (developerlar uchun namuna)
+!**/.env.example
+!**/.env.sample
 
 # Editor / OS
 .DS_Store
