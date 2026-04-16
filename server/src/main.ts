@@ -3,8 +3,14 @@ import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { LoggingInterceptor } from './common/logging.interceptor';
+import { validateEnv } from './common/env-validator';
 
 async function bootstrap() {
+  // Muhim: AppModule yaratishdan OLDIN muhit o'zgaruvchilarini tekshiramiz.
+  // JwtModule.register(...) process.env.JWT_SECRET ni AppModule yaratilishida o'qiydi —
+  // shuning uchun validatsiya shu nuqtada bo'lishi shart.
+  validateEnv();
+
   const app = await NestFactory.create(AppModule);
   const logger = new Logger('Bootstrap');
 

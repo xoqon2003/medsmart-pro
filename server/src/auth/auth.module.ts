@@ -10,7 +10,9 @@ import { SmsModule } from '../sms/sms.module';
 @Module({
   imports: [
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'medsmart-pro-jwt-secret',
+      // Weak fallback OLIB TASHLANDI. main.ts'dagi validateEnv() bootstrap boshida
+      // JWT_SECRET mavjud va xavfsiz ekanligini kafolatlaydi.
+      secret: process.env.JWT_SECRET!,
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
     }),
     SmsModule,
