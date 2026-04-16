@@ -24,8 +24,9 @@ async function bootstrap() {
       'http://localhost:5174',
       'https://medsmart-pro.vercel.app',
       'https://web.telegram.org',
-      // Telegram Mini App origin lari
-      /^https:\/\/.*\.telegram\.org$/,
+      // Telegram Mini App — faqat ma'lum subdomainlar (web, k, z, a, oauth).
+      // Eski wildcard .* evil.telegram.org kabi begona subdomainlarni ham o'tkazar edi.
+      /^https:\/\/(web|k|z|a|oauth)\.telegram\.org$/,
     ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],

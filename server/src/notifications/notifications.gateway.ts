@@ -15,7 +15,10 @@ import { JwtService } from '@nestjs/jwt';
       'http://localhost:5173',
       'http://localhost:5174',
       'https://medsmart-pro.vercel.app',
-      /^https:\/\/.*\.telegram\.org$/,
+      'https://web.telegram.org',
+      // Telegram Mini App — faqat ma'lum subdomainlar (web, k, z, a, oauth).
+      // Eski wildcard .* evil.telegram.org kabi begona subdomainlarni ham o'tkazar edi.
+      /^https:\/\/(web|k|z|a|oauth)\.telegram\.org$/,
     ],
     credentials: true,
   },
