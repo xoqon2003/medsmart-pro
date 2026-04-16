@@ -11,7 +11,9 @@ const applicationIncludes = {
   files: true,
   payment: true,
   conclusions: { include: { author: { select: { id: true, fullName: true, role: true } } } },
-  auditLog: { orderBy: { createdAt: 'desc' as const } },
+  // take:50 — cheksiz yozuv tortishdan himoya. Zarur bo'lsa alohida
+  // GET /applications/:id/audit-log endpointi bilan to'liq tarix ko'rsatilsin.
+  auditLog: { orderBy: { createdAt: 'desc' as const }, take: 50 },
   examinations: true,
 };
 
