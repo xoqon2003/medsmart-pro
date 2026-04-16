@@ -1,88 +1,126 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { AppProvider, useApp } from './store/appStore';
-import { SplashScreen } from './components/screens/SplashScreen';
-import { RoleSelect } from './components/screens/RoleSelect';
-import { PatientProfile } from './components/screens/PatientProfile';
-import { PatientHome } from './components/screens/patient/PatientHome';
-import { FileUpload } from './components/screens/patient/FileUpload';
-import { Anamnez } from './components/screens/patient/Anamnez';
-import { ServiceSelect } from './components/screens/patient/ServiceSelect';
-import { Contract } from './components/screens/patient/Contract';
-import { Payment } from './components/screens/patient/Payment';
-import { StatusTracker } from './components/screens/patient/StatusTracker';
-import { ConclusionView } from './components/screens/patient/ConclusionView';
-import { KonsultatsiyaType } from './components/screens/patient/KonsultatsiyaType';
-import { KonsultatsiyaSubType } from './components/screens/patient/KonsultatsiyaSubType';
-import { KonsultatsiyaDoctor } from './components/screens/patient/KonsultatsiyaDoctor';
-import { KonsultatsiyaCalendar } from './components/screens/patient/KonsultatsiyaCalendar';
-import { KonsultatsiyaAnamnez } from './components/screens/patient/KonsultatsiyaAnamnez';
-import { KonsultatsiyaConfirm } from './components/screens/patient/KonsultatsiyaConfirm';
-import { KonsultatsiyaSanatorium } from './components/screens/patient/KonsultatsiyaSanatorium';
-import { UygaChaqirishManzil } from './components/screens/patient/UygaChaqirishManzil';
-import { UygaChaqirishAloqa } from './components/screens/patient/UygaChaqirishAloqa';
-import { UygaChaqirishVaqt } from './components/screens/patient/UygaChaqirishVaqt';
-import { UygaChaqirishMutaxassis } from './components/screens/patient/UygaChaqirishMutaxassis';
-import { UygaChaqirishTasdiqlash } from './components/screens/patient/UygaChaqirishTasdiqlash';
-import { TekshiruvCategory } from './components/screens/patient/TekshiruvCategory';
-import { TekshiruvExam } from './components/screens/patient/TekshiruvExam';
-import { TekshiruvCenter } from './components/screens/patient/TekshiruvCenter';
-import { TekshiruvCalendar } from './components/screens/patient/TekshiruvCalendar';
-import { TekshiruvConfirm } from './components/screens/patient/TekshiruvConfirm';
-import { RadiologDashboard } from './components/screens/radiolog/Dashboard';
-import { ApplicationView } from './components/screens/radiolog/ApplicationView';
-import { ConclusionEditor } from './components/screens/radiolog/ConclusionEditor';
-import { SpecialistReferral } from './components/screens/radiolog/SpecialistReferral';
-import { OperatorPanel } from './components/screens/operator/OperatorPanel';
-import { AdminPanel } from './components/screens/admin/AdminPanel';
-import { SpecialistDashboard } from './components/screens/specialist/SpecialistDashboard';
-import { DoctorDashboard } from './components/screens/doctor/DoctorDashboard';
-import { DoctorProfileSetup } from './components/screens/doctor/DoctorProfileSetup';
-import { DoctorPublicProfile } from './components/screens/doctor/DoctorPublicProfile';
-import { DoctorPrivatePanel } from './components/screens/doctor/DoctorPrivatePanel';
-import { TariffSelection } from './components/screens/doctor/TariffSelection';
-import { DoctorPortfolio } from './components/screens/doctor/DoctorPortfolio';
-import { DoctorPortfolioEdit } from './components/screens/doctor/DoctorPortfolioEdit';
-import { DoctorClinicManage } from './components/screens/doctor/DoctorClinicManage';
-import { PatientContactForm } from './components/screens/patient/PatientContactForm';
-import { DoctorContactRequests } from './components/screens/doctor/DoctorContactRequests';
-import { DoctorTemplateManager } from './components/screens/doctor/DoctorTemplateManager';
-import { ConversationsList } from './components/screens/shared/ConversationsList';
-import { ChatScreen } from './components/screens/shared/ChatScreen';
-import { DoctorFAQView } from './components/screens/doctor/DoctorFAQView';
-import { DoctorFAQEditor } from './components/screens/doctor/DoctorFAQEditor';
-import { DoctorServicesView } from './components/screens/doctor/DoctorServicesView';
-import { DoctorServicesEditor } from './components/screens/doctor/DoctorServicesEditor';
-import { DoctorAnonymousNumber } from './components/screens/doctor/DoctorAnonymousNumber';
-import { DoctorTelegramBot } from './components/screens/doctor/DoctorTelegramBot';
-import { DoctorAdSettings } from './components/screens/doctor/DoctorAdSettings';
-import { DoctorShareProfile } from './components/screens/doctor/DoctorShareProfile';
-import { DoctorCalendarView } from './components/screens/doctor/DoctorCalendarView';
-import { DoctorCalendarSettings } from './components/screens/doctor/DoctorCalendarSettings';
-import { PatientBookingCalendar } from './components/screens/patient/PatientBookingCalendar';
-import { PatientBookingConfirm } from './components/screens/patient/PatientBookingConfirm';
-import { WebDoctorProfilesScreen } from './components/screens/web/WebDoctorProfilesScreen';
-import { WebTariffManageScreen } from './components/screens/web/WebTariffManageScreen';
-import { WebCalendarManageScreen } from './components/screens/web/WebCalendarManageScreen';
-import { KassirDashboard } from './components/screens/kassir/KassirDashboard';
-import { SymptomInput } from './components/screens/patient/SymptomInput';
-import { AdaptiveQuestions } from './components/screens/patient/AdaptiveQuestions';
-import { DiagnosisResults } from './components/screens/patient/DiagnosisResults';
-import { WebPlatformLogin } from './components/screens/web/WebPlatformLogin';
-import { WebPlatformDashboard } from './components/screens/web/WebPlatformDashboard';
-import { NotificationsScreen } from './components/screens/NotificationsScreen';
-import { ProfileScreen } from './components/screens/ProfileScreen';
 import { BottomNav, SHOW_NAV_ON } from './components/ui/BottomNav';
 import { ServiceSelectionBottomSheet } from './components/patient/ServiceSelectionBottomSheet';
 import type { Screen } from './types';
 
+// ── Eager (darhol yuklanadi) ──────────────────────────────────────────────────
+// Foydalanuvchi ilovani ochganda darhol ko'radigan ekranlar.
+import { SplashScreen } from './components/screens/SplashScreen';
+import { RoleSelect }   from './components/screens/RoleSelect';
+
+// ── Lazy (ekranga o'tgandagina yuklanadi) ────────────────────────────────────
+// Vite har birini alohida chunk qiladi — initial bundle ~60-70% kichrayadi.
+const lazy$ = <T extends React.ComponentType<any>>(
+  factory: () => Promise<{ [key: string]: T }>,
+  name: string,
+) =>
+  lazy(() => factory().then((m) => ({ default: m[name] as T })));
+
+// Patient
+const PatientProfile         = lazy$(() => import('./components/screens/PatientProfile'),                      'PatientProfile');
+const PatientHome            = lazy$(() => import('./components/screens/patient/PatientHome'),                  'PatientHome');
+const FileUpload             = lazy$(() => import('./components/screens/patient/FileUpload'),                   'FileUpload');
+const Anamnez                = lazy$(() => import('./components/screens/patient/Anamnez'),                     'Anamnez');
+const ServiceSelect          = lazy$(() => import('./components/screens/patient/ServiceSelect'),                'ServiceSelect');
+const Contract               = lazy$(() => import('./components/screens/patient/Contract'),                    'Contract');
+const Payment                = lazy$(() => import('./components/screens/patient/Payment'),                     'Payment');
+const StatusTracker          = lazy$(() => import('./components/screens/patient/StatusTracker'),               'StatusTracker');
+const ConclusionView         = lazy$(() => import('./components/screens/patient/ConclusionView'),              'ConclusionView');
+const KonsultatsiyaType      = lazy$(() => import('./components/screens/patient/KonsultatsiyaType'),           'KonsultatsiyaType');
+const KonsultatsiyaSubType   = lazy$(() => import('./components/screens/patient/KonsultatsiyaSubType'),        'KonsultatsiyaSubType');
+const KonsultatsiyaDoctor    = lazy$(() => import('./components/screens/patient/KonsultatsiyaDoctor'),         'KonsultatsiyaDoctor');
+const KonsultatsiyaCalendar  = lazy$(() => import('./components/screens/patient/KonsultatsiyaCalendar'),       'KonsultatsiyaCalendar');
+const KonsultatsiyaAnamnez   = lazy$(() => import('./components/screens/patient/KonsultatsiyaAnamnez'),        'KonsultatsiyaAnamnez');
+const KonsultatsiyaConfirm   = lazy$(() => import('./components/screens/patient/KonsultatsiyaConfirm'),        'KonsultatsiyaConfirm');
+const KonsultatsiyaSanatorium= lazy$(() => import('./components/screens/patient/KonsultatsiyaSanatorium'),     'KonsultatsiyaSanatorium');
+const UygaChaqirishManzil    = lazy$(() => import('./components/screens/patient/UygaChaqirishManzil'),         'UygaChaqirishManzil');
+const UygaChaqirishAloqa     = lazy$(() => import('./components/screens/patient/UygaChaqirishAloqa'),          'UygaChaqirishAloqa');
+const UygaChaqirishVaqt      = lazy$(() => import('./components/screens/patient/UygaChaqirishVaqt'),           'UygaChaqirishVaqt');
+const UygaChaqirishMutaxassis= lazy$(() => import('./components/screens/patient/UygaChaqirishMutaxassis'),     'UygaChaqirishMutaxassis');
+const UygaChaqirishTasdiqlash= lazy$(() => import('./components/screens/patient/UygaChaqirishTasdiqlash'),     'UygaChaqirishTasdiqlash');
+const TekshiruvCategory      = lazy$(() => import('./components/screens/patient/TekshiruvCategory'),           'TekshiruvCategory');
+const TekshiruvExam          = lazy$(() => import('./components/screens/patient/TekshiruvExam'),               'TekshiruvExam');
+const TekshiruvCenter        = lazy$(() => import('./components/screens/patient/TekshiruvCenter'),             'TekshiruvCenter');
+const TekshiruvCalendar      = lazy$(() => import('./components/screens/patient/TekshiruvCalendar'),           'TekshiruvCalendar');
+const TekshiruvConfirm       = lazy$(() => import('./components/screens/patient/TekshiruvConfirm'),            'TekshiruvConfirm');
+const PatientContactForm     = lazy$(() => import('./components/screens/patient/PatientContactForm'),          'PatientContactForm');
+const PatientBookingCalendar = lazy$(() => import('./components/screens/patient/PatientBookingCalendar'),      'PatientBookingCalendar');
+const PatientBookingConfirm  = lazy$(() => import('./components/screens/patient/PatientBookingConfirm'),       'PatientBookingConfirm');
+// AI Tavsiya
+const SymptomInput           = lazy$(() => import('./components/screens/patient/SymptomInput'),                'SymptomInput');
+const AdaptiveQuestions      = lazy$(() => import('./components/screens/patient/AdaptiveQuestions'),           'AdaptiveQuestions');
+const DiagnosisResults       = lazy$(() => import('./components/screens/patient/DiagnosisResults'),            'DiagnosisResults');
+
+// Radiolog
+const RadiologDashboard      = lazy$(() => import('./components/screens/radiolog/Dashboard'),                  'RadiologDashboard');
+const ApplicationView        = lazy$(() => import('./components/screens/radiolog/ApplicationView'),            'ApplicationView');
+const ConclusionEditor       = lazy$(() => import('./components/screens/radiolog/ConclusionEditor'),           'ConclusionEditor');
+const SpecialistReferral     = lazy$(() => import('./components/screens/radiolog/SpecialistReferral'),         'SpecialistReferral');
+
+// Operator / Admin
+const OperatorPanel          = lazy$(() => import('./components/screens/operator/OperatorPanel'),              'OperatorPanel');
+const AdminPanel             = lazy$(() => import('./components/screens/admin/AdminPanel'),                    'AdminPanel');
+const SpecialistDashboard    = lazy$(() => import('./components/screens/specialist/SpecialistDashboard'),      'SpecialistDashboard');
+
+// Doctor
+const DoctorDashboard        = lazy$(() => import('./components/screens/doctor/DoctorDashboard'),              'DoctorDashboard');
+const DoctorProfileSetup     = lazy$(() => import('./components/screens/doctor/DoctorProfileSetup'),           'DoctorProfileSetup');
+const DoctorPublicProfile    = lazy$(() => import('./components/screens/doctor/DoctorPublicProfile'),          'DoctorPublicProfile');
+const DoctorPrivatePanel     = lazy$(() => import('./components/screens/doctor/DoctorPrivatePanel'),           'DoctorPrivatePanel');
+const TariffSelection        = lazy$(() => import('./components/screens/doctor/TariffSelection'),              'TariffSelection');
+const DoctorPortfolio        = lazy$(() => import('./components/screens/doctor/DoctorPortfolio'),              'DoctorPortfolio');
+const DoctorPortfolioEdit    = lazy$(() => import('./components/screens/doctor/DoctorPortfolioEdit'),          'DoctorPortfolioEdit');
+const DoctorClinicManage     = lazy$(() => import('./components/screens/doctor/DoctorClinicManage'),           'DoctorClinicManage');
+const DoctorContactRequests  = lazy$(() => import('./components/screens/doctor/DoctorContactRequests'),        'DoctorContactRequests');
+const DoctorTemplateManager  = lazy$(() => import('./components/screens/doctor/DoctorTemplateManager'),        'DoctorTemplateManager');
+const DoctorFAQView          = lazy$(() => import('./components/screens/doctor/DoctorFAQView'),                'DoctorFAQView');
+const DoctorFAQEditor        = lazy$(() => import('./components/screens/doctor/DoctorFAQEditor'),              'DoctorFAQEditor');
+const DoctorServicesView     = lazy$(() => import('./components/screens/doctor/DoctorServicesView'),           'DoctorServicesView');
+const DoctorServicesEditor   = lazy$(() => import('./components/screens/doctor/DoctorServicesEditor'),         'DoctorServicesEditor');
+const DoctorAnonymousNumber  = lazy$(() => import('./components/screens/doctor/DoctorAnonymousNumber'),        'DoctorAnonymousNumber');
+const DoctorTelegramBot      = lazy$(() => import('./components/screens/doctor/DoctorTelegramBot'),            'DoctorTelegramBot');
+const DoctorAdSettings       = lazy$(() => import('./components/screens/doctor/DoctorAdSettings'),             'DoctorAdSettings');
+const DoctorShareProfile     = lazy$(() => import('./components/screens/doctor/DoctorShareProfile'),           'DoctorShareProfile');
+const DoctorCalendarView     = lazy$(() => import('./components/screens/doctor/DoctorCalendarView'),           'DoctorCalendarView');
+const DoctorCalendarSettings = lazy$(() => import('./components/screens/doctor/DoctorCalendarSettings'),       'DoctorCalendarSettings');
+
+// Shared
+const ConversationsList      = lazy$(() => import('./components/screens/shared/ConversationsList'),            'ConversationsList');
+const ChatScreen             = lazy$(() => import('./components/screens/shared/ChatScreen'),                   'ChatScreen');
+const NotificationsScreen    = lazy$(() => import('./components/screens/NotificationsScreen'),                 'NotificationsScreen');
+const ProfileScreen          = lazy$(() => import('./components/screens/ProfileScreen'),                       'ProfileScreen');
+
+// Web Platform
+const WebPlatformLogin       = lazy$(() => import('./components/screens/web/WebPlatformLogin'),                'WebPlatformLogin');
+const WebPlatformDashboard   = lazy$(() => import('./components/screens/web/WebPlatformDashboard'),            'WebPlatformDashboard');
+const WebDoctorProfilesScreen= lazy$(() => import('./components/screens/web/WebDoctorProfilesScreen'),         'WebDoctorProfilesScreen');
+const WebTariffManageScreen  = lazy$(() => import('./components/screens/web/WebTariffManageScreen'),           'WebTariffManageScreen');
+const WebCalendarManageScreen= lazy$(() => import('./components/screens/web/WebCalendarManageScreen'),         'WebCalendarManageScreen');
+
+// Kassir
+const KassirDashboard        = lazy$(() => import('./components/screens/kassir/KassirDashboard'),              'KassirDashboard');
+
+// ── Suspense fallback ─────────────────────────────────────────────────────────
+function ScreenLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
+
+// ── App content ───────────────────────────────────────────────────────────────
 function AppContent() {
   const { currentScreen, navigate, currentUser, serviceSheetOpen, closeServiceSheet } = useApp();
   const showNav = SHOW_NAV_ON.includes(currentScreen as Screen);
 
   const renderScreen = () => {
     switch (currentScreen) {
+      // Eager ekranlar
       case 'splash':              return <SplashScreen />;
       case 'role_select':         return <RoleSelect />;
+      // Patient
       case 'patient_profile':     return <PatientProfile />;
       case 'patient_home':        return <PatientHome />;
       case 'patient_upload':      return <FileUpload />;
@@ -111,55 +149,57 @@ function AppContent() {
       case 'patient_tks_center':     return <TekshiruvCenter />;
       case 'patient_tks_calendar':   return <TekshiruvCalendar />;
       case 'patient_tks_confirm':    return <TekshiruvConfirm />;
-      // ── AI Tavsiya (Simptom tahlili) ─────────────────────────
       case 'patient_symptom_input':       return <SymptomInput />;
       case 'patient_adaptive_questions':  return <AdaptiveQuestions />;
       case 'patient_diagnosis_results':   return <DiagnosisResults />;
+      // Radiolog
       case 'radiolog_dashboard':  return <RadiologDashboard />;
       case 'radiolog_view':       return <ApplicationView />;
       case 'radiolog_conclude':   return <ConclusionEditor />;
       case 'radiolog_specialist': return <SpecialistReferral />;
-      case 'operator_dashboard':  return <OperatorPanel />;
-      case 'admin_dashboard':     return <AdminPanel />;
-      case 'specialist_dashboard':return <SpecialistDashboard />;
-      case 'doctor_dashboard':       return <DoctorDashboard />;
-      // doctor_patient_view is now handled inside DoctorDashboard as viewMode='detail'
-      case 'doctor_patient_view':    return <DoctorDashboard />;
-      // TZ-01: Shifokor profil ekranlari
-      case 'doctor_profile_setup':   return <DoctorProfileSetup />;
-      case 'doctor_public_profile':  return <DoctorPublicProfile />;
-      case 'doctor_private_panel':   return <DoctorPrivatePanel />;
-      case 'doctor_tariff_select':   return <TariffSelection />;
-      case 'doctor_clinic_manage':   return <DoctorClinicManage />;
-      case 'doctor_verification':    return <DoctorPrivatePanel />;
-      case 'doctor_portfolio':       return <DoctorPortfolio />;
-      case 'doctor_portfolio_edit':  return <DoctorPortfolioEdit />;
-      case 'patient_contact_form':   return <PatientContactForm />;
+      // Operator / Admin
+      case 'operator_dashboard':   return <OperatorPanel />;
+      case 'admin_dashboard':      return <AdminPanel />;
+      case 'specialist_dashboard': return <SpecialistDashboard />;
+      // Doctor
+      case 'doctor_dashboard':        return <DoctorDashboard />;
+      case 'doctor_patient_view':     return <DoctorDashboard />;
+      case 'doctor_profile_setup':    return <DoctorProfileSetup />;
+      case 'doctor_public_profile':   return <DoctorPublicProfile />;
+      case 'doctor_private_panel':    return <DoctorPrivatePanel />;
+      case 'doctor_tariff_select':    return <TariffSelection />;
+      case 'doctor_clinic_manage':    return <DoctorClinicManage />;
+      case 'doctor_verification':     return <DoctorPrivatePanel />;
+      case 'doctor_portfolio':        return <DoctorPortfolio />;
+      case 'doctor_portfolio_edit':   return <DoctorPortfolioEdit />;
+      case 'patient_contact_form':    return <PatientContactForm />;
       case 'doctor_contact_requests': return <DoctorContactRequests />;
       case 'doctor_template_manager': return <DoctorTemplateManager />;
-      case 'conversations_list':     return <ConversationsList />;
-      case 'chat_screen':            return <ChatScreen />;
-      case 'doctor_faq_view':        return <DoctorFAQView />;
-      case 'doctor_faq_editor':      return <DoctorFAQEditor />;
-      case 'doctor_services_view':   return <DoctorServicesView />;
-      case 'doctor_services_editor': return <DoctorServicesEditor />;
+      case 'conversations_list':      return <ConversationsList />;
+      case 'chat_screen':             return <ChatScreen />;
+      case 'doctor_faq_view':         return <DoctorFAQView />;
+      case 'doctor_faq_editor':       return <DoctorFAQEditor />;
+      case 'doctor_services_view':    return <DoctorServicesView />;
+      case 'doctor_services_editor':  return <DoctorServicesEditor />;
       case 'doctor_anonymous_number': return <DoctorAnonymousNumber />;
-      case 'doctor_telegram_bot':    return <DoctorTelegramBot />;
-      case 'doctor_ad_settings':     return <DoctorAdSettings />;
-      case 'doctor_share_profile':   return <DoctorShareProfile />;
-      case 'doctor_calendar_view':   return <DoctorCalendarView />;
-      case 'doctor_calendar_settings': return <DoctorCalendarSettings />;
-      case 'patient_booking_calendar': return <PatientBookingCalendar />;
-      case 'patient_booking_confirm':  return <PatientBookingConfirm />;
+      case 'doctor_telegram_bot':     return <DoctorTelegramBot />;
+      case 'doctor_ad_settings':      return <DoctorAdSettings />;
+      case 'doctor_share_profile':    return <DoctorShareProfile />;
+      case 'doctor_calendar_view':    return <DoctorCalendarView />;
+      case 'doctor_calendar_settings':return <DoctorCalendarSettings />;
+      case 'patient_booking_calendar':return <PatientBookingCalendar />;
+      case 'patient_booking_confirm': return <PatientBookingConfirm />;
+      // Web Platform
       case 'web_doctor_profiles':     return <WebDoctorProfilesScreen />;
       case 'web_tariff_manage':       return <WebTariffManageScreen />;
       case 'web_calendar_manage':     return <WebCalendarManageScreen />;
-      case 'kassir_dashboard':       return <KassirDashboard />;
-      case 'web_login':           return <WebPlatformLogin />;
-      case 'web_dashboard':       return <WebPlatformDashboard />;
-      case 'notifications':       return <NotificationsScreen />;
-      case 'profile':             return <ProfileScreen />;
-      default:                    return <SplashScreen />;
+      case 'kassir_dashboard':        return <KassirDashboard />;
+      case 'web_login':               return <WebPlatformLogin />;
+      case 'web_dashboard':           return <WebPlatformDashboard />;
+      // Shared
+      case 'notifications':           return <NotificationsScreen />;
+      case 'profile':                 return <ProfileScreen />;
+      default:                        return <SplashScreen />;
     }
   };
 
@@ -171,11 +211,15 @@ function AppContent() {
       {isWebScreen ? (
         // Full-screen desktop layout — max-w-md yo'q
         <div className="min-h-screen relative">
-          {renderScreen()}
+          <Suspense fallback={<ScreenLoader />}>
+            {renderScreen()}
+          </Suspense>
         </div>
       ) : (
         <div className={`max-w-md mx-auto min-h-screen bg-gray-50 relative overflow-hidden ${showNav ? 'pb-[64px]' : ''}`}>
-          {renderScreen()}
+          <Suspense fallback={<ScreenLoader />}>
+            {renderScreen()}
+          </Suspense>
         </div>
       )}
       <BottomNav />
