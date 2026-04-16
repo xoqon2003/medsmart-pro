@@ -89,9 +89,17 @@ export function AppProvider({ children, initialScreen = 'splash' }: { children: 
   const closeServiceSheet = useCallback(() => setServiceSheetOpen(false), []);
 
   useEffect(() => {
+    // Foydalanuvchi tizimga kirmagan bo'lsa — API so'rovlarini yubormaymiz.
+    // Login/splash ekranlarida keraksiz network trafikni oldini oladi.
+    // User o'zgarganda (login/logout) bu effect qayta ishlaydi.
+    if (!currentUser) {
+      setApplications([]);
+      setNotifications([]);
+      return;
+    }
     applicationService.getAll().then(setApplications);
     notificationService.getAll().then(setNotifications);
-  }, []);
+  }, [currentUser?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Deep-link: /d/{slug} URL orqali shifokor profilini ochish
   useEffect(() => {
