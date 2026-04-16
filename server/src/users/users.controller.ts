@@ -10,9 +10,12 @@ import {
   Request,
   ForbiddenException,
 } from '@nestjs/common';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtGuard } from '../auth/jwt.guard';
+import { UpdateUserDto } from './dto/update-user.dto';
 
+@ApiTags('users')
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -37,11 +40,12 @@ export class UsersController {
    * Faqat o'zining profilini yoki ADMIN boshqa foydalanuvchilarni
    * o'zgartira oladi.
    */
+  @ApiBearerAuth()
   @UseGuards(JwtGuard)
   @Put(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: any,
+    @Body() data: UpdateUserDto,
     @Request() req: { user: { sub: number; role: string } },
   ) {
     const isSelf = req.user?.sub === id;
