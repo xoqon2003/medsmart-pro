@@ -1,5 +1,6 @@
-// Mock servislar (backend ishlamayotganda)
-export * from './mock';
+// Dev: mock servislar  |  Prod: API implementatsiyalari (vite.config.ts aliasi orqali)
+// core-switch.mock.ts production build'da core-switch.prod.ts bilan almashtiriladi.
+export * from './core-switch.mock';
 
 // Mock'da yo'q servislarni API'dan import qilamiz (fallback)
 export { doctorService } from './api/doctorService';

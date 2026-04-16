@@ -11,10 +11,27 @@ export default defineConfig(({ command }) => ({
     tailwindcss(),
   ],
   resolve: {
-    alias: {
+    alias: [
       // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
-    },
+      { find: '@', replacement: path.resolve(__dirname, './src') },
+
+      // ── HIGH-8: Mock data tree-shake ──────────────────────────────────────
+      // Production build'da:
+      //   1. core-switch.mock → core-switch.prod  (mock services → API services)
+      //   2. /data/mockData   → mockData.prod      (858 sat mock ma'lumot → bo'sh stub)
+      // Natijada mockData.ts production bundle'ga KIRMAYDI.
+      // Dev rejimida ('vite dev') bu aliaslar ISHLAMAYDI — mock ma'lumotlar saqlanadi.
+      ...(command === 'build' ? [
+        {
+          find: /.*core-switch\.mock$/,
+          replacement: path.resolve(__dirname, 'src/services/core-switch.prod.ts'),
+        },
+        {
+          find: /[/\\]data[/\\]mockData$/,
+          replacement: path.resolve(__dirname, 'src/app/data/mockData.prod.ts'),
+        },
+      ] : []),
+    ],
   },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.
