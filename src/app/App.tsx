@@ -1,6 +1,7 @@
 import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router';
 import { AppProvider, useApp } from './store/appStore';
+import { LocaleProvider } from './store/LocaleContext';
 import { BottomNav, SHOW_NAV_ON } from './components/ui/BottomNav';
 import { ServiceSelectionBottomSheet } from './components/patient/ServiceSelectionBottomSheet';
 import type { Screen } from './types';
@@ -8,6 +9,9 @@ import type { Screen } from './types';
 // ── Eager (darhol yuklanadi) ──────────────────────────────────────────────────
 import { SplashScreen } from './components/screens/SplashScreen';
 import { RoleSelect }   from './components/screens/RoleSelect';
+import { TermsAcceptDialog } from './components/common/TermsAcceptDialog';
+import { PWAUpdatePrompt } from './components/common/PWAUpdatePrompt';
+import { OfflineBanner } from './components/common/OfflineBanner';
 
 // ── Lazy (ekranga o'tgandagina yuklanadi) ────────────────────────────────────
 const lazy$ = <T extends React.ComponentType<any>>(
@@ -99,6 +103,18 @@ const WebCalendarManageScreen= lazy$(() => import('./components/screens/web/WebC
 
 // Kassir
 const KassirDashboard        = lazy$(() => import('./components/screens/kassir/KassirDashboard'),              'KassirDashboard');
+
+// Kasalliklar KB
+const DiseaseListPage      = lazy$(() => import('./pages/diseases/DiseaseListPage'),  'DiseaseListPage');
+const DiseaseCardPage      = lazy$(() => import('./pages/diseases/DiseaseCardPage'),  'DiseaseCardPage');
+
+// KB Admin
+const KBDiseaseEditorPage  = lazy$(() => import('./pages/kb/KBDiseaseEditorPage'),   'KBDiseaseEditorPage');
+const KBReviewQueuePage    = lazy$(() => import('./pages/kb/KBReviewQueuePage'),      'KBReviewQueuePage');
+
+// Shifokor Inbox (Triage natijalar)
+const CasesInboxPage       = lazy$(() => import('./pages/cases/CasesInboxPage'),      'CasesInboxPage');
+const CaseDetailPage       = lazy$(() => import('./pages/cases/CaseDetailPage'),      'CaseDetailPage');
 
 // ── Suspense fallback ─────────────────────────────────────────────────────────
 function ScreenLoader() {
@@ -217,6 +233,19 @@ function AppRoutes() {
       <Route path="/web/admin/tariflar"              element={<WebTariffManageScreen />} />
       <Route path="/web/admin/kalendar"              element={<WebCalendarManageScreen />} />
 
+      {/* Kasalliklar KB */}
+      <Route path="/kasalliklar"       element={<DiseaseListPage />} />
+      <Route path="/kasalliklar/:slug" element={<DiseaseCardPage />} />
+
+      {/* KB Admin */}
+      <Route path="/kb/diseases/new"        element={<KBDiseaseEditorPage />} />
+      <Route path="/kb/diseases/:slug/edit" element={<KBDiseaseEditorPage />} />
+      <Route path="/kb/review"              element={<KBReviewQueuePage />} />
+
+      {/* Shifokor Inbox — triage natijalar */}
+      <Route path="/shifokor/inbox"     element={<CasesInboxPage />} />
+      <Route path="/shifokor/inbox/:id" element={<CaseDetailPage />} />
+
       {/* Fallback — noma'lum URL splash ga yuboriladi */}
       <Route path="*" element={<SplashScreen />} />
     </Routes>
@@ -249,6 +278,15 @@ function AppContent() {
       )}
       <BottomNav />
 
+      {/* Offline holat banneri — tarmoq ulanishi yo'qligida yuqorida ko'rinadi */}
+      <OfflineBanner />
+
+      {/* PWA yangi versiya taklifi — Service Worker yangilanishida ko'rinadi */}
+      <PWAUpdatePrompt />
+
+      {/* Bir martalik shartlar dialogi — app birinchi ochilganda */}
+      <TermsAcceptDialog />
+
       {/* Global service selection sheet — triggered from anywhere */}
       <ServiceSelectionBottomSheet
         open={serviceSheetOpen}
@@ -272,9 +310,11 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AppProvider>
-        <AppContent />
-      </AppProvider>
+      <LocaleProvider>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </LocaleProvider>
     </BrowserRouter>
   );
 }

@@ -1,11 +1,14 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Bell, User, FileText, CheckCircle, AlertCircle, ChevronRight,
   Brain, Star, Send, Download, Eye, Stethoscope, ChevronDown, ChevronUp,
-  Plus, Clock, Printer, Share2, Check, X, Upload
+  Plus, Clock, Printer, Share2, Check, X, Upload, MessageCircle, Inbox
 } from 'lucide-react';
+import { useDoctorInbox } from '../../../hooks/useDoctorInbox';
 import { useApp } from '../../../store/appStore';
+import { ChatWindow } from '../../chat/ChatWindow';
 import {
   getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice, getConclusionTypeLabel
 } from '../../../utils/formatters';
@@ -25,13 +28,15 @@ const DOCTOR_TEMPLATES = [
   "Ambulatoriya davolash ko'rsatilgan, kasalxonaga yotqizish shart emas.",
 ];
 
-const TABS = ['Barcha arizalar', 'Faol', 'Bajarildi'];
+const TABS = ['Barcha arizalar', 'Faol', 'Bajarildi', 'Keluvchi murojaatlar'];
 
 export function DoctorDashboard() {
   const {
     currentUser, applications, navigate,
     addConclusionToApp, addNotification, unreadCount
   } = useApp();
+  const routerNavigate = useNavigate();
+  const { data: inboxData } = useDoctorInbox({ status: 'SENT_TO_DOCTOR', limit: 1 });
 
   const [activeTab, setActiveTab] = useState(0);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
@@ -704,7 +709,7 @@ export function DoctorDashboard() {
         {/* Tabs */}
         <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm mb-4">
           {TABS.map((tab, i) => {
-            const counts = [stats.total, stats.active, stats.done];
+            const counts = [stats.total, stats.active, stats.done, 0];
             return (
               <button
                 key={tab}
@@ -724,7 +729,50 @@ export function DoctorDashboard() {
           })}
         </div>
 
+        {/* Keluvchi murojaatlar (triage) tab */}
+        {activeTab === TABS.length - 1 && (
+          <div className="space-y-4 pb-24">
+            {/* Demo chat */}
+            <div className="bg-white rounded-2xl shadow-sm p-3">
+              <div className="flex items-center gap-2 mb-3">
+                <MessageCircle className="w-4 h-4 text-sky-600" />
+                <p className="text-gray-700 text-sm font-medium">Bemor bilan suhbat</p>
+                <span className="text-xs bg-sky-100 text-sky-600 px-2 py-0.5 rounded-full ml-auto">Demo</span>
+              </div>
+              <ChatWindow
+                roomId="consultation_demo"
+                currentUserId={currentUser?.id ?? 0}
+                className="h-[420px]"
+              />
+            </div>
+
+            {/* Inbox CTA */}
+            <button
+              type="button"
+              onClick={() => routerNavigate('/shifokor/inbox')}
+              className="w-full bg-white rounded-2xl border border-primary/20 shadow-sm p-4 flex items-center gap-4 hover:border-primary/50 hover:shadow-md transition-all text-left"
+            >
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Inbox className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-sm text-foreground">Triage natijalari</p>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Bemorlar yuborgan simptom sessiyalarini ko'rish
+                </p>
+              </div>
+              {(inboxData?.total ?? 0) > 0 && (
+                <span className="shrink-0 min-w-[24px] h-6 px-1.5 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
+                  {inboxData!.total}
+                </span>
+              )}
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
+            </button>
+          </div>
+        )}
+
         {/* Application cards */}
+        {activeTab < TABS.length - 1 && (
         <div className="space-y-3 pb-24">
           {tabApps.length === 0 ? (
             <div className="text-center py-12">
@@ -882,6 +930,7 @@ export function DoctorDashboard() {
             })
           )}
         </div>
+        )}
       </div>
     </div>
   );
