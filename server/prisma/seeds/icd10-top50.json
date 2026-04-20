@@ -1,0 +1,502 @@
+[
+  {
+    "icd10": "I10",
+    "nameUz": "Arterial gipertoniya",
+    "nameLat": "Hypertensio arterialis",
+    "nameRu": "Артериальная гипертензия",
+    "synonyms": ["Qon bosimining ko'tarilishi", "Gipertoniya kasalligi", "AGB"],
+    "slug": "arterial-gipertoniya-i10",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "I20",
+    "nameUz": "Stenokardiya",
+    "nameLat": "Angina pectoris",
+    "nameRu": "Стенокардия",
+    "synonyms": ["Ko'krak qisishi", "Yurak og'rig'i", "Angina"],
+    "slug": "stenokardiya-i20",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "I21",
+    "nameUz": "O'tkir miokard infarkti",
+    "nameLat": "Infarctus myocardii acutus",
+    "nameRu": "Острый инфаркт миокарда",
+    "synonyms": ["Yurak xuruji", "Miokard nekrozi", "OMI"],
+    "slug": "miokard-infarkti-i21",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "I50",
+    "nameUz": "Yurak yetishmovchiligi",
+    "nameLat": "Insufficientia cordis",
+    "nameRu": "Сердечная недостаточность",
+    "synonyms": ["Yurak sustligi", "Kardial dekompensatsiya"],
+    "slug": "yurak-yetishmovchiligi-i50",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "I63",
+    "nameUz": "Ishemik insult",
+    "nameLat": "Infarctus cerebri",
+    "nameRu": "Ишемический инсульт",
+    "synonyms": ["Miya qon aylanishining buzilishi", "Insult", "ONMK"],
+    "slug": "ishemik-insult-i63",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "I73.9",
+    "nameUz": "Periferik arteriya kasalligi",
+    "nameLat": "Morbus arteriarum periphericarum",
+    "nameRu": "Болезнь периферических артерий",
+    "synonyms": ["Oyoq tomirlarining kasalligi", "Periferik obliteratsiya"],
+    "slug": "periferik-arteriya-kasalligi-i739",
+    "categorySlug": "yurak-qon-tomir",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "J00",
+    "nameUz": "O'tkir rinit",
+    "nameLat": "Rhinitis acuta",
+    "nameRu": "Острый ринит",
+    "synonyms": ["Tumov", "Burun yallig'lanishi", "Shamollash"],
+    "slug": "utir-rinit-j00",
+    "categorySlug": "nafas-yullari",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "J06",
+    "nameUz": "ORVI",
+    "nameLat": "Infectio viralis respiratoria acuta",
+    "nameRu": "ОРВИ",
+    "synonyms": ["O'tkir respirator virusli infeksiya", "Shamollash", "Gripp kabi kasallik"],
+    "slug": "orvi-j06",
+    "categorySlug": "nafas-yullari",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "J18",
+    "nameUz": "Pnevmoniya",
+    "nameLat": "Pneumonia",
+    "nameRu": "Пневмония",
+    "synonyms": ["O'pka yallig'lanishi", "Pnevmonit"],
+    "slug": "pnevmoniya-j18",
+    "categorySlug": "nafas-yullari",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "J45",
+    "nameUz": "Bronxial astma",
+    "nameLat": "Asthma bronchiale",
+    "nameRu": "Бронхиальная астма",
+    "synonyms": ["Astma", "Bronxospazm", "Nafas qisilishi"],
+    "slug": "bronxial-astma-j45",
+    "categorySlug": "nafas-yullari",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "J40",
+    "nameUz": "Bronxit",
+    "nameLat": "Bronchitis",
+    "nameRu": "Бронхит",
+    "synonyms": ["Bronx yallig'lanishi", "O'tkir bronxit"],
+    "slug": "bronxit-j40",
+    "categorySlug": "nafas-yullari",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "J35",
+    "nameUz": "Tonzillit",
+    "nameLat": "Tonsillitis chronica",
+    "nameRu": "Тонзиллит",
+    "synonyms": ["Bodomcha bezlari yallig'lanishi", "Angina surunkali shakli"],
+    "slug": "tonzillit-j35",
+    "categorySlug": "nafas-yullari",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "K25",
+    "nameUz": "Oshqozon yarasi",
+    "nameLat": "Ulcus ventriculi",
+    "nameRu": "Язва желудка",
+    "synonyms": ["Gastrik yara", "Oshqozon peptic yarasi"],
+    "slug": "oshqozon-yarasi-k25",
+    "categorySlug": "hazm-tizimi",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "K27",
+    "nameUz": "Peptik yara",
+    "nameLat": "Ulcus pepticum",
+    "nameRu": "Пептическая язва",
+    "synonyms": ["12 barmoqli ichak yarasi", "Duodenal yara"],
+    "slug": "peptik-yara-k27",
+    "categorySlug": "hazm-tizimi",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "K29",
+    "nameUz": "Gastrit",
+    "nameLat": "Gastritis",
+    "nameRu": "Гастрит",
+    "synonyms": ["Oshqozon shilliq qavatining yallig'lanishi", "O'tkir gastrit"],
+    "slug": "gastrit-k29",
+    "categorySlug": "hazm-tizimi",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "K80",
+    "nameUz": "O't-tosh kasalligi",
+    "nameLat": "Cholelithiasis",
+    "nameRu": "Желчнокаменная болезнь",
+    "synonyms": ["O't pufagidagi toshlar", "Xoletsistolitiaz"],
+    "slug": "ot-tosh-kasalligi-k80",
+    "categorySlug": "hazm-tizimi",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "K92",
+    "nameUz": "Oshqozon-ichak traktidan qon ketish",
+    "nameLat": "Haemorrhagia tractus gastrointestinalis",
+    "nameRu": "Желудочно-кишечное кровотечение",
+    "synonyms": ["GI qon ketish", "Ichki qon ketish"],
+    "slug": "gi-qon-ketish-k92",
+    "categorySlug": "hazm-tizimi",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "K58",
+    "nameUz": "Ta'sirlanuvchan ichak sindromi",
+    "nameLat": "Syndroma intestini irritabilis",
+    "nameRu": "Синдром раздражённого кишечника",
+    "synonyms": ["IBS", "Funksional kolopatiya", "Spastik kolit"],
+    "slug": "tassirlanuvchan-ichak-sindromi-k58",
+    "categorySlug": "hazm-tizimi",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "E11",
+    "nameUz": "Qandli diabet 2-tur",
+    "nameLat": "Diabetes mellitus typus 2",
+    "nameRu": "Сахарный диабет 2 типа",
+    "synonyms": ["2-toifali diabet", "Insulin qarshiligi diabeti"],
+    "slug": "qandli-diabet-2-tur-e11",
+    "categorySlug": "endokrin",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "E10",
+    "nameUz": "Qandli diabet 1-tur",
+    "nameLat": "Diabetes mellitus typus 1",
+    "nameRu": "Сахарный диабет 1 типа",
+    "synonyms": ["1-toifali diabet", "Insulin-dependent diabet", "Yoshlik diabeti"],
+    "slug": "qandli-diabet-1-tur-e10",
+    "categorySlug": "endokrin",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "E05",
+    "nameUz": "Tirotoksikoz",
+    "nameLat": "Thyrotoxicosis",
+    "nameRu": "Тиреотоксикоз",
+    "synonyms": ["Qalqonsimon bez giperaktivligi", "Gipotireoz", "Greyvs kasalligi"],
+    "slug": "tirotoksikoz-e05",
+    "categorySlug": "endokrin",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "E03",
+    "nameUz": "Gipotireoz",
+    "nameLat": "Hypothyreosis",
+    "nameRu": "Гипотиреоз",
+    "synonyms": ["Qalqonsimon bez sustligi", "Tireoid yetishmovchiligi"],
+    "slug": "gipotireoz-e03",
+    "categorySlug": "endokrin",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "E66",
+    "nameUz": "Semizlik",
+    "nameLat": "Obesitas",
+    "nameRu": "Ожирение",
+    "synonyms": ["Ortiqcha vazn", "Adipozitas"],
+    "slug": "semizlik-e66",
+    "categorySlug": "endokrin",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "E78",
+    "nameUz": "Dislipidemiya",
+    "nameLat": "Dyslipidaemia",
+    "nameRu": "Дислипидемия",
+    "synonyms": ["Xolesterin yuksalishi", "Giperxolesterinemiya", "Triglitseridlarning ko'tarilishi"],
+    "slug": "dislipidemiya-e78",
+    "categorySlug": "endokrin",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "G43",
+    "nameUz": "Migren",
+    "nameLat": "Migrena",
+    "nameRu": "Мигрень",
+    "synonyms": ["Bir tomonlama bosh og'rig'i", "Hemikraniya"],
+    "slug": "migren-g43",
+    "categorySlug": "nerv-tizimi",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "G40",
+    "nameUz": "Epilepsiya",
+    "nameLat": "Epilepsia",
+    "nameRu": "Эпилепсия",
+    "synonyms": ["Tutqanoq kasalligi", "Xuruji bilan o'tadigan kasallik"],
+    "slug": "epilepsiya-g40",
+    "categorySlug": "nerv-tizimi",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "G35",
+    "nameUz": "Ko'p skleroz",
+    "nameLat": "Sclerosis multiplex",
+    "nameRu": "Рассеянный склероз",
+    "synonyms": ["Tarqoq skleroz", "Multipl skleroz", "MS"],
+    "slug": "kop-skleroz-g35",
+    "categorySlug": "nerv-tizimi",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "G20",
+    "nameUz": "Parkinson kasalligi",
+    "nameLat": "Morbus Parkinson",
+    "nameRu": "Болезнь Паркинсона",
+    "synonyms": ["Parkinsonizm", "Qaltirash falaji"],
+    "slug": "parkinson-kasalligi-g20",
+    "categorySlug": "nerv-tizimi",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "G30",
+    "nameUz": "Altsgeymer kasalligi",
+    "nameLat": "Morbus Alzheimer",
+    "nameRu": "Болезнь Альцгеймера",
+    "synonyms": ["Senilya demansiya", "Alzheimer"],
+    "slug": "altsgeymer-kasalligi-g30",
+    "categorySlug": "nerv-tizimi",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "F32",
+    "nameUz": "Depressiya",
+    "nameLat": "Episodium depressivum",
+    "nameRu": "Депрессия",
+    "synonyms": ["Depressiv epizod", "Ruhiy tushkunlik", "Unipolar depressiya"],
+    "slug": "depressiya-f32",
+    "categorySlug": "nerv-tizimi",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "M05",
+    "nameUz": "Revmatoid artrit",
+    "nameLat": "Arthritis rheumatoidea",
+    "nameRu": "Ревматоидный артрит",
+    "synonyms": ["Bo'g'imlarning yallig'lanishi", "RA", "Revmatizm"],
+    "slug": "revmatoid-artrit-m05",
+    "categorySlug": "tayanch-harakat",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "M16",
+    "nameUz": "Son-chanoq bo'g'imi artrozi",
+    "nameLat": "Coxarthrosis",
+    "nameRu": "Коксартроз",
+    "synonyms": ["Koksartroz", "Son bo'g'imi artrozi"],
+    "slug": "koksartroz-m16",
+    "categorySlug": "tayanch-harakat",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "M54",
+    "nameUz": "Bel og'rig'i",
+    "nameLat": "Dorsalgia",
+    "nameRu": "Боль в спине",
+    "synonyms": ["Dorsalgiya", "Lumbalji", "Radikulit"],
+    "slug": "bel-oghrigi-m54",
+    "categorySlug": "tayanch-harakat",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "M10",
+    "nameUz": "Podagra",
+    "nameLat": "Gout",
+    "nameRu": "Подагра",
+    "synonyms": ["Siydik kislotasining ko'tarilishi", "Giperurikemiya artrit"],
+    "slug": "podagra-m10",
+    "categorySlug": "tayanch-harakat",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "M81",
+    "nameUz": "Osteoporoz",
+    "nameLat": "Osteoporosis",
+    "nameRu": "Остеопороз",
+    "synonyms": ["Suyak zichligi kamayishi", "Suyak sinuvchanligining ortishi"],
+    "slug": "osteoporoz-m81",
+    "categorySlug": "tayanch-harakat",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "N18",
+    "nameUz": "Surunkali buyrak kasalligi",
+    "nameLat": "Morbus renalis chronicus",
+    "nameRu": "Хроническая болезнь почек",
+    "synonyms": ["SBK", "Surunkali nefropatiya", "CKD"],
+    "slug": "surunkali-buyrak-kasalligi-n18",
+    "categorySlug": "buyrak-siydik",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "N39",
+    "nameUz": "Siydik yo'li infeksiyasi",
+    "nameLat": "Infectio tractus urinarii",
+    "nameRu": "Инфекция мочевых путей",
+    "synonyms": ["SYI", "Sistitit", "Pielonefrit"],
+    "slug": "siydik-yoli-infeksiyasi-n39",
+    "categorySlug": "buyrak-siydik",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "N20",
+    "nameUz": "Buyrak toshi",
+    "nameLat": "Calculosis renalis",
+    "nameRu": "Мочекаменная болезнь",
+    "synonyms": ["Nephrolithiasis", "Buyrak-siydik toshi kasalligi"],
+    "slug": "buyrak-toshi-n20",
+    "categorySlug": "buyrak-siydik",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "N04",
+    "nameUz": "Nefrotik sindrom",
+    "nameLat": "Syndroma nephroticum",
+    "nameRu": "Нефротический синдром",
+    "synonyms": ["Buyrak nefrozy", "Proteinuriya sindromi"],
+    "slug": "nefrotik-sindrom-n04",
+    "categorySlug": "buyrak-siydik",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "D50",
+    "nameUz": "Temir tanqisligidan kamqonlik",
+    "nameLat": "Anaemia sideropenica",
+    "nameRu": "Железодефицитная анемия",
+    "synonyms": ["Temir tanqisligi anemiyasi", "Gemoglobin kamligi"],
+    "slug": "temir-tanqisligi-anemiya-d50",
+    "categorySlug": "qon",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "D68",
+    "nameUz": "Qon ivishining buzilishi",
+    "nameLat": "Coagulopathia",
+    "nameRu": "Нарушение свёртываемости крови",
+    "synonyms": ["Koagulopatiya", "Qon ivishmasligi", "Gemofiliiya"],
+    "slug": "qon-ivishi-buzilishi-d68",
+    "categorySlug": "qon",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "L20",
+    "nameUz": "Atopik dermatit",
+    "nameLat": "Dermatitis atopica",
+    "nameRu": "Атопический дерматит",
+    "synonyms": ["Atopik ekzema", "Neyrodermit", "Allergik dermatit"],
+    "slug": "atopik-dermatit-l20",
+    "categorySlug": "teri",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "L40",
+    "nameUz": "Psoriaz",
+    "nameLat": "Psoriasis",
+    "nameRu": "Псориаз",
+    "synonyms": ["Tangachasimon lishay", "Psoriaz kasalligi"],
+    "slug": "psoriaz-l40",
+    "categorySlug": "teri",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "L50",
+    "nameUz": "Eshakemi",
+    "nameLat": "Urticaria",
+    "nameRu": "Крапивница",
+    "synonyms": ["Urtikariya", "Allergik toshmalar"],
+    "slug": "eshakemi-l50",
+    "categorySlug": "teri",
+    "severity": "MILD"
+  },
+  {
+    "icd10": "H25",
+    "nameUz": "Katarakta",
+    "nameLat": "Cataracta",
+    "nameRu": "Катаракта",
+    "synonyms": ["Ko'z gavharining xiralashishi", "Ko'z linzasi kasalligi"],
+    "slug": "katarakta-h25",
+    "categorySlug": "koz",
+    "severity": "MODERATE"
+  },
+  {
+    "icd10": "H40",
+    "nameUz": "Glaukoma",
+    "nameLat": "Glaucoma",
+    "nameRu": "Глаукома",
+    "synonyms": ["Ko'z ichki bosimining ko'tarilishi", "Optik nerv shikastlanishi"],
+    "slug": "glaukoma-h40",
+    "categorySlug": "koz",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "A15",
+    "nameUz": "Sil kasalligi",
+    "nameLat": "Tuberculosis",
+    "nameRu": "Туберкулёз",
+    "synonyms": ["TB", "Tuberkulyoz", "O'pka sili"],
+    "slug": "sil-kasalligi-a15",
+    "categorySlug": "infeksion",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "B19",
+    "nameUz": "Viral gepatit",
+    "nameLat": "Hepatitis viralis",
+    "nameRu": "Вирусный гепатит",
+    "synonyms": ["B gepatit", "C gepatit", "Jigar virusli yallig'lanishi"],
+    "slug": "viral-gepatit-b19",
+    "categorySlug": "infeksion",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "A00",
+    "nameUz": "Vabo",
+    "nameLat": "Cholera",
+    "nameRu": "Холера",
+    "synonyms": ["Cholera", "O'tkir ichak infeksiyasi"],
+    "slug": "vabo-a00",
+    "categorySlug": "infeksion",
+    "severity": "SEVERE"
+  },
+  {
+    "icd10": "A09",
+    "nameUz": "Ich ketish kasalligi",
+    "nameLat": "Diarrhoea infectiosa",
+    "nameRu": "Инфекционная диарея",
+    "synonyms": ["Diareya", "Ichburug'", "Oshqozon-ichak infeksiyasi"],
+    "slug": "ich-ketish-kasalligi-a09",
+    "categorySlug": "infeksion",
+    "severity": "MILD"
+  }
+]

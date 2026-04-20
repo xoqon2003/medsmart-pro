@@ -11,6 +11,9 @@
     "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "prisma:studio": "prisma studio",
+    "openapi:generate": "ts-node scripts/generate-openapi.ts",
+    "seed:diseases": "ts-node -r tsconfig-paths/register scripts/seed-diseases.ts",
+    "db:seed:diseases": "ts-node prisma/seeds/diseases/seed-diseases.ts",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage"
