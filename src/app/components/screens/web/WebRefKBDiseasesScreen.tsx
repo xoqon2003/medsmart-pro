@@ -3,12 +3,56 @@ import { motion, AnimatePresence } from 'motion/react';
 import {
   Search, Plus, Edit3, Trash2, X, ChevronDown, ChevronUp,
   Stethoscope, FlaskConical, BookOpen, Pill, HelpCircle,
-  AlertTriangle, Check, Clock, FileText, User,
+  AlertTriangle, Check, Clock, FileText, User, Loader2,
+  RefreshCw, ExternalLink,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { WebPlatformLayout } from './WebPlatformLayout';
 import { useApp } from '../../../store/appStore';
 import { BODY_ZONES, COMMON_SYMPTOMS } from '../../../data/clinicalKB';
+import { useKBDiseasesList } from '../../../hooks/useKBDiseases';
 import type { KBDisease, KBApprovalStatus, AdaptiveQuestion, DrugRecommendation, DiagnosticProtocol } from '../../../types';
+import type { DiseaseListItem } from '../../../types/api/disease';
+
+// API status → KBApprovalStatus map
+function mapApiStatus(s: DiseaseListItem['status']): KBApprovalStatus {
+  switch (s) {
+    case 'PUBLISHED': return 'approved';
+    case 'DRAFT':     return 'draft';
+    case 'REVIEW':    return 'review';
+    case 'REJECTED':  return 'rejected';
+    case 'ARCHIVED':  return 'rejected';
+    case 'APPROVED':  return 'approved';
+    default:          return 'draft';
+  }
+}
+
+function apiItemToKBDisease(item: DiseaseListItem): KBDisease {
+  return {
+    id: item.id,
+    nameUz: item.nameUz,
+    nameLat: item.nameLat ?? '',
+    icd10: item.icd10,
+    description: '',
+    category: item.category,
+    symptoms: [],
+    requiredSymptoms: [],
+    supportingSymptoms: [],
+    excludingSymptoms: [],
+    specialist: '',
+    relatedSpecialists: [],
+    tests: [],
+    bodyZones: [],
+    adaptiveQuestions: [],
+    drugRecommendations: [],
+    createdBy: '',
+    createdByName: '',
+    createdAt: item.updatedAt,
+    updatedAt: item.updatedAt,
+    approvalStatus: mapApiStatus(item.status),
+    isActive: true,
+  };
+}
 
 // ── Kategoriyalar ──
 const DISEASE_CATEGORIES = [
@@ -120,6 +164,7 @@ type EditTab = 'basic' | 'symptoms' | 'protocol' | 'drugs' | 'questions';
 
 export function WebRefKBDiseasesScreen() {
   const { clinicalKBData, addKBDisease, updateKBDisease, removeKBDisease, setKBDiseases } = useApp();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('Barchasi');
   const [statusFilter, setStatusFilter] = useState<KBApprovalStatus | 'all'>('all');
@@ -127,12 +172,35 @@ export function WebRefKBDiseasesScreen() {
   const [editTab, setEditTab] = useState<EditTab>('basic');
   const [showModal, setShowModal] = useState(false);
 
+  // API/Mock toggle
+  const [useApi] = useState(
+    import.meta.env.PROD || import.meta.env.VITE_USE_REAL_API === 'true',
+  );
+
+  // API query — faqat useApi=true bo'lganda
+  const apiQuery = useKBDiseasesList(useApi ? { limit: 100 } : undefined);
+
   // Birinchi marta ochilganda mock ma'lumotlarni yuklash (agar bo'sh bo'lsa)
   React.useEffect(() => {
-    if (clinicalKBData.length === 0) setKBDiseases(MOCK_DISEASES);
-  }, []);
+    if (!useApi && clinicalKBData.length === 0) setKBDiseases(MOCK_DISEASES);
+  }, []); // eslint-disable-line
 
-  const diseases = clinicalKBData;
+  // API ma'lumotlarini KBDisease formatga map qilish; xato bo'lsa mock'ga fallback
+  const apiDiseases: KBDisease[] = useMemo(() => {
+    if (!useApi) return [];
+    if (!apiQuery.data) return [];
+    return apiQuery.data.items.map(apiItemToKBDisease);
+  }, [useApi, apiQuery.data]);
+
+  // Xato bo'lsa mock'ga fallback qilinadi
+  const diseases: KBDisease[] = useMemo(() => {
+    if (!useApi) return clinicalKBData;
+    if (apiQuery.isError) {
+      // fallback to mock
+      return clinicalKBData.length > 0 ? clinicalKBData : MOCK_DISEASES;
+    }
+    return apiDiseases;
+  }, [useApi, clinicalKBData, apiDiseases, apiQuery.isError]);
 
   const filtered = useMemo(() => diseases.filter(d =>
     (category === 'Barchasi' || d.category === category) &&
@@ -153,6 +221,10 @@ export function WebRefKBDiseasesScreen() {
   };
 
   const openNew = () => {
+    if (useApi) {
+      navigate('/kb/diseases/new');
+      return;
+    }
     const now = new Date().toISOString();
     setEditingDisease({
       id: `kb_${Date.now()}`, nameUz: '', nameLat: '', icd10: '', description: '',
@@ -167,6 +239,11 @@ export function WebRefKBDiseasesScreen() {
   };
 
   const openEdit = (d: KBDisease) => {
+    if (useApi) {
+      // API modeda slug kerak — id'dan foydalanamiz (slug bo'lmasa id bilan)
+      navigate(`/kb/diseases/${d.id}/edit`);
+      return;
+    }
     setEditingDisease({ ...d });
     setEditTab('basic');
     setShowModal(true);
@@ -200,6 +277,14 @@ export function WebRefKBDiseasesScreen() {
   return (
     <WebPlatformLayout title="Kasalliklar bazasi" subtitle="Klinik bilim bazasi — kasalliklar, simptomlar, protokollar">
       <div className="p-6 space-y-5">
+        {/* API holat xabari */}
+        {useApi && apiQuery.isError && (
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm text-yellow-400">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            API ulanmadi — mock ma'lumotlar ko'rsatilmoqda
+          </div>
+        )}
+
         {/* Filtrlar */}
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}
           className="bg-slate-900 border border-slate-800 rounded-2xl p-5">
@@ -214,6 +299,15 @@ export function WebRefKBDiseasesScreen() {
               className="px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white outline-none focus:border-indigo-500 min-w-[180px]">
               {DISEASE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
+            {useApi && (
+              <button
+                onClick={() => navigate('/kb/review')}
+                className="flex items-center gap-2 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-medium transition-colors"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Review navbati
+              </button>
+            )}
             <button onClick={openNew}
               className="flex items-center gap-2 px-5 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-sm font-medium transition-colors">
               <Plus className="w-4 h-4" />
@@ -222,7 +316,7 @@ export function WebRefKBDiseasesScreen() {
           </div>
 
           {/* Status filtrlar */}
-          <div className="flex gap-2 mt-3">
+          <div className="flex gap-2 mt-3 flex-wrap">
             {STATUS_OPTIONS.map(s => (
               <button key={s.key} onClick={() => setStatusFilter(s.key)}
                 className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -231,6 +325,18 @@ export function WebRefKBDiseasesScreen() {
                     : 'bg-slate-800 text-slate-400 hover:text-white'
                 }`}>{s.label}</button>
             ))}
+            {useApi && (
+              <span className={`ml-auto px-2.5 py-1.5 rounded-lg text-xs ${
+                apiQuery.isLoading ? 'text-yellow-400' :
+                apiQuery.isError ? 'text-red-400' : 'text-emerald-400'
+              } flex items-center gap-1`}>
+                {apiQuery.isLoading
+                  ? <><Loader2 className="w-3 h-3 animate-spin" /> Yuklanmoqda...</>
+                  : apiQuery.isError
+                  ? 'API xato (mock)'
+                  : 'API ulangan'}
+              </span>
+            )}
           </div>
         </motion.div>
 

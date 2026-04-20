@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig(({ command }) => ({
   plugins: [
@@ -9,6 +10,69 @@ export default defineConfig(({ command }) => ({
     // Tailwind is not being actively used – do not remove them
     react(),
     tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
+      manifest: {
+        name: 'MedSmart-Pro',
+        short_name: 'MedSmart',
+        description: "O'zbekiston tibbiy ma'lumotlar platformasi",
+        theme_color: '#0f172a',
+        background_color: '#ffffff',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'vite.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+          },
+          {
+            src: 'vite.svg',
+            sizes: '512x512',
+            type: 'image/svg+xml',
+            purpose: 'any maskable',
+          },
+        ],
+      },
+      workbox: {
+        // Cache strategies
+        runtimeCaching: [
+          {
+            // API responses cache
+            urlPattern: /^https?:\/\/.*\/api\/v1\/diseases/,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'diseases-api',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24, // 1 kun
+              },
+            },
+          },
+          {
+            // Static assets
+            urlPattern: /\.(js|css|woff2?|png|svg|ico)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'static-assets',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 kun
+              },
+            },
+          },
+        ],
+        // App shell offline
+        navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/^\/api/],
+      },
+      devOptions: {
+        enabled: false, // dev da SW ni o'chirib qo'y
+      },
+    }),
   ],
   resolve: {
     alias: [
