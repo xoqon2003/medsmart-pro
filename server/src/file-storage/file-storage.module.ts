@@ -8,6 +8,8 @@ import { FileStorageController } from './file-storage.controller';
     MulterModule.register({
       limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
     }),
+    // JwtGuard AuthModule dan keladi — AuthModule @Global() bo'lgani uchun
+    // bu yerda qo'shimcha import kerak emas.
   ],
   controllers: [FileStorageController],
   providers: [FileStorageService],

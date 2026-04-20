@@ -28,6 +28,14 @@ import { FileStorageModule } from './file-storage/file-storage.module';
 import { LaboratoryModule } from './laboratory/laboratory.module';
 import { PharmacyModule } from './pharmacy/pharmacy.module';
 import { EmrModule } from './emr/emr.module';
+import { DiseasesModule } from './diseases/diseases.module';
+import { SymptomsModule } from './symptoms/symptoms.module';
+import { ReferencesModule } from './references/references.module';
+import { DiseaseBlocksModule } from './disease-blocks/disease-blocks.module';
+import { KbModerationModule } from './kb-moderation/kb-moderation.module';
+import { TriageModule } from './triage/triage.module';
+import { ClinicalToolsModule } from './clinical-tools/clinical-tools.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -66,6 +74,14 @@ import { EmrModule } from './emr/emr.module';
     LaboratoryModule,
     PharmacyModule,
     EmrModule,
+    DiseasesModule,
+    SymptomsModule,
+    ReferencesModule,
+    DiseaseBlocksModule,
+    KbModerationModule,
+    TriageModule,
+    ClinicalToolsModule,
+    ChatModule,
   ],
   providers: [
     // Global rate limiter

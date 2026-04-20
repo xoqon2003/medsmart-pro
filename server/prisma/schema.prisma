@@ -17,6 +17,11 @@ enum UserRole {
   OPERATOR
   ADMIN
   KASSIR
+  // ── Disease KB roles (PR-05) ───────────────────────────────────────────────
+  STUDENT
+  NURSE
+  EDITOR
+  MEDICAL_EDITOR
 }
 
 enum Gender {
@@ -200,6 +205,7 @@ model User {
   contactRequests  ContactRequest[] @relation("PatientContacts")
   sentMessages     Message[]          @relation("SentMessages")
   receivedMessages Message[]          @relation("ReceivedMessages")
+  chatMessages     ChatMessage[]      @relation("ChatSentMessages")
   messagePermissions   MessagePermission[]    @relation("PatientPermissions")
   consultationRequests ConsultationRequest[]  @relation("PatientConsultations")
   refreshTokens        RefreshToken[]
@@ -212,6 +218,14 @@ model User {
   patientRecords       MedicalRecord[]    @relation("PatientMedicalRecords")
   doctorRecords        MedicalRecord[]    @relation("DoctorMedicalRecords")
   allergies            Allergy[]          @relation("PatientAllergies")
+
+  // ── Disease KB relations (PR-04) ────────────────────────────────────────
+  diseaseNotes         UserDiseaseNote[]
+  diseaseEditLogs      DiseaseEditLog[]           @relation("DiseaseEditor")
+  sentMatchSessions    SymptomMatchSession[]      @relation("MatchSessionUser")
+  receivedMatchSessions SymptomMatchSession[]     @relation("MatchSessionDoctor")
+  aiTriageSessions     AITriageSession[]
+  publishedCases       ClinicalCase[]             @relation("ClinicalCasePublisher")
 
   @@index([role])
   @@index([phone])
@@ -540,6 +554,9 @@ model DoctorProfile {
   totalRatings          Int   @default(0)
   overallRank           Int?
   specialtyRank         Int?
+
+  // ── Disease KB (PR-04) ─────────────────────────────────────────────────
+  diseaseSpecialties    DiseaseSpecialty[]
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
@@ -940,6 +957,8 @@ model LabTest {
   normalRange String?
   unit        String?
   price       Int           @default(0)
+  // ── Disease KB extension (PR-03) ──────────────────────────────────────────
+  loincCode   String?       // LOINC terminology code
   completedAt DateTime?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
@@ -1014,9 +1033,13 @@ model Medicine {
   sideEffects     String?
   contraindications String?
   isActive        Boolean            @default(true)
+  // ── Disease KB extensions (PR-03) ─────────────────────────────────────────
+  rxnormCode      String?            // RxNorm terminology code
+  innName         String?            // International Nonproprietary Name (WHO INN)
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
   prescriptionItems PrescriptionItem[]
+  diseaseLinks    DiseaseMedication[]
 
   @@index([category])
   @@index([name])
@@ -1063,4 +1086,745 @@ model Allergy {
 
   @@index([patientId])
   @@unique([patientId, allergen])
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ── Disease Knowledge Base Module ──────────────────────────────────────────────
+// PR-02..PR-06 (see docs/analysis/implementation-plan.md §3 Faza 0)
+// Frontend type mapping (src/app/types/index.ts):
+//   KBApprovalStatus 'draft'|'review'|'approved'|'rejected'  ↔  ApprovalStatus DRAFT|REVIEW|APPROVED|REJECTED
+//   (backend adds PUBLISHED + ARCHIVED as additional lifecycle states).
+//   EvidenceLevel 'A'|'B'|'C'|'D'                            ↔  EvidenceLevel A|B|C|D
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── KB Enums (PR-02) ───────────────────────────────────────────────────────────
+
+enum ApprovalStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum EvidenceLevel {
+  A
+  B
+  C
+  D
+}
+
+enum ContentLevel {
+  L1
+  L2
+  L3
+}
+
+enum AudienceMode {
+  PATIENT
+  STUDENT
+  NURSE
+  DOCTOR
+  SPECIALIST
+  MIXED
+}
+
+enum DiseaseSeverity {
+  MILD
+  MODERATE
+  SEVERE
+}
+
+enum SymptomSeverity {
+  MILD
+  MODERATE
+  SEVERE
+  CRITICAL
+}
+
+enum ReferenceType {
+  DOI
+  PUBMED
+  URL
+  WHO
+  PROTOCOL
+  BOOK
+  LOCAL_PROTOCOL
+}
+
+// ── KB Enums (PR-03) ───────────────────────────────────────────────────────────
+
+enum StageType {
+  EARLY
+  EXPANDED
+  LATE
+}
+
+enum MedicationVisibility {
+  PATIENT
+  STUDENT
+  DOCTOR
+}
+
+enum LabTestPriority {
+  MINIMUM
+  EXTENDED
+}
+
+enum TranslationStatus {
+  AUTO
+  REVIEWED
+  VERIFIED
+  PENDING
+}
+
+// ── KB Enums (PR-04) ───────────────────────────────────────────────────────────
+
+enum SymptomAnswer {
+  YES
+  NO
+  UNKNOWN
+  SOMETIMES
+}
+
+enum MatchSessionStatus {
+  ACTIVE
+  SENT_TO_DOCTOR
+  EXPIRED
+  ARCHIVED
+}
+
+enum EditLogType {
+  CREATE
+  UPDATE
+  DELETE
+  STATUS_CHANGE
+}
+
+// ── Disease (PR-02) ────────────────────────────────────────────────────────────
+
+model Disease {
+  id                String           @id @default(uuid())
+  slug              String           @unique
+  icd10             String           @unique
+  icd11             String?
+  nameUz            String
+  nameRu            String?
+  nameEn            String?
+  nameLat           String?
+  synonyms          String[]         @default([])
+  category          String
+  audienceLevels    AudienceMode[]   @default([])
+  severityLevels    DiseaseSeverity[] @default([])
+  protocolSources   String[]         @default([])
+  status            ApprovalStatus   @default(DRAFT)
+  editorId          Int?
+  // ── FTS (PR-06) ────────────────────────────────────────────────────────
+  searchVector      Unsupported("tsvector")?
+  // ── pgvector: 1536-dimension OpenAI embedding (PR-07) ─────────────────
+  embedding         Unsupported("vector(1536)")?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  // Relations
+  diseaseSymptoms   DiseaseSymptom[]
+  references        DiseaseReference[]
+  blocks            DiseaseBlock[]
+  stages            DiseaseStage[]
+  medications       DiseaseMedication[]
+  labTests          DiseaseLabTest[]
+  clinicalCases     ClinicalCase[]
+  userNotes         UserDiseaseNote[]
+  matchSessions     SymptomMatchSession[]
+  editLogs          DiseaseEditLog[]
+  epidemiology      RegionEpidemiology[]
+  specialties       DiseaseSpecialty[]
+
+  @@index([category])
+  @@index([updatedAt])
+  @@index([status])
+}
+
+// ── Symptom (PR-02) ────────────────────────────────────────────────────────────
+
+model Symptom {
+  id           String           @id @default(uuid())
+  code         String           @unique
+  nameUz       String
+  nameRu       String?
+  nameEn       String?
+  nameLat      String?
+  category     String
+  bodyZone     String?
+  severity     SymptomSeverity  @default(MILD)
+  synonyms     String[]         @default([])
+  isRedFlag    Boolean          @default(false)
+  // ── FTS (PR-06) ────────────────────────────────────────────────────────
+  searchVector Unsupported("tsvector")?
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  diseaseLinks DiseaseSymptom[]
+
+  @@index([category])
+  @@index([bodyZone])
+}
+
+// ── DiseaseSymptom M2M (PR-02) ─────────────────────────────────────────────────
+
+model DiseaseSymptom {
+  id           String   @id @default(uuid())
+  diseaseId    String
+  symptomId    String
+  weight       Decimal  @db.Decimal(5, 3) @default(1.000)
+  specificity  Decimal? @db.Decimal(5, 3)
+  sensitivity  Decimal? @db.Decimal(5, 3)
+  isRequired   Boolean  @default(false)
+  isExcluding  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  disease      Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  symptom      Symptom  @relation(fields: [symptomId], references: [id], onDelete: Cascade)
+
+  @@unique([diseaseId, symptomId])
+  @@index([diseaseId])
+  @@index([symptomId])
+}
+
+// ── Reference (PR-02) ──────────────────────────────────────────────────────────
+
+model Reference {
+  id             String         @id @default(uuid())
+  type           ReferenceType
+  citation       String         @db.Text
+  url            String?
+  doi            String?        @unique
+  pubmedId       String?
+  whoCode        String?
+  publishedAt    DateTime?
+  accessedAt     DateTime       @default(now())
+  evidenceLevel  EvidenceLevel  @default(C)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  diseases       DiseaseReference[]
+  epidemiology   RegionEpidemiology[]
+
+  @@index([type])
+  @@index([pubmedId])
+}
+
+// ── DiseaseReference M2M (PR-02) ───────────────────────────────────────────────
+
+model DiseaseReference {
+  id            String    @id @default(uuid())
+  diseaseId     String
+  referenceId   String
+  blockMarker   String?
+  note          String?   @db.Text
+  createdAt     DateTime  @default(now())
+
+  disease       Disease   @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  reference     Reference @relation(fields: [referenceId], references: [id], onDelete: Cascade)
+
+  @@unique([diseaseId, referenceId, blockMarker])
+  @@index([diseaseId])
+  @@index([referenceId])
+}
+
+// ── DiseaseBlock (PR-03) ───────────────────────────────────────────────────────
+
+model DiseaseBlock {
+  id                 String            @id @default(uuid())
+  diseaseId          String
+  marker             String            // canonical id: "etiology", "pathogenesis", ...
+  label              String            // display label (synonym variant)
+  level              ContentLevel      @default(L1)
+  orderIndex         Int               @default(0)
+  audiencePriority   Json?             // { patient: 1, doctor: 2, ... }
+  contentMd          String            @db.Text
+  contentJson        Json?
+  translationStatusUz TranslationStatus @default(VERIFIED)
+  translationStatusRu TranslationStatus @default(PENDING)
+  translationStatusEn TranslationStatus @default(PENDING)
+  evidenceLevel      EvidenceLevel     @default(C)
+  status             ApprovalStatus    @default(DRAFT)
+  lastEditedBy       Int?
+  lastEditedAt       DateTime?
+  publishedAt        DateTime?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+
+  disease            Disease           @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  editLogs           DiseaseEditLog[]
+
+  @@index([diseaseId])
+  @@index([marker])
+  @@index([status])
+  @@unique([diseaseId, marker])
+}
+
+// ── DiseaseStage (PR-03) ───────────────────────────────────────────────────────
+
+model DiseaseStage {
+  id              String     @id @default(uuid())
+  diseaseId       String
+  stageType       StageType
+  orderIndex      Int        @default(0)
+  titleUz         String
+  descriptionMd   String     @db.Text
+  imageKey        String?
+  clinicalSigns   String[]   @default([])
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+
+  disease         Disease    @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@index([diseaseId])
+  @@index([stageType])
+}
+
+// ── DiseaseMedication (PR-03) ──────────────────────────────────────────────────
+
+model DiseaseMedication {
+  id                 String                @id @default(uuid())
+  diseaseId          String
+  medicineId         String
+  group              String                // e.g. "NSAID", "DMARD"
+  averageDose        String
+  dosageNotes        String?               @db.Text
+  contraindications  String?               @db.Text
+  interactions       Json?
+  evidenceLevel      EvidenceLevel         @default(C)
+  audienceVisibility MedicationVisibility  @default(DOCTOR)
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+
+  disease            Disease               @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  medicine           Medicine              @relation(fields: [medicineId], references: [id], onDelete: Restrict)
+
+  @@index([diseaseId])
+  @@index([medicineId])
+  @@unique([diseaseId, medicineId, group])
+}
+
+// ── DiseaseLabTest (PR-03) ─────────────────────────────────────────────────────
+// NOTE: Intentionally NOT FK'd to LabTest. Existing LabTest belongs to a per-
+// patient LabOrder (lab order item). DiseaseLabTest is a dictionary reference
+// (which test to run for a disease). Loose reference via LOINC / local code.
+// See plan §3 PR-03 and project context note 7.2.
+
+model DiseaseLabTest {
+  id              String           @id @default(uuid())
+  diseaseId       String
+  labTestCode     String           // LOINC or local code
+  name            String
+  loincCode       String?
+  priority        LabTestPriority  @default(MINIMUM)
+  fastingRequired Boolean          @default(false)
+  timingNotes     String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  disease         Disease          @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@index([diseaseId])
+  @@index([labTestCode])
+  @@unique([diseaseId, labTestCode])
+}
+
+// ── ClinicalCase (PR-03) ───────────────────────────────────────────────────────
+
+model ClinicalCase {
+  id                 String   @id @default(uuid())
+  diseaseId          String
+  anonymousId        String
+  ageRange           String
+  gender             Gender
+  anamnesisMd        String   @db.Text
+  diagnosisResultMd  String   @db.Text
+  treatmentMd        String   @db.Text
+  outcomeMd          String   @db.Text
+  publishedBy        Int?
+  publishedAt        DateTime?
+  consentObtained    Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  disease            Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  publisher          User?    @relation("ClinicalCasePublisher", fields: [publishedBy], references: [id], onDelete: SetNull)
+
+  @@index([diseaseId])
+  @@index([publishedBy])
+}
+
+// ── UserDiseaseNote (PR-04) ────────────────────────────────────────────────────
+
+model UserDiseaseNote {
+  id             String   @id @default(uuid())
+  userId         Int
+  diseaseId      String
+  noteMd         String?  @db.Text
+  symptomAnswers Json?
+  savedAt        DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  disease        Disease  @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([diseaseId])
+  @@unique([userId, diseaseId])
+}
+
+// ── AITriageSession (PR-04) ────────────────────────────────────────────────────
+
+model AITriageSession {
+  id            String   @id @default(uuid())
+  userId        Int?
+  anonymousId   String?
+  symptoms      Json
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  matchSessions SymptomMatchSession[]
+
+  @@index([userId])
+  @@index([anonymousId])
+  @@index([expiresAt])
+}
+
+// ── SymptomMatchSession (PR-04) ────────────────────────────────────────────────
+
+model SymptomMatchSession {
+  id                 String              @id @default(uuid())
+  userId             Int?
+  anonymousId        String?
+  aiTriageSessionId  String?
+  diseaseId          String
+  matchScore         Decimal             @db.Decimal(5, 3) @default(0.000)
+  matchedSymptoms    Json
+  missingSymptoms    Json
+  userAnswers        Json
+  status             MatchSessionStatus  @default(ACTIVE)
+  sentToDoctorId     Int?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  expiresAt          DateTime
+
+  user               User?               @relation("MatchSessionUser", fields: [userId], references: [id], onDelete: SetNull)
+  doctor             User?               @relation("MatchSessionDoctor", fields: [sentToDoctorId], references: [id], onDelete: SetNull)
+  disease            Disease             @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  aiTriageSession    AITriageSession?    @relation(fields: [aiTriageSessionId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([diseaseId])
+  @@index([status])
+  @@index([expiresAt])
+}
+
+// ── DiseaseEditLog (PR-04) ─────────────────────────────────────────────────────
+
+model DiseaseEditLog {
+  id         String       @id @default(uuid())
+  diseaseId  String
+  blockId    String?
+  editorId   Int
+  editType   EditLogType
+  diffJson   Json
+  createdAt  DateTime     @default(now())
+
+  disease    Disease      @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  block      DiseaseBlock? @relation(fields: [blockId], references: [id], onDelete: SetNull)
+  editor     User         @relation("DiseaseEditor", fields: [editorId], references: [id], onDelete: Restrict)
+
+  @@index([diseaseId])
+  @@index([blockId])
+  @@index([editorId])
+  @@index([createdAt])
+}
+
+// ── RegionEpidemiology (PR-04) ─────────────────────────────────────────────────
+
+model RegionEpidemiology {
+  id           String     @id @default(uuid())
+  diseaseId    String
+  region       String     // "UZ", "UZ-TO", "global"
+  prevalence   Decimal?   @db.Decimal(10, 6)
+  incidence    Decimal?   @db.Decimal(10, 6)
+  mortality    Decimal?   @db.Decimal(10, 6)
+  sourceRefId  String?
+  period       String     // e.g. "2023"
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  disease      Disease    @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+  sourceRef    Reference? @relation(fields: [sourceRefId], references: [id], onDelete: SetNull)
+
+  @@index([diseaseId])
+  @@index([region])
+  @@unique([diseaseId, region, period])
+}
+
+// ── DiseaseSpecialty M2M (PR-04) ───────────────────────────────────────────────
+
+model DiseaseSpecialty {
+  id              String        @id @default(uuid())
+  doctorProfileId String
+  diseaseId       String
+  createdAt       DateTime      @default(now())
+
+  doctorProfile   DoctorProfile @relation(fields: [doctorProfileId], references: [id], onDelete: Cascade)
+  disease         Disease       @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorProfileId, diseaseId])
+  @@index([doctorProfileId])
+  @@index([diseaseId])
+}
+
+// ── Real-time Chat (Socket.io) ────────────────────────────────────────────────
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  roomId    String   // "consultation_{id}" | "visit_{id}" | "direct_{userId1}_{userId2}"
+  senderId  Int
+  sender    User     @relation("ChatSentMessages", fields: [senderId], references: [id])
+  content   String   @db.Text
+  type      String   @default("TEXT") // TEXT | TRIAGE_RESULT | FILE
+  createdAt DateTime @default(now())
+
+  @@index([roomId, createdAt])
+  @@index([senderId])
+}
+
+// ─── Triage catalogue (GAP-04/05, frontend-parity) ───────────────────────────
+// These three models persist the clinical catalogue that the frontend
+// currently ships as TypeScript constants (`src/app/lib/red-flag-engine.ts`,
+// `src/app/calculators/*`). Goal: let medical editors update rules/formulas
+// without a redeploy. Bootstrap seed lives in
+// `server/prisma/seeds/triage-catalogue.ts` and mirrors the FE constants.
+
+enum EmergencySeverity {
+  CRITICAL
+  HIGH
+  MODERATE
+}
+
+enum CalculatorInputType {
+  NUMBER
+  BOOLEAN
+  SELECT
+}
+
+/// Universal klinik asbob toifasi (GAP-05d). Har toifa o'z hisoblash va
+/// UI render strategiyasi bilan keladi:
+///   SCORE         — raqamli risk skoreri (CHA₂DS₂-VASc, HEART, Wells)
+///   QUESTIONNAIRE — bemor-hisoboti (PHQ-9, GAD-7, CAT, ACT, AUDIT)
+///   CRITERIA      — boolean diagnostic tree (Light's, Duke, ACR)
+///   DOSE          — dori-doza hisobi (DOCTOR-only audience majburiy)
+///   STAGING       — kasallik bosqichi klassifikatsiyasi (NYHA, MELD, Child-Pugh)
+enum ClinicalToolType {
+  SCORE
+  QUESTIONNAIRE
+  CRITERIA
+  DOSE
+  STAGING
+}
+
+/// RedFlagRule — persistent red-flag rule catalogue.
+///
+/// Scope fields (`applicableCategories`, `applicableIcd10Prefixes`) mirror
+/// the frontend `RedFlagRule` interface exactly — both layers agree that
+/// BOTH filters must match when set (AND semantics), and an unset field
+/// means "open". The boolean decision tree lives in `conditionJson` as a
+/// `RuleCondition` tree; the server never re-evaluates it (compute stays
+/// on the client so alerts render in <50 ms), the DB is source-of-truth.
+model RedFlagRule {
+  id                       String              @id @default(uuid())
+  /// Stable slug matching frontend constants (e.g. 'rule.hypertensive-crisis').
+  ruleKey                  String              @unique
+  /// i18n key for the human-readable name shown in the banner.
+  nameKey                  String
+  /// i18n key for the action/CTA message ('emergency.critical.action', …).
+  actionKey                String
+  severity                 EmergencySeverity
+  applicableCategories     String[]            @default([])
+  applicableIcd10Prefixes  String[]            @default([])
+  /// `RuleCondition` tree (kind: 'symptom' | 'and' | 'or').
+  conditionJson            Json
+  /// Editorial notes / citation; surfaced in the admin UI only.
+  sourceCitation           String?             @db.Text
+  isActive                 Boolean             @default(true)
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+
+  events                   RedFlagEvent[]
+
+  @@index([severity])
+  @@index([isActive])
+}
+
+/// ClinicalTool — universal klinik asbob katalogi (GAP-05d).
+///
+/// Bir model 5 xil asbob turini boshqaradi (`toolType`): SCORE,
+/// QUESTIONNAIRE, CRITERIA, DOSE, STAGING. Avvalgi `ClinicalCalculator`
+/// ham shu yerga birlashtiriladi (`toolType = SCORE`).
+///
+/// Admin boshqaruvi layerlari:
+///   1. `isActive` — global on/off (tizim admin qo'li)
+///   2. `allowedAudiences` — qaysi foydalanuvchi roli ko'rishi mumkin
+///      (bo'sh bo'lsa = hamma authenticated)
+///   3. `requiredRoles` — QAT'IY gate: faqat shu rollar ishlata oladi
+///      (masalan, DOSE toolType majburiy `DOCTOR` bo'ladi)
+///   4. `applicableCategories` + `applicableIcd10Prefixes` — kasallik
+///      scope (AND semantikasi, bo'sh = GLOBAL)
+///   5. `clinicOverridesJson` — har-klinika darajada override JSON
+///      `{ "<clinicId>": { "isActive": false, "reason": "..." } }`
+///
+/// `formulaKey` — whitelist identifier (FE compute function nomi), DB'da
+/// hech qanday arbitrary kod saqlanmaydi. Formula o'zgarishi engineering
+/// PR + code review talab qiladi; editor faqat meta-ma'lumot + scope +
+/// activation'ni boshqaradi.
+model ClinicalTool {
+  id                       String              @id @default(uuid())
+  /// Stable slug mos keladi FE registriga (e.g. 'chads-vasc', 'phq-9').
+  toolKey                  String              @unique
+  toolType                 ClinicalToolType
+
+  // ── i18n + tavsif ────────────────────────────────────────────────────
+  /// i18n key for the tool name ("calc.chadsVasc.name", "tool.phq9.name").
+  nameKey                  String
+  /// i18n key for 1-2 sentence intro shown above the inputs.
+  descriptionKey           String?
+  /// Citation text ("ESC 2020 AF Guidelines", "Kroenke 2001").
+  source                   String
+  /// Optional DOI / URL to primary literature or guideline.
+  sourceUrl                String?
+  evidenceLevel            EvidenceLevel       @default(C)
+
+  // ── Formula (trust boundary) ──────────────────────────────────────────
+  /// Whitelisted compute function identifier on the client.
+  formulaKey               String
+  /// `CalculatorInput[]` or `QuestionnaireItem[]` — shape depends on toolType.
+  inputsJson               Json
+  /// Optional output schema (band thresholds, recommendation map).
+  outputSchemaJson         Json?
+  /// Fine-grained — which audience sees the formula text ('L2' | 'L3').
+  showFormulaForAudience   String?
+
+  // ── Kasallik bo'yicha scope ─────────────────────────────────────────
+  applicableCategories     String[]            @default([])
+  applicableIcd10Prefixes  String[]            @default([])
+
+  // ── Foydalanuvchi rol-boshqaruvi ─────────────────────────────────────
+  /// Kimning UI'da ko'rishi mumkinligini cheklaydi. Bo'sh = barcha
+  /// authenticated foydalanuvchilar. DOSE toolType odatda faqat
+  /// [DOCTOR, SPECIALIST, NURSE] bilan cheklanadi.
+  allowedAudiences         AudienceMode[]      @default([])
+  /// HARD gate: faqat shu rollar API ga muvaffaqiyatli "run" so'rovi
+  /// yubora oladi. Audience'dan ko'ra qattiqroq (backend 403 qaytaradi).
+  /// DOSE toolType uchun majburiy to'ldiriladi (DOCTOR / SPECIALIST).
+  requiredRoles            UserRole[]          @default([])
+
+  // ── Activation + admin audit ─────────────────────────────────────────
+  isActive                 Boolean             @default(true)
+  /// Deaktivatsiya sababi (ADMIN UI'da ko'rinadi, foydalanuvchi ko'rmaydi).
+  deactivationReason       String?             @db.Text
+  deactivatedAt            DateTime?
+  deactivatedBy            Int?
+  /// Per-klinika override map. Format:
+  /// { "<clinicId>": { "isActive": false, "reason": "...", "updatedAt": "..." } }
+  /// Klinika administratori faqat o'z klinikasi uchun yopishi mumkin.
+  clinicOverridesJson      Json?
+
+  // ── Locale + UI ──────────────────────────────────────────────────────
+  /// O'zbek populyatsiyasiga moslik: 'HIGH' | 'MEDIUM' | 'LOW'. LOW
+  /// bo'lsa FE disclaimer banner ko'rsatadi.
+  regionFitness            String?
+  /// UI ordering. Kichik qiymat = yuqoriroq prioritet (default 100).
+  priorityWeight           Int                 @default(100)
+
+  // ── Audit ────────────────────────────────────────────────────────────
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  createdBy                Int?
+  updatedBy                Int?
+
+  usageLogs                ClinicalToolUsageLog[]
+
+  @@index([toolType])
+  @@index([formulaKey])
+  @@index([isActive])
+  @@index([priorityWeight])
+}
+
+/// RedFlagEvent — immutable audit log of rule hits. Written every time a
+/// user's answer set triggers a rule in `SymptomMatchSession`. Critical
+/// for retrospective clinical review and for evaluating over-/under-
+/// triage rates.
+///
+/// Intentionally decoupled from `SymptomMatchSession` via `SetNull` so we
+/// can retain audit trail after a session expires/archives (HIPAA-style
+/// audit persistence, though we do not hold PHI per CLAUDE.md MVP rules).
+model RedFlagEvent {
+  id                String               @id @default(uuid())
+  ruleId            String
+  matchSessionId    String?
+  /// Symptom codes that resolved true (denormalised from the hit).
+  triggeredBy       String[]             @default([])
+  severityAtFire    EmergencySeverity
+  /// Set if the client surfaced the banner to the user.
+  shownToUser       Boolean              @default(true)
+  createdAt         DateTime             @default(now())
+
+  rule              RedFlagRule          @relation(fields: [ruleId], references: [id], onDelete: Restrict)
+
+  @@index([ruleId])
+  @@index([matchSessionId])
+  @@index([createdAt])
+  @@index([severityAtFire])
+}
+
+/// ClinicalToolUsageLog — lightweight adoption tracking. Records WHICH
+/// tool was used against WHICH disease at what result band, without
+/// storing the input values (those are PHI-adjacent).
+///
+/// `toolType` denormalized so analytics queries can group by toolType
+/// without a JOIN. Numeric vs boolean vs band result stored in three
+/// nullable columns — the correct column depends on toolType:
+///   SCORE / DOSE      → `numericValue` + `band` (optional)
+///   QUESTIONNAIRE     → `numericValue` (total) + `band`
+///   CRITERIA          → `booleanValue`
+///   STAGING           → `band` (NYHA I-IV, MELD band, …)
+model ClinicalToolUsageLog {
+  id              String              @id @default(uuid())
+  toolId          String
+  /// Denormalized for analytics; mirrors `tool.toolType`.
+  toolType        ClinicalToolType
+  diseaseId       String?
+  matchSessionId  String?
+  /// Klinika tenant ID (agar foydalanuvchi klinika ichida ishlayotgan bo'lsa).
+  clinicId        Int?
+  /// Shu asbobni ishga tushirgan foydalanuvchi roli — rol-level adoption
+  /// ko'rsatkichlarini olish uchun denormalize qilindi.
+  invokedByRole   UserRole?
+  /// Band stored as string to stay in sync with FE `ToolResult['band']`
+  /// ('low' | 'moderate' | 'high' | 'very_high' | 'nyha-i' | …).
+  band            String?
+  /// SCORE / QUESTIONNAIRE / DOSE numeric result (rounded).
+  numericValue    Decimal?            @db.Decimal(12, 3)
+  /// CRITERIA boolean outcome (true = positive / meets criteria).
+  booleanValue    Boolean?
+  createdAt       DateTime            @default(now())
+
+  tool            ClinicalTool        @relation(fields: [toolId], references: [id], onDelete: Cascade)
+
+  @@index([toolId])
+  @@index([toolType])
+  @@index([diseaseId])
+  @@index([matchSessionId])
+  @@index([clinicId])
+  @@index([createdAt])
 }

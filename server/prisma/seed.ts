@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { seedTriageCatalogue } from './seeds/triage-catalogue';
 
 const prisma = new PrismaClient();
 
@@ -163,6 +164,13 @@ async function main() {
       actorId: users[0].id, actorRole: 'PATIENT', actorName: 'Aziz Karimov',
     },
   });
+
+  // ── Triage catalogue (red-flag rules + universal clinical tools) ──
+  const triage = await seedTriageCatalogue(prisma);
+  console.log(
+    `Triage catalogue: ${triage.rulesUpserted} red-flag rules, ` +
+      `${triage.toolsUpserted} clinical tools upserted.`,
+  );
 
   console.log('Seed completed!');
 }

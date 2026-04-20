@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -7,6 +7,13 @@ import { RolesGuard } from './roles.guard';
 import { TelegramValidator } from './telegram.validator';
 import { SmsModule } from '../sms/sms.module';
 
+/**
+ * @Global — JwtGuard, RolesGuard va JwtService ilovaning ixtiyoriy modulida
+ * AuthModule ni qayta import qilmasdan ishlatilishi uchun. 20+ modul
+ * JwtGuard ishlatadi, ularning har birini import qilish DI duplikatsiyasi
+ * va test qilishda muammolar yaratardi.
+ */
+@Global()
 @Module({
   imports: [
     JwtModule.register({

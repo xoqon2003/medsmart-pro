@@ -9,6 +9,13 @@ import { JobsService } from './jobs.service';
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379', 10),
+        // Lazy connect — ilova boot paytida Redis ga darhol ulanmaydi.
+        // Birinchi queue operatsiyasi (add/process) da ulanadi.
+        // Bu OpenAPI codegen uchun muhim: NestFactory.create() Redis
+        // mavjud bo'lmaganda ham hang bo'lmaydi.
+        lazyConnect: true,
+        // Ulanish muvaffaqiyatsiz bo'lsa cheksiz retry qilmaslik
+        maxRetriesPerRequest: process.env.SKIP_DB_CONNECT === 'true' ? 0 : 3,
       },
     }),
     BullModule.registerQueue({
@@ -26,6 +33,8 @@ export class JobsModule implements OnModuleInit {
   constructor(private jobsService: JobsService) {}
 
   async onModuleInit() {
+    // OpenAPI codegen da recurring jobs kerak emas (Redis ulanmagan)
+    if (process.env.SKIP_DB_CONNECT === 'true') return;
     await this.jobsService.setupRecurringJobs();
   }
 }

@@ -60,6 +60,12 @@ async function bootstrap() {
     .addTag('doctor-profile', 'Shifokor profili')
     .addTag('kassa', 'Kassa operatsiyalari')
     .addTag('health', 'Tizim holati')
+    .addTag('diseases', 'Kasalliklar bazasi')
+    .addTag('symptoms', 'Simptomlar lug\'ati')
+    .addTag('references', 'Tibbiy manbalar')
+    .addTag('disease-blocks', 'Kasallik bloklari')
+    .addTag('markers', 'Canonical marker katalogi')
+    .addTag('icd', 'ICD-10/ICD-11 qidiruv')
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);
