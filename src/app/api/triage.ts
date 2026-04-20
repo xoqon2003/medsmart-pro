@@ -62,3 +62,17 @@ export const saveTriageNote = (sessionId: string, noteMd: string) =>
     method: 'POST',
     body: JSON.stringify({ noteMd }),
   });
+
+/**
+ * Debounced answer sync — persists the current symptom answers to the session.
+ * Called on every answer change with a 600 ms debounce so the DB stays in sync
+ * even if the user leaves before clicking "Shifokorga yuborish".
+ */
+export const updateSessionAnswers = (
+  sessionId: string,
+  userAnswers: Record<string, AnswerValue>,
+): Promise<void> =>
+  apiFetch(`/triage/sessions/${sessionId}/update`, {
+    method: 'POST',
+    body: JSON.stringify({ userAnswers }),
+  });

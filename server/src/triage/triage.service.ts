@@ -340,9 +340,14 @@ export class TriageService {
     if (!session) throw new NotFoundException('Sessiya topilmadi');
     if (session.userId !== userId) throw new ForbiddenException('Ruxsat yo\'q');
 
+    // Build update payload — only include fields present in DTO
+    const data: Record<string, unknown> = {};
+    if (dto.status !== undefined) data.status = dto.status;
+    if (dto.userAnswers !== undefined) data.userAnswers = dto.userAnswers;
+
     return this.p.symptomMatchSession.update({
       where: { id: sessionId },
-      data: { status: dto.status },
+      data,
     });
   }
 

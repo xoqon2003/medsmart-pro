@@ -98,6 +98,44 @@ describe('TriageService', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
+  it('3b. updateSession with userAnswers persists answers to DB', async () => {
+    mockSymptomMatchSession.findUnique.mockResolvedValue({
+      id: 'sess-1', userId: 1, status: 'ACTIVE',
+    });
+    mockSymptomMatchSession.update.mockResolvedValue({
+      id: 'sess-1', status: 'ACTIVE', userAnswers: { FEVER: 'YES', COUGH: 'NO' },
+    });
+    const svc = buildService();
+    const result = await svc.updateSession(1, 'sess-1', {
+      userAnswers: { FEVER: 'YES', COUGH: 'NO' },
+    });
+    expect(mockSymptomMatchSession.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({ userAnswers: { FEVER: 'YES', COUGH: 'NO' } }),
+      }),
+    );
+    expect(result.userAnswers).toEqual({ FEVER: 'YES', COUGH: 'NO' });
+  });
+
+  it('3c. updateSession with both status + userAnswers updates both fields', async () => {
+    mockSymptomMatchSession.findUnique.mockResolvedValue({
+      id: 'sess-2', userId: 5, status: 'ACTIVE',
+    });
+    mockSymptomMatchSession.update.mockResolvedValue({
+      id: 'sess-2', status: 'ARCHIVED', userAnswers: { HEADACHE: 'YES' },
+    });
+    const svc = buildService();
+    await svc.updateSession(5, 'sess-2', {
+      status: 'ARCHIVED',
+      userAnswers: { HEADACHE: 'YES' },
+    });
+    expect(mockSymptomMatchSession.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { status: 'ARCHIVED', userAnswers: { HEADACHE: 'YES' } },
+      }),
+    );
+  });
+
   // ─── listDoctorInbox ──────────────────────────────────────────────────────
 
   it('5. listDoctorInbox: PATIENT role → ForbiddenException', async () => {
