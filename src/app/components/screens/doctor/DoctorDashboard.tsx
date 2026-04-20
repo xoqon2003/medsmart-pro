@@ -7,6 +7,7 @@ import {
   Plus, Clock, Printer, Share2, Check, X, Upload, MessageCircle, Inbox
 } from 'lucide-react';
 import { useDoctorInbox } from '../../../hooks/useDoctorInbox';
+import { DISEASE_KB_ENABLED } from '../../../lib/featureFlags';
 import { useApp } from '../../../store/appStore';
 import { ChatWindow } from '../../chat/ChatWindow';
 import {
@@ -36,7 +37,9 @@ export function DoctorDashboard() {
     addConclusionToApp, addNotification, unreadCount
   } = useApp();
   const routerNavigate = useNavigate();
-  const { data: inboxData } = useDoctorInbox({ status: 'SENT_TO_DOCTOR', limit: 1 });
+  const { data: inboxData } = useDoctorInbox(
+    DISEASE_KB_ENABLED ? { status: 'SENT_TO_DOCTOR', limit: 1 } : { limit: 0 },
+  );
 
   const [activeTab, setActiveTab] = useState(0);
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
@@ -746,8 +749,8 @@ export function DoctorDashboard() {
               />
             </div>
 
-            {/* Inbox CTA */}
-            <button
+            {/* Inbox CTA — faqat flag yoqilganda ko'rinadi */}
+            {DISEASE_KB_ENABLED && <button
               type="button"
               onClick={() => routerNavigate('/shifokor/inbox')}
               className="w-full bg-white rounded-2xl border border-primary/20 shadow-sm p-4 flex items-center gap-4 hover:border-primary/50 hover:shadow-md transition-all text-left"
@@ -767,7 +770,7 @@ export function DoctorDashboard() {
                 </span>
               )}
               <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
-            </button>
+            </button>}
           </div>
         )}
 

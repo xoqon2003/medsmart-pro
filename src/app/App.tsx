@@ -1,9 +1,10 @@
 import React, { Suspense, lazy } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router';
 import { AppProvider, useApp } from './store/appStore';
 import { LocaleProvider } from './store/LocaleContext';
 import { BottomNav, SHOW_NAV_ON } from './components/ui/BottomNav';
 import { ServiceSelectionBottomSheet } from './components/patient/ServiceSelectionBottomSheet';
+import { DISEASE_KB_ENABLED } from './lib/featureFlags';
 import type { Screen } from './types';
 
 // ── Eager (darhol yuklanadi) ──────────────────────────────────────────────────
@@ -233,18 +234,39 @@ function AppRoutes() {
       <Route path="/web/admin/tariflar"              element={<WebTariffManageScreen />} />
       <Route path="/web/admin/kalendar"              element={<WebCalendarManageScreen />} />
 
-      {/* Kasalliklar KB */}
-      <Route path="/kasalliklar"       element={<DiseaseListPage />} />
-      <Route path="/kasalliklar/:slug" element={<DiseaseCardPage />} />
+      {/* Kasalliklar KB — VITE_FEATURE_DISEASE_KB=true bo'lgandagina ochiq */}
+      <Route
+        path="/kasalliklar"
+        element={DISEASE_KB_ENABLED ? <DiseaseListPage /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/kasalliklar/:slug"
+        element={DISEASE_KB_ENABLED ? <DiseaseCardPage /> : <Navigate to="/" replace />}
+      />
 
       {/* KB Admin */}
-      <Route path="/kb/diseases/new"        element={<KBDiseaseEditorPage />} />
-      <Route path="/kb/diseases/:slug/edit" element={<KBDiseaseEditorPage />} />
-      <Route path="/kb/review"              element={<KBReviewQueuePage />} />
+      <Route
+        path="/kb/diseases/new"
+        element={DISEASE_KB_ENABLED ? <KBDiseaseEditorPage /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/kb/diseases/:slug/edit"
+        element={DISEASE_KB_ENABLED ? <KBDiseaseEditorPage /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/kb/review"
+        element={DISEASE_KB_ENABLED ? <KBReviewQueuePage /> : <Navigate to="/" replace />}
+      />
 
       {/* Shifokor Inbox — triage natijalar */}
-      <Route path="/shifokor/inbox"     element={<CasesInboxPage />} />
-      <Route path="/shifokor/inbox/:id" element={<CaseDetailPage />} />
+      <Route
+        path="/shifokor/inbox"
+        element={DISEASE_KB_ENABLED ? <CasesInboxPage /> : <Navigate to="/shifokor" replace />}
+      />
+      <Route
+        path="/shifokor/inbox/:id"
+        element={DISEASE_KB_ENABLED ? <CaseDetailPage /> : <Navigate to="/shifokor" replace />}
+      />
 
       {/* Fallback — noma'lum URL splash ga yuboriladi */}
       <Route path="*" element={<SplashScreen />} />

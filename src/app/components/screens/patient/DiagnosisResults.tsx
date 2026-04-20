@@ -1,6 +1,9 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 import { useApp } from '../../../store/appStore';
 import { runDiagnosis, clinicalKB as defaultKB } from '../../../data/clinicalKB';
+import { lookupByIcd } from '../../../api/diseases';
+import { DISEASE_KB_ENABLED } from '../../../lib/featureFlags';
 import {
   ArrowLeft,
   Stethoscope,
@@ -13,6 +16,7 @@ import {
   Calendar,
   Save,
   RotateCcw,
+  ExternalLink,
 } from 'lucide-react';
 import type { DiagnosisResult, SymptomConsultation } from '../../../types';
 
@@ -24,6 +28,9 @@ export function DiagnosisResults() {
     updateDraftConsultation,
     clinicalKBData,
   } = useApp();
+
+  // PR-18: react-router navigate for disease card deep-links
+  const routerNavigate = useNavigate();
 
   const [expandedIdx, setExpandedIdx] = useState<number>(0);
   const [saved, setSaved] = useState(false);
@@ -92,6 +99,18 @@ export function DiagnosisResults() {
   const handleRestart = () => {
     clearDraftSymptom();
     navigate('patient_symptom_input');
+  };
+
+  // Disease KB deep-link — faqat VITE_FEATURE_DISEASE_KB=true bo'lganda ishlaydi
+  const handleDiseaseClick = async (icd10: string) => {
+    if (!DISEASE_KB_ENABLED) return;
+    try {
+      const result = await lookupByIcd(icd10);
+      routerNavigate(`/kasalliklar/${result.slug}?from=ai-tavsiya`);
+    } catch {
+      // fallback: navigate by ICD query param — DiseaseListPage can handle ?icd= filter
+      routerNavigate(`/kasalliklar?icd=${encodeURIComponent(icd10)}`);
+    }
   };
 
   const probColor = (p: number) => {
@@ -248,6 +267,17 @@ export function DiagnosisResults() {
                     <BookOpen className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 mt-0.5" />
                     <p className="text-[11px] text-gray-400">Manba: {r.source}</p>
                   </div>
+
+                  {/* To'liq ma'lumot — faqat VITE_FEATURE_DISEASE_KB=true bo'lganda */}
+                  {DISEASE_KB_ENABLED && (
+                    <button
+                      onClick={() => handleDiseaseClick(r.icd10)}
+                      className="flex items-center gap-1.5 text-xs text-blue-600 underline underline-offset-2 hover:text-blue-800 transition-colors"
+                    >
+                      <ExternalLink className="w-3 h-3" />
+                      To'liq ma'lumot
+                    </button>
+                  )}
                 </div>
               )}
             </div>
