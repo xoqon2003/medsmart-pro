@@ -1,0 +1,8172 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1/auth/telegram": {
+      "post": {
+        "operationId": "AuthController_telegramAuth",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelegramAuthDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/send-otp": {
+      "post": {
+        "operationId": "AuthController_sendOtp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/verify-otp": {
+      "post": {
+        "operationId": "AuthController_verifyOtp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/set-pin": {
+      "post": {
+        "operationId": "AuthController_setPin",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPinDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/register-patient": {
+      "post": {
+        "operationId": "AuthController_registerPatient",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterPatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "operationId": "AuthController_getMe",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/v1/users": {
+      "get": {
+        "operationId": "UsersController_findAll",
+        "parameters": [
+          {
+            "name": "role",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/{id}": {
+      "get": {
+        "operationId": "UsersController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "users"
+        ]
+      },
+      "put": {
+        "operationId": "UsersController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/applications": {
+      "get": {
+        "operationId": "ApplicationsController_findAll",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "radiologId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "applications"
+        ]
+      },
+      "post": {
+        "operationId": "ApplicationsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "applications"
+        ]
+      }
+    },
+    "/api/v1/applications/{id}": {
+      "get": {
+        "operationId": "ApplicationsController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "applications"
+        ]
+      },
+      "put": {
+        "operationId": "ApplicationsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "applications"
+        ]
+      }
+    },
+    "/api/v1/applications/{id}/status": {
+      "patch": {
+        "operationId": "ApplicationsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "applications"
+        ]
+      }
+    },
+    "/api/v1/applications/{appId}/conclusions": {
+      "get": {
+        "operationId": "ConclusionsController_findByApplication",
+        "parameters": [
+          {
+            "name": "appId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Conclusions"
+        ]
+      },
+      "post": {
+        "operationId": "ConclusionsController_create",
+        "parameters": [
+          {
+            "name": "appId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Conclusions"
+        ]
+      }
+    },
+    "/api/v1/payments/initiate": {
+      "post": {
+        "operationId": "PaymentsController_initiate",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/{id}/confirm": {
+      "post": {
+        "operationId": "PaymentsController_confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/{id}/refund": {
+      "post": {
+        "operationId": "PaymentsController_refund",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/{id}": {
+      "get": {
+        "operationId": "PaymentsController_getPayment",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/application/{applicationId}": {
+      "get": {
+        "operationId": "PaymentsController_getByApplication",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/payme/webhook": {
+      "post": {
+        "operationId": "PaymentsController_paymeWebhook",
+        "parameters": [
+          {
+            "name": "authorization",
+            "required": true,
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/click/prepare": {
+      "post": {
+        "operationId": "PaymentsController_clickPrepare",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/click/complete": {
+      "post": {
+        "operationId": "PaymentsController_clickComplete",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/payments/uzum/webhook": {
+      "post": {
+        "operationId": "PaymentsController_uzumWebhook",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Payments"
+        ]
+      }
+    },
+    "/api/v1/notifications": {
+      "get": {
+        "operationId": "NotificationsController_findAll",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/{id}/read": {
+      "patch": {
+        "operationId": "NotificationsController_markRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/notifications/read-all": {
+      "patch": {
+        "operationId": "NotificationsController_markAllRead",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/v1/booking/doctors": {
+      "get": {
+        "operationId": "BookingController_getDoctors",
+        "parameters": [
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "specialties",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/doctors/{id}/slots": {
+      "get": {
+        "operationId": "BookingController_getSlots",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/geo": {
+      "get": {
+        "operationId": "BookingController_getGeo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/specialties": {
+      "get": {
+        "operationId": "BookingController_getSpecialties",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/clinics/search": {
+      "get": {
+        "operationId": "BookingController_searchClinics",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "district",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "minServices",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/clinics/nearby": {
+      "get": {
+        "operationId": "BookingController_getNearbyClinics",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "radius",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/booking/clinics/top": {
+      "get": {
+        "operationId": "BookingController_getTopClinics",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Booking"
+        ]
+      }
+    },
+    "/api/v1/examinations/centers": {
+      "get": {
+        "operationId": "ExaminationsController_getCenters",
+        "parameters": [
+          {
+            "name": "region",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "district",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Examinations"
+        ]
+      }
+    },
+    "/api/v1/examinations/exams/{category}": {
+      "get": {
+        "operationId": "ExaminationsController_getExamsByCategory",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Examinations"
+        ]
+      }
+    },
+    "/api/v1/kassa/smena": {
+      "post": {
+        "operationId": "KassaController_openSmena",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kassa"
+        ]
+      }
+    },
+    "/api/v1/kassa/smena/{id}": {
+      "put": {
+        "operationId": "KassaController_closeSmena",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kassa"
+        ]
+      }
+    },
+    "/api/v1/kassa/smena/active": {
+      "get": {
+        "operationId": "KassaController_getActiveSmena",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kassa"
+        ]
+      }
+    },
+    "/api/v1/kassa/tolov": {
+      "post": {
+        "operationId": "KassaController_createTolov",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kassa"
+        ]
+      },
+      "get": {
+        "operationId": "KassaController_getTolovlar",
+        "parameters": [
+          {
+            "name": "smenaId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Kassa"
+        ]
+      }
+    },
+    "/api/v1/doctors": {
+      "get": {
+        "operationId": "DoctorProfileController_findAll",
+        "parameters": [
+          {
+            "name": "specialty",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/url/{slug}": {
+      "get": {
+        "operationId": "DoctorProfileController_findBySlug",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}/stats": {
+      "get": {
+        "operationId": "DoctorProfileController_getStats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}": {
+      "get": {
+        "operationId": "DoctorProfileController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/me/profile": {
+      "get": {
+        "operationId": "DoctorProfileController_findMyProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/profile": {
+      "post": {
+        "operationId": "DoctorProfileController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDoctorProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      },
+      "patch": {
+        "operationId": "DoctorProfileController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDoctorProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/clinics": {
+      "post": {
+        "operationId": "DoctorProfileController_addClinic",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddClinicDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/clinics/{id}": {
+      "delete": {
+        "operationId": "DoctorProfileController_removeClinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/operations": {
+      "post": {
+        "operationId": "DoctorProfileController_addOperationType",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddOperationTypeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/subscribe": {
+      "post": {
+        "operationId": "DoctorProfileController_subscribe",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/admin/verify-clinic/{id}": {
+      "patch": {
+        "operationId": "DoctorProfileController_verifyClinic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/doctors/admin/verify-license/{id}": {
+      "patch": {
+        "operationId": "DoctorProfileController_verifyLicense",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "DoctorProfile"
+        ]
+      }
+    },
+    "/api/v1/tariffs": {
+      "get": {
+        "operationId": "TariffController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tariff"
+        ]
+      },
+      "post": {
+        "operationId": "TariffController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTariffDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tariff"
+        ]
+      }
+    },
+    "/api/v1/tariffs/{id}": {
+      "get": {
+        "operationId": "TariffController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tariff"
+        ]
+      },
+      "patch": {
+        "operationId": "TariffController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tariff"
+        ]
+      }
+    },
+    "/api/v1/tariffs/seed": {
+      "post": {
+        "operationId": "TariffController_seed",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Tariff"
+        ]
+      }
+    },
+    "/api/v1/clinics": {
+      "get": {
+        "operationId": "ClinicController_findAll",
+        "parameters": [
+          {
+            "name": "city",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinic"
+        ]
+      },
+      "post": {
+        "operationId": "ClinicController_create",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinic"
+        ]
+      }
+    },
+    "/api/v1/clinics/{id}": {
+      "get": {
+        "operationId": "ClinicController_findById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinic"
+        ]
+      },
+      "patch": {
+        "operationId": "ClinicController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinic"
+        ]
+      }
+    },
+    "/api/v1/clinics/{id}/verify": {
+      "patch": {
+        "operationId": "ClinicController_verify",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Clinic"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}/portfolio": {
+      "get": {
+        "operationId": "PortfolioController_getPortfolio",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/education": {
+      "post": {
+        "operationId": "PortfolioController_addEducation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateEducationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/education/{id}": {
+      "patch": {
+        "operationId": "PortfolioController_updateEducation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      },
+      "delete": {
+        "operationId": "PortfolioController_deleteEducation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/experience": {
+      "post": {
+        "operationId": "PortfolioController_addExperience",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateExperienceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/experience/{id}": {
+      "patch": {
+        "operationId": "PortfolioController_updateExperience",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      },
+      "delete": {
+        "operationId": "PortfolioController_deleteExperience",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/achievements": {
+      "post": {
+        "operationId": "PortfolioController_addAchievement",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAchievementDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/achievements/{id}": {
+      "patch": {
+        "operationId": "PortfolioController_updateAchievement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      },
+      "delete": {
+        "operationId": "PortfolioController_deleteAchievement",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/certificates": {
+      "post": {
+        "operationId": "PortfolioController_addCertificate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCertificateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/certificates/{id}": {
+      "patch": {
+        "operationId": "PortfolioController_updateCertificate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      },
+      "delete": {
+        "operationId": "PortfolioController_deleteCertificate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Portfolio"
+        ]
+      }
+    },
+    "/api/v1/contacts/request": {
+      "post": {
+        "operationId": "ContactsController_createRequest",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateContactRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/contacts/requests": {
+      "get": {
+        "operationId": "ContactsController_getRequests",
+        "parameters": [
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/contacts/requests/{id}": {
+      "patch": {
+        "operationId": "ContactsController_updateStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/contacts/requests/{id}/reply": {
+      "post": {
+        "operationId": "ContactsController_reply",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/templates": {
+      "get": {
+        "operationId": "ContactsController_getTemplates",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "post": {
+        "operationId": "ContactsController_createTemplate",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}/templates": {
+      "get": {
+        "operationId": "ContactsController_getPublicTemplates",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/templates/{id}": {
+      "patch": {
+        "operationId": "ContactsController_updateTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      },
+      "delete": {
+        "operationId": "ContactsController_deleteTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Contacts"
+        ]
+      }
+    },
+    "/api/v1/messages/conversations": {
+      "get": {
+        "operationId": "MessagesController_getConversations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/{userId}": {
+      "get": {
+        "operationId": "MessagesController_getMessages",
+        "parameters": [
+          {
+            "name": "userId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages": {
+      "post": {
+        "operationId": "MessagesController_sendMessage",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/{id}/read": {
+      "patch": {
+        "operationId": "MessagesController_markAsRead",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/permission/check/{doctorId}": {
+      "get": {
+        "operationId": "MessagesController_checkPermission",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/permission/request": {
+      "post": {
+        "operationId": "MessagesController_requestPermission",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/permission/{id}/grant": {
+      "patch": {
+        "operationId": "MessagesController_grantPermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/messages/permission/{id}/revoke": {
+      "patch": {
+        "operationId": "MessagesController_revokePermission",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Messages"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}/faq": {
+      "get": {
+        "operationId": "FaqServicesController_getPublicFaq",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/faq": {
+      "post": {
+        "operationId": "FaqServicesController_createFaq",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFaqDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/faq/{id}": {
+      "patch": {
+        "operationId": "FaqServicesController_updateFaq",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      },
+      "delete": {
+        "operationId": "FaqServicesController_deleteFaq",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/doctors/{id}/services": {
+      "get": {
+        "operationId": "FaqServicesController_getPublicServices",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/services": {
+      "post": {
+        "operationId": "FaqServicesController_createService",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMedicalServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/services/{id}": {
+      "patch": {
+        "operationId": "FaqServicesController_updateService",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      },
+      "delete": {
+        "operationId": "FaqServicesController_deleteService",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "FaqServices"
+        ]
+      }
+    },
+    "/api/v1/extras/anonymous-number": {
+      "get": {
+        "operationId": "ExtrasController_getAnonymousNumber",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      },
+      "post": {
+        "operationId": "ExtrasController_upsertAnonymousNumber",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      }
+    },
+    "/api/v1/extras/call-schedule": {
+      "get": {
+        "operationId": "ExtrasController_getCallSchedule",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      },
+      "post": {
+        "operationId": "ExtrasController_upsertCallSchedule",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      }
+    },
+    "/api/v1/extras/telegram-bot": {
+      "get": {
+        "operationId": "ExtrasController_getTelegramBot",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      },
+      "post": {
+        "operationId": "ExtrasController_upsertTelegramBot",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      }
+    },
+    "/api/v1/extras/ad-settings": {
+      "get": {
+        "operationId": "ExtrasController_getAdSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      },
+      "post": {
+        "operationId": "ExtrasController_upsertAdSettings",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Extras"
+        ]
+      }
+    },
+    "/api/v1/calendar/{doctorId}": {
+      "get": {
+        "operationId": "CalendarController_getCalendar",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/{doctorId}/slots": {
+      "get": {
+        "operationId": "CalendarController_getSlots",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "date",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/settings/me": {
+      "get": {
+        "operationId": "CalendarController_getSettings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/settings": {
+      "post": {
+        "operationId": "CalendarController_upsertSettings",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCalendarSettingsDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/generate": {
+      "post": {
+        "operationId": "CalendarController_generateSlots",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/block": {
+      "post": {
+        "operationId": "CalendarController_blockSlot",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BlockSlotDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/calendar/block/{slotId}": {
+      "delete": {
+        "operationId": "CalendarController_unblockSlot",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/consultations/book": {
+      "post": {
+        "operationId": "CalendarController_bookConsultation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BookConsultationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/consultations/{id}/cancel": {
+      "patch": {
+        "operationId": "CalendarController_cancelConsultation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/consultations/{id}/complete": {
+      "patch": {
+        "operationId": "CalendarController_completeConsultation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/consultations/{id}/rate": {
+      "post": {
+        "operationId": "CalendarController_rateConsultation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/consultations/{id}/reschedule": {
+      "patch": {
+        "operationId": "CalendarController_rescheduleConsultation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Calendar"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "HealthController_check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The Health Check is successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "ok"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {},
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "The Health Check is not successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "info": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "error": {
+                      "type": "object",
+                      "example": {
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      },
+                      "nullable": true
+                    },
+                    "details": {
+                      "type": "object",
+                      "example": {
+                        "database": {
+                          "status": "up"
+                        },
+                        "redis": {
+                          "status": "down",
+                          "message": "Could not connect"
+                        }
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "required": [
+                          "status"
+                        ],
+                        "properties": {
+                          "status": {
+                            "type": "string"
+                          }
+                        },
+                        "additionalProperties": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/health/ping": {
+      "get": {
+        "operationId": "HealthController_ping",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/api/v1/files/avatar": {
+      "post": {
+        "operationId": "FileStorageController_uploadAvatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/files/document/{applicationId}": {
+      "post": {
+        "operationId": "FileStorageController_uploadDocument",
+        "parameters": [
+          {
+            "name": "applicationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/files/conclusion/{conclusionId}": {
+      "post": {
+        "operationId": "FileStorageController_uploadConclusion",
+        "parameters": [
+          {
+            "name": "conclusionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/files/portfolio/{doctorId}": {
+      "post": {
+        "operationId": "FileStorageController_uploadPortfolio",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/files/{bucket}/{key}": {
+      "delete": {
+        "operationId": "FileStorageController_deleteFile",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/files/signed-url": {
+      "get": {
+        "operationId": "FileStorageController_getSignedUrl",
+        "parameters": [
+          {
+            "name": "bucket",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "key",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "expiresIn",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "File Storage"
+        ]
+      }
+    },
+    "/api/v1/laboratory/orders": {
+      "post": {
+        "operationId": "LaboratoryController_createOrder",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      },
+      "get": {
+        "operationId": "LaboratoryController_findOrders",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/orders/{id}": {
+      "get": {
+        "operationId": "LaboratoryController_findOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/orders/{id}/collect-sample": {
+      "put": {
+        "operationId": "LaboratoryController_collectSample",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/orders/{id}/start": {
+      "put": {
+        "operationId": "LaboratoryController_startProcessing",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/tests/{testId}/result": {
+      "put": {
+        "operationId": "LaboratoryController_updateTestResult",
+        "parameters": [
+          {
+            "name": "testId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/orders/{id}/cancel": {
+      "put": {
+        "operationId": "LaboratoryController_cancelOrder",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/laboratory/categories": {
+      "get": {
+        "operationId": "LaboratoryController_getCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Laboratory"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/prescriptions": {
+      "post": {
+        "operationId": "PharmacyController_createPrescription",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      },
+      "get": {
+        "operationId": "PharmacyController_findPrescriptions",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "doctorId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/prescriptions/{id}": {
+      "get": {
+        "operationId": "PharmacyController_findPrescription",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/prescriptions/items/{itemId}/fill": {
+      "put": {
+        "operationId": "PharmacyController_fillItem",
+        "parameters": [
+          {
+            "name": "itemId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/medicines": {
+      "get": {
+        "operationId": "PharmacyController_findMedicines",
+        "parameters": [
+          {
+            "name": "category",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      },
+      "post": {
+        "operationId": "PharmacyController_createMedicine",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/medicines/{id}": {
+      "put": {
+        "operationId": "PharmacyController_updateMedicine",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/medicines/{id}/stock": {
+      "put": {
+        "operationId": "PharmacyController_updateStock",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/pharmacy/categories": {
+      "get": {
+        "operationId": "PharmacyController_getCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Pharmacy"
+        ]
+      }
+    },
+    "/api/v1/emr/records": {
+      "post": {
+        "operationId": "EmrController_createRecord",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/patients/{patientId}/history": {
+      "get": {
+        "operationId": "EmrController_getPatientHistory",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recordType",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/records/{id}": {
+      "get": {
+        "operationId": "EmrController_findRecord",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      },
+      "put": {
+        "operationId": "EmrController_updateRecord",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/patients/{patientId}/summary": {
+      "get": {
+        "operationId": "EmrController_getPatientSummary",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/patients/{patientId}/allergies": {
+      "get": {
+        "operationId": "EmrController_getAllergies",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      },
+      "post": {
+        "operationId": "EmrController_addAllergy",
+        "parameters": [
+          {
+            "name": "patientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/allergies/{id}": {
+      "delete": {
+        "operationId": "EmrController_removeAllergy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/emr/icd/search": {
+      "get": {
+        "operationId": "EmrController_searchIcd",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "EMR (Kasallik tarixi)"
+        ]
+      }
+    },
+    "/api/v1/diseases": {
+      "get": {
+        "operationId": "DiseasesController_list",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "To'liq matn qidiruv (FTS)",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "icd",
+            "required": false,
+            "in": "query",
+            "description": "ICD-10/11 kod boshlanishi bilan filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Kategoriya filter",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Sahifa raqami",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Sahifa hajmi",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          },
+          {
+            "name": "audience",
+            "required": false,
+            "in": "query",
+            "description": "Auditoriya filtri",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "STUDENT",
+                "NURSE",
+                "DOCTOR",
+                "SPECIALIST",
+                "MIXED"
+              ]
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "description": "Til (uz/ru/en)",
+            "schema": {
+              "default": "uz",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Status filtri (admin uchun). Public holatda default PUBLISHED. 'ALL' barchasini ko'rsatadi.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "REVIEW",
+                "APPROVED",
+                "PUBLISHED",
+                "REJECTED",
+                "ARCHIVED"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled"
+          }
+        },
+        "summary": "Kasalliklar ro'yxati va qidiruv",
+        "tags": [
+          "diseases"
+        ]
+      },
+      "post": {
+        "operationId": "DiseasesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateDiseaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi kasallik yaratish",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}": {
+      "get": {
+        "operationId": "DiseasesController_getOne",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "L1",
+                "L2",
+                "L3"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topilmadi yoki feature disabled"
+          }
+        },
+        "summary": "Bitta kasallik (slug bo'yicha)",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/symptoms": {
+      "get": {
+        "operationId": "DiseasesController_symptoms",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Kasallikning simptomlari (weight bilan)",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/diseases/semantic-search": {
+      "get": {
+        "operationId": "DiseasesController_semanticSearch",
+        "parameters": [
+          {
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Qidiruv matni",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Natijalar soni (default: 10)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Semantik jihatdan yaqin kasalliklar ro'yxati"
+          }
+        },
+        "summary": "Semantik qidiruv (vektor asosida, ma'no bo'yicha)",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/index-embedding": {
+      "post": {
+        "operationId": "DiseasesController_indexEmbedding",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Disease UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ ok: true }"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Kasallik embedding indeksini yangilash (ADMIN/EDITOR)",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}": {
+      "patch": {
+        "operationId": "DiseasesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDiseaseDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiseaseResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Kasallikni yangilash",
+        "tags": [
+          "diseases"
+        ]
+      },
+      "delete": {
+        "operationId": "DiseasesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Kasallikni arxivlash (soft delete)",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/icd/{code}": {
+      "get": {
+        "operationId": "IcdController_lookup",
+        "parameters": [
+          {
+            "name": "code",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "I10",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IcdLookupResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "ICD kod topilmadi yoki feature disabled"
+          }
+        },
+        "summary": "ICD kod bo'yicha kasallik qidirish",
+        "tags": [
+          "diseases"
+        ]
+      }
+    },
+    "/api/v1/symptoms": {
+      "get": {
+        "operationId": "SymptomsController_list",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "FTS qidiruv",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "bodyZone",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomListResponseDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feature disabled"
+          }
+        },
+        "summary": "Simptomlar ro'yxati va qidiruv (FTS)",
+        "tags": [
+          "symptoms"
+        ]
+      },
+      "post": {
+        "operationId": "SymptomsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSymptomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi simptom",
+        "tags": [
+          "symptoms"
+        ]
+      }
+    },
+    "/api/v1/symptoms/{id}": {
+      "get": {
+        "operationId": "SymptomsController_one",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Bitta simptom",
+        "tags": [
+          "symptoms"
+        ]
+      },
+      "patch": {
+        "operationId": "SymptomsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSymptomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SymptomResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Simptomni yangilash",
+        "tags": [
+          "symptoms"
+        ]
+      },
+      "delete": {
+        "operationId": "SymptomsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Simptomni o'chirish (hard delete, ADMIN only)",
+        "tags": [
+          "symptoms"
+        ]
+      }
+    },
+    "/api/v1/references": {
+      "get": {
+        "operationId": "ReferencesController_list",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "type",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DOI",
+                "PUBMED",
+                "URL",
+                "WHO",
+                "PROTOCOL",
+                "BOOK",
+                "LOCAL_PROTOCOL"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceListResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Manbalar ro'yxati",
+        "tags": [
+          "references"
+        ]
+      },
+      "post": {
+        "operationId": "ReferencesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi manba",
+        "tags": [
+          "references"
+        ]
+      }
+    },
+    "/api/v1/references/{id}": {
+      "get": {
+        "operationId": "ReferencesController_one",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Bitta manba",
+        "tags": [
+          "references"
+        ]
+      },
+      "patch": {
+        "operationId": "ReferencesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferenceResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manbani yangilash",
+        "tags": [
+          "references"
+        ]
+      },
+      "delete": {
+        "operationId": "ReferencesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "409": {
+            "description": "Reference is in use by N blocks"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manbani o'chirish (agar ishlatilmagan bo'lsa)",
+        "tags": [
+          "references"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/blocks": {
+      "get": {
+        "operationId": "DiseaseBlocksController_list",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "audience",
+            "required": false,
+            "in": "query",
+            "description": "Auditoriya filtri",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "STUDENT",
+                "NURSE",
+                "DOCTOR",
+                "SPECIALIST",
+                "MIXED"
+              ]
+            }
+          },
+          {
+            "name": "level",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "L1",
+                "L2",
+                "L3"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Admin uchun: status filtri. Public holatda har doim PUBLISHED",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ALL",
+                "DRAFT",
+                "REVIEW",
+                "APPROVED",
+                "PUBLISHED",
+                "REJECTED",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "locale",
+            "required": false,
+            "in": "query",
+            "description": "Til",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BlockResponseDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Kasallik bloklarini olish",
+        "tags": [
+          "disease-blocks"
+        ]
+      },
+      "post": {
+        "operationId": "DiseaseBlocksController_create",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi blok yaratish",
+        "tags": [
+          "disease-blocks"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/blocks/{marker}": {
+      "get": {
+        "operationId": "DiseaseBlocksController_byMarker",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "marker",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Bitta blok (marker bo'yicha, lazy-load)",
+        "tags": [
+          "disease-blocks"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/blocks/{id}": {
+      "patch": {
+        "operationId": "DiseaseBlocksController_update",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateBlockDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BlockResponseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni yangilash",
+        "tags": [
+          "disease-blocks"
+        ]
+      },
+      "delete": {
+        "operationId": "DiseaseBlocksController_remove",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni o'chirish",
+        "tags": [
+          "disease-blocks"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/blocks/{id}/references": {
+      "post": {
+        "operationId": "DiseaseBlocksController_attachRef",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachReferenceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Manbani blokka bog'lash",
+        "tags": [
+          "disease-blocks"
+        ]
+      }
+    },
+    "/api/v1/markers": {
+      "get": {
+        "operationId": "MarkersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "example": {
+                    "items": [
+                      "etiology",
+                      "pathogenesis",
+                      "symptoms",
+                      "diagnosis",
+                      "treatment",
+                      "stages",
+                      "classification",
+                      "epidemiology",
+                      "risk_factors",
+                      "prevention",
+                      "prognosis",
+                      "complications",
+                      "differential",
+                      "referral",
+                      "rehabilitation",
+                      "diet",
+                      "lifestyle",
+                      "red_flags",
+                      "emergency",
+                      "patient_education",
+                      "specialists",
+                      "labs",
+                      "imaging",
+                      "medications",
+                      "procedures",
+                      "monitoring",
+                      "follow_up",
+                      "clinical_cases",
+                      "faq",
+                      "references",
+                      "icd_codes",
+                      "synonyms",
+                      "overview",
+                      "anatomy",
+                      "physiology",
+                      "definition",
+                      "history",
+                      "guidelines"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Canonical marker ro'yxati",
+        "tags": [
+          "disease-blocks"
+        ]
+      }
+    },
+    "/api/v1/kb/blocks/{id}/submit-review": {
+      "post": {
+        "operationId": "KbModerationController_submitReview",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni ko'rib chiqishga yuborish (DRAFT/REJECTED → REVIEW)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/blocks/{id}/approve": {
+      "post": {
+        "operationId": "KbModerationController_approve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni tasdiqlash (REVIEW → APPROVED)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/blocks/{id}/reject": {
+      "post": {
+        "operationId": "KbModerationController_reject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni rad etish (REVIEW → REJECTED)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/blocks/{id}/publish": {
+      "post": {
+        "operationId": "KbModerationController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni chop etish (APPROVED → PUBLISHED)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/blocks/{id}/archive": {
+      "post": {
+        "operationId": "KbModerationController_archive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blokni arxivlash (→ ARCHIVED)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/review-queue": {
+      "get": {
+        "operationId": "KbModerationController_reviewQueue",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "REVIEW statusidagi bloklar navbati",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/history/{blockId}": {
+      "get": {
+        "operationId": "KbModerationController_history",
+        "parameters": [
+          {
+            "name": "blockId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Blok uchun tahrir tarixi",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/kb/admin/lifecycle-scan": {
+      "post": {
+        "operationId": "KbModerationController_lifecycleScan",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Lifecycle scan manual trigger (12 oy lik stale bloklarni topadi)",
+        "tags": [
+          "kb-moderation"
+        ]
+      }
+    },
+    "/api/v1/triage/match": {
+      "post": {
+        "operationId": "TriageController_match",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Match user symptoms to diseases",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/sessions/{id}/update": {
+      "post": {
+        "operationId": "TriageController_updateSession",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update session status",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/sessions/{id}/send-to-doctor": {
+      "post": {
+        "operationId": "TriageController_sendToDoctor",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendToDoctorDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send triage result to a doctor via FHIR message",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/sessions": {
+      "get": {
+        "description": "Returns paginated triage sessions assigned to a doctor. Default behaviour lists the caller's own inbox (doctorId=me, status=SENT_TO_DOCTOR). Requires DOCTOR / SPECIALIST / MEDICAL_EDITOR / ADMIN role.",
+        "operationId": "TriageController_listSessions",
+        "parameters": [
+          {
+            "name": "doctorId",
+            "required": false,
+            "in": "query",
+            "description": "Doctor filter. Use \"me\" (default) to list sessions assigned to the authenticated user; a numeric user id requires ADMIN role.",
+            "schema": {
+              "default": "me",
+              "example": "me",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Session status filter.",
+            "schema": {
+              "default": "SENT_TO_DOCTOR",
+              "type": "string",
+              "enum": [
+                "ACTIVE",
+                "SENT_TO_DOCTOR",
+                "EXPIRED",
+                "ARCHIVED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (1-based).",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Page size.",
+            "schema": {
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List triage sessions for a doctor inbox",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/sessions/{id}": {
+      "get": {
+        "operationId": "TriageController_getSession",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a triage session by ID",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/sessions/{id}/save-note": {
+      "post": {
+        "operationId": "TriageController_saveNote",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Session ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Save a personal note for the disease in this session",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
+    "/api/v1/triage/red-flag-rules": {
+      "get": {
+        "description": "When `category` and/or `icd10` are passed, only rules whose scope matches (AND semantics, plus the GLOBAL rules) are returned. Unscoped calls return every active rule, useful for the admin UI.",
+        "operationId": "TriageCatalogueController_listRules",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Disease category (accepts Uzbek slug or English canonical name).",
+            "schema": {
+              "example": "yurak-qon-tomir",
+              "type": "string"
+            }
+          },
+          {
+            "name": "icd10",
+            "required": false,
+            "in": "query",
+            "description": "ICD-10 code (optional \"ICD10:\" prefix tolerated, case-insensitive).",
+            "schema": {
+              "example": "I48",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RedFlagRuleDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List active red-flag rules (optionally scoped by disease).",
+        "tags": [
+          "triage-catalogue"
+        ]
+      }
+    },
+    "/api/v1/triage/red-flag-rules/{ruleKey}": {
+      "get": {
+        "operationId": "TriageCatalogueController_getRule",
+        "parameters": [
+          {
+            "name": "ruleKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "rule.unstable-af",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedFlagRuleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fetch a single red-flag rule by its stable key.",
+        "tags": [
+          "triage-catalogue"
+        ]
+      }
+    },
+    "/api/v1/clinical-tools": {
+      "get": {
+        "description": "Returns the subset of tools the caller may see. Applies scope (category + icd10), toolType filter, and the soft audience gate. Inactive tools are hidden unless the caller is ADMIN/EDITOR and passes `includeInactive=true`.",
+        "operationId": "ClinicalToolsController_list",
+        "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "description": "Disease category (Uzbek slug or English canonical name).",
+            "schema": {
+              "example": "yurak-qon-tomir",
+              "type": "string"
+            }
+          },
+          {
+            "name": "icd10",
+            "required": false,
+            "in": "query",
+            "description": "ICD-10 code (\"ICD10:\" prefix tolerated, case-insensitive).",
+            "schema": {
+              "example": "I48",
+              "type": "string"
+            }
+          },
+          {
+            "name": "toolType",
+            "required": false,
+            "in": "query",
+            "description": "Filter by tool type.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SCORE",
+                "QUESTIONNAIRE",
+                "CRITERIA",
+                "DOSE",
+                "STAGING"
+              ]
+            }
+          },
+          {
+            "name": "clinicId",
+            "required": false,
+            "in": "query",
+            "description": "Clinic tenant id. When present, clinic-level overrides are applied to isActive. Ignored for non-authenticated calls.",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "required": false,
+            "in": "query",
+            "description": "ADMIN-only: include soft-deactivated tools. Silently ignored for non-admin callers.",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClinicalToolDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List active clinical tools (optionally scoped + role-gated).",
+        "tags": [
+          "clinical-tools"
+        ]
+      }
+    },
+    "/api/v1/clinical-tools/{toolKey}": {
+      "get": {
+        "operationId": "ClinicalToolsController_get",
+        "parameters": [
+          {
+            "name": "toolKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "phq-9",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fetch a single tool by its stable key.",
+        "tags": [
+          "clinical-tools"
+        ]
+      }
+    },
+    "/api/v1/admin/clinical-tools": {
+      "get": {
+        "operationId": "ClinicalToolsAdminController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List ALL tools (including inactive) with admin metadata.",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      },
+      "post": {
+        "operationId": "ClinicalToolsAdminController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateClinicalToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a new tool. Restricted to medical editors + system admins.",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/clinical-tools/{toolKey}": {
+      "get": {
+        "operationId": "ClinicalToolsAdminController_get",
+        "parameters": [
+          {
+            "name": "toolKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "example": "phq-9",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Fetch a single tool (admin view, includes audit).",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      },
+      "patch": {
+        "description": "When `isActive=false`, a `deactivationReason` is required. Writes are audited via `updatedBy` / `deactivatedBy`.",
+        "operationId": "ClinicalToolsAdminController_update",
+        "parameters": [
+          {
+            "name": "toolKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClinicalToolDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update mutable metadata. Flip isActive to enable/disable globally.",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      },
+      "delete": {
+        "operationId": "ClinicalToolsAdminController_softDelete",
+        "parameters": [
+          {
+            "name": "toolKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft-disable a tool (alias of PATCH with isActive=false).",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      }
+    },
+    "/api/v1/admin/clinical-tools/{toolKey}/clinic-override": {
+      "put": {
+        "description": "Clinic admins may only override tools for their own clinicId. System admins may target any clinic.",
+        "operationId": "ClinicalToolsAdminController_setClinicOverride",
+        "parameters": [
+          {
+            "name": "toolKey",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClinicOverrideDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClinicalToolAdminDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Set per-clinic activation override (tenant-local toggle).",
+        "tags": [
+          "clinical-tools-admin"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "MedSmart Pro API",
+    "description": "Tibbiy axborot tizimi API hujjatlari",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Autentifikatsiya"
+    },
+    {
+      "name": "users",
+      "description": "Foydalanuvchilar"
+    },
+    {
+      "name": "applications",
+      "description": "Arizalar"
+    },
+    {
+      "name": "payments",
+      "description": "To'lovlar"
+    },
+    {
+      "name": "booking",
+      "description": "Qabulga yozilish"
+    },
+    {
+      "name": "notifications",
+      "description": "Bildirishnomalar"
+    },
+    {
+      "name": "doctor-profile",
+      "description": "Shifokor profili"
+    },
+    {
+      "name": "kassa",
+      "description": "Kassa operatsiyalari"
+    },
+    {
+      "name": "health",
+      "description": "Tizim holati"
+    }
+  ],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "TelegramAuthDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SendOtpDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SetPinDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RefreshTokenDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "RegisterPatientDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "example": "Karimov Aziz Baxtiyorovich"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+998901234567"
+          },
+          "gender": {
+            "type": "string",
+            "enum": [
+              "MALE",
+              "FEMALE"
+            ]
+          },
+          "birthDate": {
+            "type": "string",
+            "example": "1990-05-15"
+          },
+          "city": {
+            "type": "string",
+            "example": "Toshkent"
+          },
+          "chronicDiseases": {
+            "type": "string",
+            "example": "Gipertoniya, diabet"
+          },
+          "language": {
+            "type": "string",
+            "enum": [
+              "UZ",
+              "RU"
+            ]
+          },
+          "avatar": {
+            "type": "string",
+            "example": "AK"
+          },
+          "license": {
+            "type": "string",
+            "example": "UZ-RAD-2023-0042"
+          },
+          "specialty": {
+            "type": "string",
+            "example": "MRT, MSKT, Rentgenologiya"
+          },
+          "experience": {
+            "type": "number",
+            "example": 10
+          },
+          "profileUrl": {
+            "type": "string",
+            "example": "dr-aziz-karimov"
+          }
+        }
+      },
+      "CreateApplicationDto": {
+        "type": "object",
+        "properties": {
+          "serviceType": {
+            "type": "string",
+            "enum": [
+              "AI_RADIOLOG",
+              "RADIOLOG_ONLY",
+              "RADIOLOG_SPECIALIST",
+              "CONSULTATION",
+              "HOME_VISIT"
+            ]
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "URGENT",
+              "EMERGENCY"
+            ]
+          },
+          "scanType": {
+            "type": "string",
+            "example": "MRT"
+          },
+          "organ": {
+            "type": "string",
+            "example": "Bosh miya"
+          },
+          "scanDate": {
+            "type": "string",
+            "example": "2026-04-20"
+          },
+          "patientId": {
+            "type": "number"
+          },
+          "radiologId": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "serviceType"
+        ]
+      },
+      "UpdateStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "PAID_PENDING",
+              "ACCEPTED",
+              "IN_PROGRESS",
+              "DONE",
+              "REJECTED",
+              "CANCELLED",
+              "HV_REQUESTED",
+              "HV_ACCEPTED",
+              "HV_EN_ROUTE",
+              "HV_ARRIVED"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CreateDoctorProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateDoctorProfileDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AddClinicDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "AddOperationTypeDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateTariffDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateEducationDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateExperienceDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateAchievementDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateCertificateDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateContactRequestDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateTemplateDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateFaqDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "CreateMedicalServiceDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "UpdateCalendarSettingsDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BlockSlotDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "BookConsultationDto": {
+        "type": "object",
+        "properties": {}
+      },
+      "DiseaseResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "icd10": {
+            "type": "string"
+          },
+          "icd11": {
+            "type": "object",
+            "nullable": true
+          },
+          "nameUz": {
+            "type": "string"
+          },
+          "nameRu": {
+            "type": "object",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "object",
+            "nullable": true
+          },
+          "nameLat": {
+            "type": "object",
+            "nullable": true
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string"
+          },
+          "audienceLevels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "severityLevels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "protocolSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "editorId": {
+            "type": "object",
+            "nullable": true
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "icd10",
+          "nameUz",
+          "synonyms",
+          "category",
+          "audienceLevels",
+          "severityLevels",
+          "protocolSources",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "DiseaseListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DiseaseResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "CreateDiseaseDto": {
+        "type": "object",
+        "properties": {
+          "icd10": {
+            "type": "string",
+            "description": "ICD-10 kodi",
+            "example": "I10"
+          },
+          "icd11": {
+            "type": "string",
+            "description": "ICD-11 kodi"
+          },
+          "nameUz": {
+            "type": "string",
+            "description": "Kasallik nomi (uz)",
+            "example": "Gipertoniya"
+          },
+          "nameRu": {
+            "type": "string",
+            "description": "Kasallik nomi (ru)"
+          },
+          "nameEn": {
+            "type": "string",
+            "description": "Kasallik nomi (en)"
+          },
+          "nameLat": {
+            "type": "string",
+            "description": "Lotin tilidagi nomi"
+          },
+          "synonyms": {
+            "description": "Sinonimlar",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string",
+            "description": "Kategoriya",
+            "example": "cardiology"
+          },
+          "audienceLevels": {
+            "type": "array",
+            "description": "Auditoriya darajalari",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "STUDENT",
+                "NURSE",
+                "DOCTOR",
+                "SPECIALIST",
+                "MIXED"
+              ]
+            }
+          },
+          "severityLevels": {
+            "type": "array",
+            "description": "Kasallik og'irligi darajalari",
+            "items": {
+              "type": "string",
+              "enum": [
+                "MILD",
+                "MODERATE",
+                "SEVERE",
+                "CRITICAL"
+              ]
+            }
+          },
+          "protocolSources": {
+            "description": "Protokol manbalari",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "description": "Tasdiqlash statusi",
+            "enum": [
+              "DRAFT",
+              "REVIEW",
+              "APPROVED",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "editorId": {
+            "type": "number",
+            "description": "Tahrirchi user ID (server o'rnatadi)"
+          }
+        },
+        "required": [
+          "icd10",
+          "nameUz",
+          "category"
+        ]
+      },
+      "UpdateDiseaseDto": {
+        "type": "object",
+        "properties": {
+          "icd10": {
+            "type": "string",
+            "description": "ICD-10 kodi"
+          },
+          "icd11": {
+            "type": "string"
+          },
+          "nameUz": {
+            "type": "string"
+          },
+          "nameRu": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "nameLat": {
+            "type": "string"
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "category": {
+            "type": "string"
+          },
+          "audienceLevels": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "severityLevels": {
+            "type": "array",
+            "items": {
+              "type": "array"
+            }
+          },
+          "protocolSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "REVIEW",
+              "APPROVED",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          },
+          "editorId": {
+            "type": "number"
+          }
+        }
+      },
+      "IcdLookupResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "icd10": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "icd10"
+        ]
+      },
+      "SymptomResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "nameUz": {
+            "type": "string"
+          },
+          "nameRu": {
+            "type": "object",
+            "nullable": true
+          },
+          "nameEn": {
+            "type": "object",
+            "nullable": true
+          },
+          "nameLat": {
+            "type": "object",
+            "nullable": true
+          },
+          "category": {
+            "type": "string"
+          },
+          "bodyZone": {
+            "type": "object",
+            "nullable": true
+          },
+          "severity": {
+            "type": "string"
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isRedFlag": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "nameUz",
+          "category",
+          "severity",
+          "synonyms",
+          "isRedFlag",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "SymptomListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SymptomResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "CreateSymptomDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Simptom kodi (unique)",
+            "example": "SYM-001"
+          },
+          "nameUz": {
+            "type": "string",
+            "description": "Simptom nomi (uz)"
+          },
+          "nameRu": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "nameLat": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "description": "Kategoriya",
+            "example": "general"
+          },
+          "bodyZone": {
+            "type": "string",
+            "description": "Tana zonasi"
+          },
+          "severity": {
+            "type": "string",
+            "description": "Og'irligi",
+            "enum": [
+              "MILD",
+              "MODERATE",
+              "SEVERE",
+              "CRITICAL"
+            ]
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isRedFlag": {
+            "type": "boolean",
+            "description": "Red-flag simptom"
+          }
+        },
+        "required": [
+          "code",
+          "nameUz",
+          "category"
+        ]
+      },
+      "UpdateSymptomDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "nameUz": {
+            "type": "string"
+          },
+          "nameRu": {
+            "type": "string"
+          },
+          "nameEn": {
+            "type": "string"
+          },
+          "nameLat": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "bodyZone": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "MILD",
+              "MODERATE",
+              "SEVERE",
+              "CRITICAL"
+            ]
+          },
+          "synonyms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isRedFlag": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ReferenceResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "citation": {
+            "type": "string"
+          },
+          "url": {
+            "type": "object",
+            "nullable": true
+          },
+          "doi": {
+            "type": "object",
+            "nullable": true
+          },
+          "pubmedId": {
+            "type": "object",
+            "nullable": true
+          },
+          "whoCode": {
+            "type": "object",
+            "nullable": true
+          },
+          "publishedAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "accessedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "evidenceLevel": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "citation",
+          "accessedAt",
+          "evidenceLevel",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ReferenceListResponseDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferenceResponseDto"
+            }
+          },
+          "total": {
+            "type": "number"
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "page",
+          "limit"
+        ]
+      },
+      "CreateReferenceDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Manba turi",
+            "enum": [
+              "DOI",
+              "PUBMED",
+              "URL",
+              "WHO",
+              "PROTOCOL",
+              "BOOK",
+              "LOCAL_PROTOCOL"
+            ]
+          },
+          "citation": {
+            "type": "string",
+            "description": "Iqtibos matni"
+          },
+          "url": {
+            "type": "string",
+            "description": "URL"
+          },
+          "doi": {
+            "type": "string",
+            "description": "DOI",
+            "example": "10.1038/s41586-020-2649-2"
+          },
+          "pubmedId": {
+            "type": "string",
+            "description": "PubMed ID",
+            "example": "32663912"
+          },
+          "whoCode": {
+            "type": "string",
+            "description": "WHO kod"
+          },
+          "publishedAt": {
+            "type": "string",
+            "description": "Nashr sanasi (ISO)"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "description": "Dalil darajasi",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "citation"
+        ]
+      },
+      "UpdateReferenceDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "DOI",
+              "PUBMED",
+              "URL",
+              "WHO",
+              "PROTOCOL",
+              "BOOK",
+              "LOCAL_PROTOCOL"
+            ]
+          },
+          "citation": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "doi": {
+            "type": "string"
+          },
+          "pubmedId": {
+            "type": "string"
+          },
+          "whoCode": {
+            "type": "string"
+          },
+          "publishedAt": {
+            "type": "string"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          }
+        }
+      },
+      "BlockResponseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "diseaseId": {
+            "type": "string"
+          },
+          "marker": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string"
+          },
+          "orderIndex": {
+            "type": "number"
+          },
+          "audiencePriority": {
+            "type": "object",
+            "nullable": true
+          },
+          "contentMd": {
+            "type": "string"
+          },
+          "contentJson": {
+            "type": "object",
+            "nullable": true
+          },
+          "evidenceLevel": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "diseaseId",
+          "marker",
+          "label",
+          "level",
+          "orderIndex",
+          "contentMd",
+          "evidenceLevel",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateBlockDto": {
+        "type": "object",
+        "properties": {
+          "marker": {
+            "type": "string",
+            "description": "Canonical marker id",
+            "enum": [
+              "etiology",
+              "pathogenesis",
+              "symptoms",
+              "diagnosis",
+              "treatment",
+              "stages",
+              "classification",
+              "epidemiology",
+              "risk_factors",
+              "prevention",
+              "prognosis",
+              "complications",
+              "differential",
+              "referral",
+              "rehabilitation",
+              "diet",
+              "lifestyle",
+              "red_flags",
+              "emergency",
+              "patient_education",
+              "specialists",
+              "labs",
+              "imaging",
+              "medications",
+              "procedures",
+              "monitoring",
+              "follow_up",
+              "clinical_cases",
+              "faq",
+              "references",
+              "icd_codes",
+              "synonyms",
+              "overview",
+              "anatomy",
+              "physiology",
+              "definition",
+              "history",
+              "guidelines"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "description": "Ko'rsatiladigan nom (label variant)"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2",
+              "L3"
+            ]
+          },
+          "orderIndex": {
+            "type": "number",
+            "description": "Tartib raqami"
+          },
+          "audiencePriority": {
+            "type": "object",
+            "description": "Auditoriya ustuvorligi (JSON)"
+          },
+          "contentMd": {
+            "type": "string",
+            "description": "Markdown kontent"
+          },
+          "contentJson": {
+            "type": "object",
+            "description": "Structured JSON kontent"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "REVIEW",
+              "APPROVED",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          }
+        },
+        "required": [
+          "marker",
+          "label",
+          "contentMd"
+        ]
+      },
+      "UpdateBlockDto": {
+        "type": "object",
+        "properties": {
+          "marker": {
+            "type": "string",
+            "enum": [
+              "etiology",
+              "pathogenesis",
+              "symptoms",
+              "diagnosis",
+              "treatment",
+              "stages",
+              "classification",
+              "epidemiology",
+              "risk_factors",
+              "prevention",
+              "prognosis",
+              "complications",
+              "differential",
+              "referral",
+              "rehabilitation",
+              "diet",
+              "lifestyle",
+              "red_flags",
+              "emergency",
+              "patient_education",
+              "specialists",
+              "labs",
+              "imaging",
+              "medications",
+              "procedures",
+              "monitoring",
+              "follow_up",
+              "clinical_cases",
+              "faq",
+              "references",
+              "icd_codes",
+              "synonyms",
+              "overview",
+              "anatomy",
+              "physiology",
+              "definition",
+              "history",
+              "guidelines"
+            ]
+          },
+          "label": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "L1",
+              "L2",
+              "L3"
+            ]
+          },
+          "orderIndex": {
+            "type": "number"
+          },
+          "audiencePriority": {
+            "type": "object"
+          },
+          "contentMd": {
+            "type": "string"
+          },
+          "contentJson": {
+            "type": "object"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "DRAFT",
+              "REVIEW",
+              "APPROVED",
+              "PUBLISHED",
+              "REJECTED",
+              "ARCHIVED"
+            ]
+          }
+        }
+      },
+      "AttachReferenceDto": {
+        "type": "object",
+        "properties": {
+          "referenceId": {
+            "type": "string",
+            "description": "Reference ID (uuid)"
+          },
+          "note": {
+            "type": "string",
+            "description": "Izoh"
+          }
+        },
+        "required": [
+          "referenceId"
+        ]
+      },
+      "SubmitReviewDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Qo'shimcha izoh",
+            "maxLength": 500
+          }
+        }
+      },
+      "ApproveDto": {
+        "type": "object",
+        "properties": {
+          "signature": {
+            "type": "string",
+            "description": "Tasdiqlovchi imzosi (matn)",
+            "maxLength": 200
+          }
+        }
+      },
+      "RejectDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Rad etish sababi (majburiy, min 10 belgi)",
+            "minLength": 10,
+            "maxLength": 2000
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "SymptomAnswerDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "HEADACHE"
+          },
+          "answer": {
+            "type": "string",
+            "enum": [
+              "YES",
+              "NO",
+              "UNKNOWN",
+              "SOMETIMES"
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "answer"
+        ]
+      },
+      "MatchRequestDto": {
+        "type": "object",
+        "properties": {
+          "userSymptoms": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SymptomAnswerDto"
+            }
+          },
+          "diseaseId": {
+            "type": "string",
+            "description": "Specific disease ID to match against. If omitted, scans all PUBLISHED diseases."
+          }
+        },
+        "required": [
+          "userSymptoms"
+        ]
+      },
+      "UpdateSessionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "EXPIRED"
+            ]
+          }
+        }
+      },
+      "SendToDoctorDto": {
+        "type": "object",
+        "properties": {
+          "doctorId": {
+            "type": "number",
+            "description": "Doctor user ID",
+            "example": 42
+          },
+          "note": {
+            "type": "string",
+            "description": "Optional note to attach to the message"
+          }
+        },
+        "required": [
+          "doctorId"
+        ]
+      },
+      "SaveNoteDto": {
+        "type": "object",
+        "properties": {
+          "noteMd": {
+            "type": "string",
+            "description": "Note in markdown format"
+          }
+        }
+      },
+      "RuleConditionDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "symptom",
+              "and",
+              "or"
+            ],
+            "description": "Discriminator — leaf condition or boolean composition."
+          },
+          "code": {
+            "type": "string",
+            "description": "Symptom code (for leaf nodes)."
+          },
+          "answer": {
+            "type": "string",
+            "enum": [
+              "YES",
+              "NO",
+              "UNKNOWN"
+            ],
+            "description": "Target answer for leaf (default YES)."
+          },
+          "conditions": {
+            "description": "Child conditions (for `and`/`or` nodes).",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RuleConditionDto"
+            }
+          }
+        },
+        "required": [
+          "kind"
+        ]
+      },
+      "RedFlagRuleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "ruleKey": {
+            "type": "string"
+          },
+          "nameKey": {
+            "type": "string"
+          },
+          "actionKey": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "CRITICAL",
+              "HIGH",
+              "MODERATE"
+            ]
+          },
+          "applicableCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicableIcd10Prefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "condition": {
+            "$ref": "#/components/schemas/RuleConditionDto"
+          },
+          "sourceCitation": {
+            "type": "object"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ruleKey",
+          "nameKey",
+          "actionKey",
+          "severity",
+          "applicableCategories",
+          "applicableIcd10Prefixes",
+          "condition",
+          "isActive",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ClinicalToolInputOptionDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object"
+          },
+          "labelKey": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "labelKey"
+        ]
+      },
+      "ClinicalToolInputDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "number",
+              "boolean",
+              "select"
+            ]
+          },
+          "labelKey": {
+            "type": "string"
+          },
+          "helpKey": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string"
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "step": {
+            "type": "number"
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "defaultValue": {
+            "type": "object"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalToolInputOptionDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "labelKey"
+        ]
+      },
+      "ClinicalToolDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "toolKey": {
+            "type": "string",
+            "description": "Stable slug matching the FE registry (e.g. \"phq-9\")."
+          },
+          "toolType": {
+            "type": "string",
+            "enum": [
+              "SCORE",
+              "QUESTIONNAIRE",
+              "CRITERIA",
+              "DOSE",
+              "STAGING"
+            ]
+          },
+          "nameKey": {
+            "type": "string"
+          },
+          "descriptionKey": {
+            "type": "object"
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "object"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          },
+          "formulaKey": {
+            "type": "string",
+            "description": "Whitelisted compute function identifier on the client (no arbitrary code)."
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalToolInputDto"
+            }
+          },
+          "outputSchema": {
+            "type": "object",
+            "description": "Optional output schema (bands, thresholds, recommendation map). Shape depends on toolType."
+          },
+          "showFormulaForAudience": {
+            "type": "object",
+            "description": "Audience gate for formula-text visibility (ContentLevel string)."
+          },
+          "applicableCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicableIcd10Prefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedAudiences": {
+            "description": "AudienceMode values allowed to SEE this tool in the UI.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredRoles": {
+            "description": "UserRole values allowed to actually RUN this tool (hard gate; 403 otherwise).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "regionFitness": {
+            "type": "object",
+            "description": "Uzbekistan population fit (HIGH/MEDIUM/LOW)."
+          },
+          "priorityWeight": {
+            "type": "number",
+            "description": "UI ordering; lower = higher priority."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "toolKey",
+          "toolType",
+          "nameKey",
+          "source",
+          "evidenceLevel",
+          "formulaKey",
+          "inputs",
+          "applicableCategories",
+          "applicableIcd10Prefixes",
+          "allowedAudiences",
+          "requiredRoles",
+          "isActive",
+          "priorityWeight",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ClinicalToolAdminDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "toolKey": {
+            "type": "string",
+            "description": "Stable slug matching the FE registry (e.g. \"phq-9\")."
+          },
+          "toolType": {
+            "type": "string",
+            "enum": [
+              "SCORE",
+              "QUESTIONNAIRE",
+              "CRITERIA",
+              "DOSE",
+              "STAGING"
+            ]
+          },
+          "nameKey": {
+            "type": "string"
+          },
+          "descriptionKey": {
+            "type": "object"
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "object"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          },
+          "formulaKey": {
+            "type": "string",
+            "description": "Whitelisted compute function identifier on the client (no arbitrary code)."
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClinicalToolInputDto"
+            }
+          },
+          "outputSchema": {
+            "type": "object",
+            "description": "Optional output schema (bands, thresholds, recommendation map). Shape depends on toolType."
+          },
+          "showFormulaForAudience": {
+            "type": "object",
+            "description": "Audience gate for formula-text visibility (ContentLevel string)."
+          },
+          "applicableCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicableIcd10Prefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedAudiences": {
+            "description": "AudienceMode values allowed to SEE this tool in the UI.",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "requiredRoles": {
+            "description": "UserRole values allowed to actually RUN this tool (hard gate; 403 otherwise).",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "regionFitness": {
+            "type": "object",
+            "description": "Uzbekistan population fit (HIGH/MEDIUM/LOW)."
+          },
+          "priorityWeight": {
+            "type": "number",
+            "description": "UI ordering; lower = higher priority."
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "deactivationReason": {
+            "type": "object"
+          },
+          "deactivatedAt": {
+            "type": "object"
+          },
+          "deactivatedBy": {
+            "type": "object"
+          },
+          "clinicOverrides": {
+            "type": "object",
+            "description": "Per-clinic override map. Shape: { \"<clinicId>\": { isActive: boolean, reason?: string, updatedAt: string } }."
+          },
+          "createdBy": {
+            "type": "object"
+          },
+          "updatedBy": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "toolKey",
+          "toolType",
+          "nameKey",
+          "source",
+          "evidenceLevel",
+          "formulaKey",
+          "inputs",
+          "applicableCategories",
+          "applicableIcd10Prefixes",
+          "allowedAudiences",
+          "requiredRoles",
+          "isActive",
+          "priorityWeight",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateClinicalToolDto": {
+        "type": "object",
+        "properties": {
+          "toolKey": {
+            "type": "string",
+            "example": "phq-9"
+          },
+          "toolType": {
+            "type": "string",
+            "enum": [
+              "SCORE",
+              "QUESTIONNAIRE",
+              "CRITERIA",
+              "DOSE",
+              "STAGING"
+            ]
+          },
+          "nameKey": {
+            "type": "string"
+          },
+          "descriptionKey": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "default": "C"
+          },
+          "formulaKey": {
+            "type": "string",
+            "description": "Whitelisted compute function identifier. Unknown keys render as \"unsupported\" on the client."
+          },
+          "inputs": {
+            "type": "object",
+            "description": "Input schema (CalculatorInput[] or QuestionnaireItem[]). Shape validated at the runtime layer, not here."
+          },
+          "outputSchema": {
+            "type": "object"
+          },
+          "showFormulaForAudience": {
+            "type": "string",
+            "description": "ContentLevel string for formula-text gate (\"L1\"/\"L2\"/\"L3\")."
+          },
+          "applicableCategories": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicableIcd10Prefixes": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedAudiences": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "STUDENT",
+                "NURSE",
+                "DOCTOR",
+                "SPECIALIST",
+                "MIXED"
+              ]
+            }
+          },
+          "requiredRoles": {
+            "type": "array",
+            "default": [],
+            "items": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "RADIOLOG",
+                "DOCTOR",
+                "SPECIALIST",
+                "OPERATOR",
+                "ADMIN",
+                "KASSIR",
+                "STUDENT",
+                "NURSE",
+                "EDITOR",
+                "MEDICAL_EDITOR"
+              ]
+            }
+          },
+          "regionFitness": {
+            "type": "string",
+            "description": "Region fitness: HIGH/MEDIUM/LOW."
+          },
+          "priorityWeight": {
+            "type": "number",
+            "default": 100
+          }
+        },
+        "required": [
+          "toolKey",
+          "toolType",
+          "nameKey",
+          "source",
+          "formulaKey",
+          "inputs"
+        ]
+      },
+      "UpdateClinicalToolDto": {
+        "type": "object",
+        "properties": {
+          "nameKey": {
+            "type": "string"
+          },
+          "descriptionKey": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "sourceUrl": {
+            "type": "string"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ]
+          },
+          "inputs": {
+            "type": "object"
+          },
+          "outputSchema": {
+            "type": "object"
+          },
+          "showFormulaForAudience": {
+            "type": "string"
+          },
+          "applicableCategories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "applicableIcd10Prefixes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedAudiences": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "STUDENT",
+                "NURSE",
+                "DOCTOR",
+                "SPECIALIST",
+                "MIXED"
+              ]
+            }
+          },
+          "requiredRoles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "PATIENT",
+                "RADIOLOG",
+                "DOCTOR",
+                "SPECIALIST",
+                "OPERATOR",
+                "ADMIN",
+                "KASSIR",
+                "STUDENT",
+                "NURSE",
+                "EDITOR",
+                "MEDICAL_EDITOR"
+              ]
+            }
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "deactivationReason": {
+            "type": "string",
+            "description": "Required when flipping isActive=false so admins can audit who/why."
+          },
+          "regionFitness": {
+            "type": "string"
+          },
+          "priorityWeight": {
+            "type": "number"
+          }
+        }
+      },
+      "ClinicOverrideDto": {
+        "type": "object",
+        "properties": {
+          "clinicId": {
+            "type": "number",
+            "description": "Clinic tenant id."
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "true = enable for this clinic, false = disable. Overrides the global `isActive` flag for this tenant only."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Audit note — shown in the admin UI."
+          }
+        },
+        "required": [
+          "clinicId",
+          "isActive"
+        ]
+      }
+    }
+  }
+}
