@@ -11,6 +11,9 @@ import { SymptomMatcherSheet } from '../../components/diseases/SymptomMatcherShe
 import { MedicalDisclaimer } from '../../components/common/MedicalDisclaimer';
 import { DownloadPdfButton } from '../../components/diseases/DownloadPdfButton';
 import { ClinicalCalculatorsSection } from '../../components/diseases/ClinicalCalculatorsSection';
+import { DiseaseScientistsSection } from '../../components/diseases/DiseaseScientistsSection';
+import { DiseaseResearchSection } from '../../components/diseases/DiseaseResearchSection';
+import { DiseaseGeneticsSection } from '../../components/diseases/DiseaseGeneticsSection';
 import { useLocale } from '../../store/LocaleContext';
 import type { DiseaseBlock } from '../../types/api/disease';
 import type { AudienceLevel } from '../../constants/disease-tabs';
@@ -96,6 +99,12 @@ export function DiseaseCardPage() {
         icd10={disease.icd10}
         audience={audience}
       />
+
+      {/* Disease KB v2 metadata (PR-14/15/16) — scientists, research, genetics.
+          Har bo'lim bo'sh bo'lsa o'zini render qilmaydi (data.length === 0). */}
+      <DiseaseScientistsSection slug={disease.slug} />
+      <DiseaseResearchSection slug={disease.slug} />
+      <DiseaseGeneticsSection slug={disease.slug} />
 
       {/* Medical disclaimer */}
       <div className="mt-8">

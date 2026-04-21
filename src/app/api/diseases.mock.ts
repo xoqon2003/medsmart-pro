@@ -4,6 +4,9 @@ import type {
   DiseaseListResponse,
   DiseaseSearchParams,
   DiseaseBlock,
+  DiseaseScientist,
+  DiseaseResearch,
+  DiseaseGenetic,
 } from '../types/api/disease';
 import type { DiseaseSymptomWithWeight } from '../types/api/symptom';
 
@@ -215,6 +218,166 @@ export async function mockLookupByIcd(code: string): Promise<{ slug: string; id:
   const d = MOCK_DISEASES.find((x) => x.icd10.toLowerCase() === code.toLowerCase());
   if (!d) throw new Error('Not found');
   return { slug: d.slug, id: d.id, icd10: d.icd10 };
+}
+
+// ── KB v2 metadata mocks (PR-14/15/16) ─────────────────────────────────────
+//
+// Server fixtures (server/prisma/seeds/diseases/fixtures.ts) ga mos
+// namuna ma'lumotlar. Noma'lum slug uchun bo'sh ro'yxat qaytaradi.
+
+const SCIENTISTS_BY_SLUG: Record<string, DiseaseScientist[]> = {
+  'gipertoniya-i10': [
+    {
+      id: 'sci-rr', diseaseId: 'd1',
+      fullName: 'Scipione Riva-Rocci', role: 'DISCOVERER',
+      country: 'Italiya', birthYear: 1863, deathYear: 1937,
+      bioMd: 'Italyan pediatr-internisti; 1896-yilda **simfigmomanometr** ixtiro qildi va arterial bosimni noinvaziv o\'lchash uchun asos yaratdi.',
+      contributionsMd: 'Bosimni manjet orqali o\'lchash uslubi; zamonaviy tonometr prototipi.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+    {
+      id: 'sci-nk', diseaseId: 'd1',
+      fullName: 'Nikolay Korotkov', role: 'CONTRIBUTOR',
+      country: 'Rossiya', birthYear: 1874, deathYear: 1920,
+      bioMd: 'Rus harbiy shifokor-xirurgi; 1905-yilda **Korotkov tovushlarini** kashf qildi — diastolik va sistolik bosimni stetoskop orqali aniq aniqlash usuli.',
+      contributionsMd: 'Auskultativ usul — hozirgacha oltin standart.',
+      photoUrl: null, orderIndex: 1,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'migren-g43': [
+    {
+      id: 'sci-arab', diseaseId: 'd7',
+      fullName: 'Aretaeus Kappadokiyalik', role: 'CLASSIFIER',
+      country: 'Qadimgi Yunoniston', birthYear: 30, deathYear: 90,
+      bioMd: 'Eramizning I asrida yashagan yunon shifokori; migrenni **heterokraniya** deb atab, bir tomonlama bosh og\'rig\'ini alohida kasallik sifatida birinchi tavsifladi.',
+      contributionsMd: 'Heterokraniya → migraena etimologik manbai.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'qandli-diabet-2-tur-e11': [
+    {
+      id: 'sci-banting', diseaseId: 'd6',
+      fullName: 'Frederick Banting', role: 'DISCOVERER',
+      country: 'Kanada', birthYear: 1891, deathYear: 1941,
+      bioMd: 'Kanada olimi; Charles Best bilan 1921-yilda **insulinni** ajratib oldi va diabetni davolashda inqilob qildi. 1923-yilda Nobel mukofoti.',
+      contributionsMd: 'Insulin ekstraksiyasi; Toronto universitetida klinik sinovlar.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+};
+
+const RESEARCH_BY_SLUG: Record<string, DiseaseResearch[]> = {
+  'gipertoniya-i10': [
+    {
+      id: 'res-sprint', diseaseId: 'd1',
+      title: 'A Randomized Trial of Intensive versus Standard Blood-Pressure Control (SPRINT)',
+      authors: 'The SPRINT Research Group', journal: 'New England Journal of Medicine',
+      year: 2015, doi: '10.1056/NEJMoa1511939', pubmedId: '26551272', nctId: 'NCT01206062',
+      type: 'RCT',
+      summaryMd: 'Intensiv bosim nazorati (SBP <120) standart (SBP <140) ga nisbatan kardiovaskulyar voqealar va umumiy o\'limni **25%** ga kamaytirdi.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+    {
+      id: 'res-esh', diseaseId: 'd1',
+      title: '2023 ESH Guidelines for the management of arterial hypertension',
+      authors: 'Mancia G et al. (ESH)', journal: 'Journal of Hypertension',
+      year: 2023, doi: '10.1097/HJH.0000000000003480', pubmedId: null, nctId: null,
+      type: 'GUIDELINE',
+      summaryMd: 'European Society of Hypertension yangi 2023-yilgi tavsiyalari — ofis SBP ≥140/DBP ≥90 dan boshlab tashxis; ambulator monitoring ustuvor.',
+      evidenceLevel: 'A', isLandmark: false,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'qandli-diabet-2-tur-e11': [
+    {
+      id: 'res-ukpds', diseaseId: 'd6',
+      title: 'Intensive blood-glucose control with sulphonylureas or insulin compared with conventional treatment (UKPDS 33)',
+      authors: 'UK Prospective Diabetes Study Group', journal: 'The Lancet',
+      year: 1998, doi: '10.1016/S0140-6736(98)07019-6', pubmedId: '9742976', nctId: null,
+      type: 'RCT',
+      summaryMd: 'Intensiv glikemik nazorat mikrovaskulyar asoratlarni **25%** ga kamaytiradi. 10 yillik kuzatuv.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+    {
+      id: 'res-ada2024', diseaseId: 'd6',
+      title: 'Standards of Care in Diabetes — 2024',
+      authors: 'American Diabetes Association', journal: 'Diabetes Care',
+      year: 2024, doi: '10.2337/dc24-Sint', pubmedId: null, nctId: null,
+      type: 'GUIDELINE',
+      summaryMd: 'ADA 2024 standartlari — HbA1c maqsadi <7.0%, GLP-1 va SGLT2 — kardiovaskulyar himoya bilan birinchi qator.',
+      evidenceLevel: 'A', isLandmark: false,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'migren-g43': [
+    {
+      id: 'res-cgrp', diseaseId: 'd7',
+      title: 'Efficacy of erenumab for the prevention of episodic migraine',
+      authors: 'Goadsby PJ et al.', journal: 'New England Journal of Medicine',
+      year: 2017, doi: '10.1056/NEJMoa1705848', pubmedId: '29171821', nctId: 'NCT02456740',
+      type: 'RCT',
+      summaryMd: 'Anti-CGRP monoklonal antitana **erenumab** migrenli kunlar sonini oylik ≥50% ga kamaytirdi.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+};
+
+const GENETICS_BY_SLUG: Record<string, DiseaseGenetic[]> = {
+  'gipertoniya-i10': [
+    {
+      id: 'gen-htn-1', diseaseId: 'd1',
+      geneSymbol: 'AGT', variantType: 'SNP (M235T)',
+      inheritancePattern: 'COMPLEX',
+      penetrance: '0.150',
+      bloodGroupRisk: null,
+      populationNoteMd: 'Angiotensinogen gen variant. Slavyan va O\'rta Osiyo populyatsiyalarida AA genotip gipertoniya xavfini **15%** ga oshiradi.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'qandli-diabet-2-tur-e11': [
+    {
+      id: 'gen-dm-1', diseaseId: 'd6',
+      geneSymbol: 'TCF7L2', variantType: 'SNP (rs7903146)',
+      inheritancePattern: 'COMPLEX',
+      penetrance: '0.200',
+      bloodGroupRisk: null,
+      populationNoteMd: 'TCF7L2 — T2D uchun eng kuchli umumiy variant. CT/TT genotip odds ratio ~1.4.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'migren-g43': [
+    {
+      id: 'gen-mig-1', diseaseId: 'd7',
+      geneSymbol: 'CACNA1A', variantType: 'Missense',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: '0.700',
+      bloodGroupRisk: null,
+      populationNoteMd: 'Familial hemiplegic migraine type 1 (FHM1) — kalsiy kanali mutatsiyasi.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+};
+
+export async function mockGetDiseaseScientists(slug: string): Promise<DiseaseScientist[]> {
+  await new Promise((r) => setTimeout(r, 200));
+  return SCIENTISTS_BY_SLUG[slug] ?? [];
+}
+
+export async function mockGetDiseaseResearch(slug: string): Promise<DiseaseResearch[]> {
+  await new Promise((r) => setTimeout(r, 200));
+  return RESEARCH_BY_SLUG[slug] ?? [];
+}
+
+export async function mockGetDiseaseGenetics(slug: string): Promise<DiseaseGenetic[]> {
+  await new Promise((r) => setTimeout(r, 200));
+  return GENETICS_BY_SLUG[slug] ?? [];
 }
 
 export async function mockSemanticSearch(q: string, limit: number): Promise<DiseaseListItem[]> {

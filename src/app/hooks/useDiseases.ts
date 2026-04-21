@@ -1,5 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { listDiseases, getDisease, getDiseaseSymptoms, semanticSearch } from '../api/diseases';
+import {
+  listDiseases,
+  getDisease,
+  getDiseaseSymptoms,
+  semanticSearch,
+  getDiseaseScientists,
+  getDiseaseResearch,
+  getDiseaseGenetics,
+} from '../api/diseases';
 import type { DiseaseSearchParams } from '../types/api/disease';
 
 export const useDiseasesList = (params: DiseaseSearchParams) =>
@@ -34,4 +42,34 @@ export const useSemanticSearch = (query: string, limit = 10) =>
     queryFn: () => semanticSearch(query, limit),
     enabled: query.length > 3,
     staleTime: 2 * 60 * 1000,
+  });
+
+// ── KB v2 metadata (PR-14/15) ───────────────────────────────────────────────
+//
+// Scientists / Research / Genetics — DiseaseCard sahifa uchun alohida
+// query'lar (asosiy detail query'ni bloklash o'rniga, lazy yuklash).
+// staleTime: 5 daqiqa — metadata kamdan-kam o'zgaradi.
+
+export const useDiseaseScientists = (slug: string) =>
+  useQuery({
+    queryKey: ['disease', slug, 'scientists'],
+    queryFn: () => getDiseaseScientists(slug),
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  });
+
+export const useDiseaseResearch = (slug: string) =>
+  useQuery({
+    queryKey: ['disease', slug, 'research'],
+    queryFn: () => getDiseaseResearch(slug),
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
+  });
+
+export const useDiseaseGenetics = (slug: string) =>
+  useQuery({
+    queryKey: ['disease', slug, 'genetics'],
+    queryFn: () => getDiseaseGenetics(slug),
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000,
   });

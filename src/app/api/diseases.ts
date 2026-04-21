@@ -4,6 +4,9 @@ import type {
   DiseaseDetail,
   DiseaseSearchParams,
   DiseaseListItem,
+  DiseaseScientist,
+  DiseaseResearch,
+  DiseaseGenetic,
 } from '../types/api/disease';
 import type { DiseaseSymptomWithWeight } from '../types/api/symptom';
 import {
@@ -12,6 +15,9 @@ import {
   mockGetDiseaseSymptoms,
   mockLookupByIcd,
   mockSemanticSearch,
+  mockGetDiseaseScientists,
+  mockGetDiseaseResearch,
+  mockGetDiseaseGenetics,
 } from './diseases.mock';
 
 const USE_REAL_API = import.meta.env.VITE_USE_REAL_API === 'true';
@@ -49,4 +55,24 @@ export const semanticSearch = (q: string, limit = 10): Promise<DiseaseListItem[]
   return apiFetch<DiseaseListItem[]>(
     `/diseases/semantic-search?q=${encodeURIComponent(q)}&limit=${limit}`,
   );
+};
+
+// ── KB v2 metadata (PR-14/15) ───────────────────────────────────────────────
+//
+// Uchta yangi modelga public GET endpointlar. Backend mutation'lar
+// (POST/PATCH/DELETE) admin UI'da kerak bo'ladi — hozir faqat o'qish.
+
+export const getDiseaseScientists = (slug: string): Promise<DiseaseScientist[]> => {
+  if (!USE_REAL_API) return mockGetDiseaseScientists(slug);
+  return apiFetch<DiseaseScientist[]>(`/diseases/${slug}/scientists`);
+};
+
+export const getDiseaseResearch = (slug: string): Promise<DiseaseResearch[]> => {
+  if (!USE_REAL_API) return mockGetDiseaseResearch(slug);
+  return apiFetch<DiseaseResearch[]>(`/diseases/${slug}/research`);
+};
+
+export const getDiseaseGenetics = (slug: string): Promise<DiseaseGenetic[]> => {
+  if (!USE_REAL_API) return mockGetDiseaseGenetics(slug);
+  return apiFetch<DiseaseGenetic[]>(`/diseases/${slug}/genetics`);
 };
