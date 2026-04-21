@@ -110,8 +110,12 @@ const DiseaseListPage      = lazy$(() => import('./pages/diseases/DiseaseListPag
 const DiseaseCardPage      = lazy$(() => import('./pages/diseases/DiseaseCardPage'),  'DiseaseCardPage');
 
 // KB Admin
-const KBDiseaseEditorPage  = lazy$(() => import('./pages/kb/KBDiseaseEditorPage'),   'KBDiseaseEditorPage');
+const KBDiseaseListPage    = lazy$(() => import('./pages/kb/KBDiseaseListPage'),      'KBDiseaseListPage');
+const KBDiseaseEditorPage  = lazy$(() => import('./pages/kb/KBDiseaseEditorPage'),    'KBDiseaseEditorPage');
 const KBReviewQueuePage    = lazy$(() => import('./pages/kb/KBReviewQueuePage'),      'KBReviewQueuePage');
+
+// Bemor profili
+const MyDiseasesPage       = lazy$(() => import('./pages/profile/MyDiseasesPage'),    'MyDiseasesPage');
 
 // Shifokor Inbox (Triage natijalar)
 const CasesInboxPage       = lazy$(() => import('./pages/cases/CasesInboxPage'),      'CasesInboxPage');
@@ -246,6 +250,10 @@ function AppRoutes() {
 
       {/* KB Admin */}
       <Route
+        path="/kb/diseases"
+        element={DISEASE_KB_ENABLED ? <KBDiseaseListPage /> : <Navigate to="/" replace />}
+      />
+      <Route
         path="/kb/diseases/new"
         element={DISEASE_KB_ENABLED ? <KBDiseaseEditorPage /> : <Navigate to="/" replace />}
       />
@@ -266,6 +274,12 @@ function AppRoutes() {
       <Route
         path="/shifokor/inbox/:id"
         element={DISEASE_KB_ENABLED ? <CaseDetailPage /> : <Navigate to="/shifokor" replace />}
+      />
+
+      {/* Bemor profili — mening tahlillarim */}
+      <Route
+        path="/bemor/tahlillarim"
+        element={DISEASE_KB_ENABLED ? <MyDiseasesPage /> : <Navigate to="/bemor" replace />}
       />
 
       {/* Fallback — noma'lum URL splash ga yuboriladi */}

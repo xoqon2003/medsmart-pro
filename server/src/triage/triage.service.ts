@@ -331,6 +331,68 @@ export class TriageService {
     return { items, total, page, limit };
   }
 
+  // ─── listMySessions ─────────────────────────────────────────────────────────
+
+  async listMySessions(userId: number, page = 1, limit = 20) {
+    const p = Math.max(page, 1);
+    const l = Math.min(Math.max(limit, 1), 50);
+    const skip = (p - 1) * l;
+
+    const where = { userId, status: { not: 'ARCHIVED' } };
+
+    const [total, rows] = await Promise.all([
+      this.p.symptomMatchSession.count({ where }),
+      this.p.symptomMatchSession.findMany({
+        where,
+        orderBy: { updatedAt: 'desc' },
+        skip,
+        take: l,
+        select: {
+          id: true,
+          matchScore: true,
+          matchedSymptoms: true,
+          missingSymptoms: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          expiresAt: true,
+          disease: {
+            select: { id: true, slug: true, icd10: true, nameUz: true },
+          },
+        },
+      }),
+    ]);
+
+    type Row = {
+      id: string;
+      matchScore: number | { toNumber(): number };
+      matchedSymptoms: unknown;
+      missingSymptoms: unknown;
+      status: string;
+      createdAt: Date;
+      updatedAt: Date;
+      expiresAt: Date | null;
+      disease: { id: string; slug: string; icd10: string; nameUz: string } | null;
+    };
+
+    const items = (rows as Row[]).map((r) => ({
+      id: r.id,
+      matchScore:
+        typeof r.matchScore === 'object'
+          ? (r.matchScore as { toNumber(): number }).toNumber()
+          : Number(r.matchScore),
+      status: r.status,
+      createdAt: r.createdAt,
+      updatedAt: r.updatedAt,
+      expiresAt: r.expiresAt,
+      disease: r.disease,
+      matchedSymptomCount: Array.isArray(r.matchedSymptoms) ? r.matchedSymptoms.length : 0,
+      missingSymptomCount: Array.isArray(r.missingSymptoms) ? r.missingSymptoms.length : 0,
+    }));
+
+    return { items, total, page: p, limit: l };
+  }
+
   // ─── updateSession ───────────────────────────────────────────────────────────
 
   async updateSession(userId: number, sessionId: string, dto: UpdateSessionDto) {

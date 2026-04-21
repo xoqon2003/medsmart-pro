@@ -43,6 +43,24 @@ export class TriageController {
     return this.triageService.match(req.user.sub, dto);
   }
 
+  // ─── GET /triage/my-sessions ────────────────────────────────────────────────
+
+  @Get('my-sessions')
+  @ApiOperation({
+    summary: "Joriy foydalanuvchining triage sessiyalari (bemor 'Mening kasalliklarim' uchun)",
+  })
+  listMySessions(
+    @Request() req: AuthRequest,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.triageService.listMySessions(
+      req.user.sub,
+      page ? Number(page) : 1,
+      limit ? Number(limit) : 20,
+    );
+  }
+
   // ─── POST /triage/sessions/:id/update ───────────────────────────────────────
 
   @Post('sessions/:id/update')

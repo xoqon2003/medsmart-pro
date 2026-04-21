@@ -258,6 +258,37 @@ describe('TriageService', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
+  it('14. listMySessions returns only caller sessions, excludes ARCHIVED', async () => {
+    const row = {
+      id: 'sess-99',
+      userId: 7,
+      status: 'ACTIVE',
+      matchScore: new (class { toNumber() { return 0.75; } })(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      expiresAt: null,
+      disease: { id: 'd1', slug: 'flu', icd10: 'J11', nameUz: 'Gripp' },
+      matchedSymptoms: [{ id: 's1' }],
+      missingSymptoms: [{ id: 's2' }, { id: 's3' }],
+    };
+    mockSymptomMatchSession.count.mockResolvedValue(1);
+    mockSymptomMatchSession.findMany.mockResolvedValue([row]);
+
+    const svc = buildService();
+    const res = await svc.listMySessions(7, 1, 20);
+
+    expect(mockSymptomMatchSession.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId: 7, status: { not: 'ARCHIVED' } },
+      }),
+    );
+    expect(res.total).toBe(1);
+    expect(res.items).toHaveLength(1);
+    expect(res.items[0].matchScore).toBe(0.75);
+    expect(res.items[0].matchedSymptomCount).toBe(1);
+    expect(res.items[0].missingSymptomCount).toBe(2);
+  });
+
   it('4. saveNote calls userDiseaseNote.upsert', async () => {
     mockSymptomMatchSession.findUnique.mockResolvedValue({
       id: 'sess-1',
