@@ -14,6 +14,7 @@ import { ClinicalCalculatorsSection } from '../../components/diseases/ClinicalCa
 import { DiseaseScientistsSection } from '../../components/diseases/DiseaseScientistsSection';
 import { DiseaseResearchSection } from '../../components/diseases/DiseaseResearchSection';
 import { DiseaseGeneticsSection } from '../../components/diseases/DiseaseGeneticsSection';
+import { RelatedDiseasesWidget } from '../../components/diseases/RelatedDiseasesWidget';
 import { useLocale } from '../../store/LocaleContext';
 import type { DiseaseBlock } from '../../types/api/disease';
 import type { AudienceLevel } from '../../constants/disease-tabs';
@@ -115,6 +116,9 @@ export function DiseaseCardPage() {
       <DiseaseScientistsSection slug={disease.slug} />
       <DiseaseResearchSection slug={disease.slug} />
       <DiseaseGeneticsSection slug={disease.slug} />
+
+      {/* Related diseases — same category, current excluded */}
+      <RelatedDiseasesWidget currentSlug={disease.slug} category={disease.category} />
 
       {/* Medical disclaimer */}
       <div className="mt-8">

@@ -8,6 +8,7 @@ export const en = {
   'diseases.notFound': 'Nothing found',
   'diseases.loading': 'Loading...',
   'diseases.showMore': 'Show more',
+  'diseases.related': 'Related diseases',
 
   // Disease card
   'disease.synonyms': 'Synonyms',

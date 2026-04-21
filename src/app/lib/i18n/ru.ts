@@ -8,6 +8,7 @@ export const ru = {
   'diseases.notFound': 'Ничего не найдено',
   'diseases.loading': 'Загрузка...',
   'diseases.showMore': 'Показать больше',
+  'diseases.related': 'Похожие заболевания',
 
   // Kasallik kartasi
   'disease.synonyms': 'Синонимы',

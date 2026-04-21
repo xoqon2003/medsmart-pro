@@ -6,6 +6,7 @@ export const uz = {
   'diseases.notFound': 'Hech narsa topilmadi',
   'diseases.loading': 'Yuklanmoqda...',
   'diseases.showMore': "Ko'proq ko'rsatish",
+  'diseases.related': 'Aloqador kasalliklar',
 
   // Kasallik kartasi
   'disease.synonyms': 'Sinonimlari',
