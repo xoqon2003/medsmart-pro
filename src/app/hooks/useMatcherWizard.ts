@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
 import type {
-  DifferentialDiagnosisRow,
   MatchScores,
   RiskFactorAnswer,
   RiskFactorValue,
@@ -10,6 +9,13 @@ import type {
 import type { AnswerValue } from '../types/api/triage';
 import type { DiseaseSymptomWithWeight } from '../types/api/symptom';
 import type { DiseaseDetail, DiseaseListItem } from '../types/api/disease';
+import {
+  computeRiskTier,
+  computeAnsweredRatio,
+  computeRedFlagCount,
+  computeDdx,
+  computeConfidence,
+} from '../lib/matcher-wizard-logic';
 
 /**
  * Wizard-level state (GAP-01). Bridges the existing `useSymptomMatcher`
@@ -53,78 +59,30 @@ export function useMatcherWizard(opts: {
   }, []);
 
   /** Number of symptoms with any non-UNKNOWN answer / total. */
-  const answeredRatio = useMemo(() => {
-    if (symptoms.length === 0) return 0;
-    let count = 0;
-    for (const sym of symptoms) {
-      const ans = answers.get(sym.code);
-      if (ans && ans !== 'UNKNOWN') count++;
-    }
-    return count / symptoms.length;
-  }, [symptoms, answers]);
+  const answeredRatio = useMemo(
+    () => computeAnsweredRatio(symptoms, answers),
+    [symptoms, answers],
+  );
 
   /** Count of YES answers on symptoms flagged isRedFlag. */
-  const redFlagCount = useMemo(() => {
-    let count = 0;
-    for (const sym of symptoms) {
-      if (sym.isRedFlag && answers.get(sym.code) === 'YES') count++;
-    }
-    return count;
-  }, [symptoms, answers]);
+  const redFlagCount = useMemo(
+    () => computeRedFlagCount(symptoms, answers),
+    [symptoms, answers],
+  );
 
   /** Risk tier from the count of YES risk answers (TZ §3.1.3 Bosqich 4). */
-  const riskTier: MatchScores['risk'] = useMemo(() => {
-    let yes = 0;
-    riskFactors.forEach((rf) => {
-      if (rf.value === 'YES') yes++;
-    });
-    if (yes >= 6) return 'VERY_HIGH';
-    if (yes >= 4) return 'HIGH';
-    if (yes >= 2) return 'MODERATE';
-    return 'LOW';
-  }, [riskFactors]);
+  const riskTier: MatchScores['risk'] = useMemo(
+    () => computeRiskTier(riskFactors),
+    [riskFactors],
+  );
 
-  /** Builds DDx rows from nearby candidate diseases. Real backend returns this
-   *  from `/triage/session/:id/ddx`; here we fake a spread around baseScore. */
-  const ddx: DifferentialDiagnosisRow[] = useMemo(() => {
-    const primaryRow: DifferentialDiagnosisRow = {
-      diseaseId: primaryDisease.id,
-      slug: primaryDisease.slug,
-      nameUz: primaryDisease.nameUz,
-      icd10: primaryDisease.icd10,
-      matchScore: baseScore,
-      confidence: 0.5, // placeholder; real engine computes delta/top
-      deltaFromTop: 0,
-      redFlag: redFlagCount > 0,
-    };
+  /** Builds DDx rows from nearby candidate diseases. */
+  const ddx = useMemo(
+    () => computeDdx(primaryDisease, candidateDiseases, baseScore, redFlagCount),
+    [primaryDisease, candidateDiseases, baseScore, redFlagCount],
+  );
 
-    const others = candidateDiseases
-      .filter((d) => d.id !== primaryDisease.id)
-      .slice(0, 4)
-      .map<DifferentialDiagnosisRow>((d, idx) => ({
-        diseaseId: d.id,
-        slug: d.slug,
-        nameUz: d.nameUz,
-        icd10: d.icd10,
-        // Smoothly decreasing scores so the UI visibly orders them.
-        matchScore: Math.max(0.15, baseScore * (0.75 - idx * 0.12)),
-        confidence: 0.3,
-        deltaFromTop: baseScore - baseScore * (0.75 - idx * 0.12),
-        redFlag: false,
-      }));
-
-    return [primaryRow, ...others]
-      .sort((a, b) => b.matchScore - a.matchScore)
-      .slice(0, 5);
-  }, [primaryDisease, candidateDiseases, baseScore, redFlagCount]);
-
-  const confidence = useMemo(() => {
-    if (ddx.length < 2) return 0;
-    const top = ddx[0].matchScore;
-    const next = ddx[1].matchScore;
-    if (top === 0) return 0;
-    return Math.max(0, Math.min(1, (top - next) / top));
-  }, [ddx]);
+  const confidence = useMemo(() => computeConfidence(ddx), [ddx]);
 
   const scores: MatchScores = useMemo(
     () => ({
