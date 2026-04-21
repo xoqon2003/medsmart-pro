@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download, LayoutGrid, List, Sparkles, Archive, Trash2, Eye } from 'lucide-react';
+import { Plus, FileText, Clock, CheckCircle, AlertCircle, ChevronRight, Bell, User, Star, Download, LayoutGrid, List, Sparkles, Archive, Trash2, BookOpen, Activity } from 'lucide-react';
+import { useNavigate as useRouterNavigate } from 'react-router';
 import { useApp } from '../../../store/appStore';
 import { getStatusLabel, getUrgencyLabel, formatDateTime, formatPrice } from '../../../utils/formatters';
 import { downloadConclusionReport } from '../../../utils/pdfGenerator';
 import { PatientApplicationsTable } from './PatientApplicationsTable';
+import { DISEASE_KB_ENABLED } from '../../../lib/featureFlags';
 import type { ViewMode } from '../../../types';
 
 export function PatientHome() {
   const { currentUser, applications, navigate, setSelectedApplication, unreadCount, openServiceSheet, symptomHistory, updateSymptomStatus } = useApp();
+  const routerNavigate = useRouterNavigate();
   const [activeTab, setActiveTab] = useState<'active' | 'done' | 'symptoms'>('active');
   const [downloading, setDownloading] = useState<number | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>(() =>
@@ -99,6 +102,38 @@ export function PatientHome() {
           </div>
           <ChevronRight className="w-5 h-5 text-gray-400" />
         </motion.button>
+
+        {/* Disease KB quick-access — shown only when feature is enabled */}
+        {DISEASE_KB_ENABLED && (
+          <div className="grid grid-cols-2 gap-3 mb-5">
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => routerNavigate('/kasalliklar')}
+              className="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 text-left"
+            >
+              <div className="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center shrink-0">
+                <BookOpen className="w-5 h-5 text-violet-600" />
+              </div>
+              <div>
+                <p className="text-gray-900 text-sm font-medium">Kasalliklar bazasi</p>
+                <p className="text-gray-400 text-xs">ICD-10 ma'lumotnoma</p>
+              </div>
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.97 }}
+              onClick={() => routerNavigate('/bemor/tahlillarim')}
+              className="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-3 text-left"
+            >
+              <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center shrink-0">
+                <Activity className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="text-gray-900 text-sm font-medium">Mening tahlillarim</p>
+                <p className="text-gray-400 text-xs">Simptom natijalari</p>
+              </div>
+            </motion.button>
+          </div>
+        )}
 
         {/* Tabs + View Toggle */}
         <div className="flex items-center gap-2 mb-4">
