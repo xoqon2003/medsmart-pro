@@ -168,6 +168,9 @@ export class DiseasesService {
           },
           orderBy: { orderIndex: 'asc' },
         },
+        scientists: { orderBy: { orderIndex: 'asc' } },
+        research: { orderBy: [{ isLandmark: 'desc' }, { year: 'desc' }] },
+        genetics: true,
       },
     })) as DiseaseRow | null;
 

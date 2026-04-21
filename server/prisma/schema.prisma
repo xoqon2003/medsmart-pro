@@ -1202,6 +1202,48 @@ enum EditLogType {
   STATUS_CHANGE
 }
 
+// ── KB Enums (v2 extensions: scientists, research, genetics) ──────────────────
+
+enum ScientistRole {
+  DISCOVERER
+  CLASSIFIER
+  CONTRIBUTOR
+  RESEARCHER
+  EDITOR
+}
+
+enum ResearchType {
+  RCT
+  META_ANALYSIS
+  SYSTEMATIC_REVIEW
+  COHORT
+  CASE_CONTROL
+  CASE_SERIES
+  CASE_REPORT
+  GUIDELINE
+}
+
+enum InheritancePattern {
+  AUTOSOMAL_DOMINANT
+  AUTOSOMAL_RECESSIVE
+  X_LINKED_DOMINANT
+  X_LINKED_RECESSIVE
+  MITOCHONDRIAL
+  COMPLEX
+  SPORADIC
+}
+
+enum BloodGroup {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
 // ── Disease (PR-02) ────────────────────────────────────────────────────────────
 
 model Disease {
@@ -1240,6 +1282,9 @@ model Disease {
   editLogs          DiseaseEditLog[]
   epidemiology      RegionEpidemiology[]
   specialties       DiseaseSpecialty[]
+  scientists        DiseaseScientist[]
+  research          DiseaseResearch[]
+  genetics          DiseaseGenetic[]
 
   @@index([category])
   @@index([updatedAt])
@@ -1584,6 +1629,72 @@ model DiseaseSpecialty {
   @@unique([doctorProfileId, diseaseId])
   @@index([doctorProfileId])
   @@index([diseaseId])
+}
+
+// ── Disease KB v2 extensions (scientists, research, genetics) ──────────────────
+
+model DiseaseScientist {
+  id              String        @id @default(uuid())
+  diseaseId       String
+  fullName        String
+  role            ScientistRole
+  country         String?
+  birthYear       Int?
+  deathYear       Int?
+  bioMd           String?       @db.Text
+  contributionsMd String?       @db.Text
+  photoUrl        String?
+  orderIndex      Int           @default(0)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  disease         Disease       @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@index([diseaseId])
+  @@index([role])
+}
+
+model DiseaseResearch {
+  id            String        @id @default(uuid())
+  diseaseId     String
+  title         String
+  authors       String
+  journal       String?
+  year          Int
+  doi           String?
+  pubmedId      String?
+  nctId         String?
+  type          ResearchType
+  summaryMd     String        @db.Text
+  evidenceLevel EvidenceLevel @default(C)
+  isLandmark    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  disease       Disease       @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@unique([diseaseId, doi])
+  @@index([diseaseId])
+  @@index([year])
+  @@index([type])
+}
+
+model DiseaseGenetic {
+  id                 String              @id @default(uuid())
+  diseaseId          String
+  geneSymbol         String?
+  variantType        String?
+  inheritancePattern InheritancePattern?
+  penetrance         Decimal?            @db.Decimal(4, 3)
+  bloodGroupRisk     BloodGroup?
+  populationNoteMd   String?             @db.Text
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  disease            Disease             @relation(fields: [diseaseId], references: [id], onDelete: Cascade)
+
+  @@index([diseaseId])
+  @@index([geneSymbol])
 }
 
 // ── Real-time Chat (Socket.io) ────────────────────────────────────────────────

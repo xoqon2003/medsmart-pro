@@ -101,6 +101,26 @@ describe('DiseasesService', () => {
       });
       await expect(service.findBySlug('a', 'L1', null)).rejects.toBeInstanceOf(NotFoundException);
     });
+
+    it('scientists, research, genetics include qiladi', async () => {
+      (repo.findUnique as jest.Mock).mockResolvedValue({
+        id: 'd1',
+        status: 'PUBLISHED',
+        blocks: [],
+        scientists: [],
+        research: [],
+        genetics: [],
+      });
+
+      await service.findBySlug('gipertoniya-i10', 'L1', null);
+
+      const callArg = (repo.findUnique as jest.Mock).mock.calls[0][0] as {
+        include: Record<string, unknown>;
+      };
+      expect(callArg.include).toHaveProperty('scientists');
+      expect(callArg.include).toHaveProperty('research');
+      expect(callArg.include).toHaveProperty('genetics');
+    });
   });
 
   describe('create', () => {
