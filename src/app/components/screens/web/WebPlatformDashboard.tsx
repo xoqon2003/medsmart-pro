@@ -5,13 +5,14 @@
  */
 
 import React, { useState, useMemo } from 'react';
+import { useNavigate as useRouterNavigate } from 'react-router';
 import { motion } from 'motion/react';
 import {
   TrendingUp, TrendingDown, Users, FileText, Banknote,
   Clock, CheckCircle2, AlertCircle, XCircle, ArrowUpRight,
   MoreHorizontal, Download, RefreshCw, Eye, ChevronRight,
   Activity, Stethoscope, CreditCard, Wifi, Zap,
-  Calendar, Filter, BarChart2,
+  Calendar, Filter, BarChart2, BookOpen, ClipboardList,
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
@@ -19,6 +20,7 @@ import {
 } from 'recharts';
 import { WebPlatformLayout } from './WebPlatformLayout';
 import { useApp } from '../../../store/appStore';
+import { DISEASE_KB_ENABLED } from '../../../lib/featureFlags';
 // TODO: Real API dan olish — hozircha seed data
 import { mockApplications, mockUsers, mockKassaTolovlar } from '../../../data/mockData';
 
@@ -123,6 +125,7 @@ type Period = 'bugun' | 'hafta' | 'oy';
 
 export function WebPlatformDashboard() {
   const { applications, currentUser, navigate, setSelectedApplication } = useApp();
+  const routerNavigate = useRouterNavigate();
   const [period, setPeriod] = useState<Period>('hafta');
   const [chartType, setChartType] = useState<'arizalar' | 'tolovlar' | 'bemorlar'>('arizalar');
 
@@ -381,6 +384,29 @@ export function WebPlatformDashboard() {
                     <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 transition-colors" />
                   </button>
                 ))}
+
+                {/* Kasalliklar KB admin — faqat flag yoqilganda */}
+                {DISEASE_KB_ENABLED && (
+                  <>
+                    <div className="my-2 border-t border-slate-800" />
+                    <button
+                      onClick={() => routerNavigate('/kb/diseases')}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-600/20 transition-colors group"
+                    >
+                      <BookOpen className="w-4 h-4 text-indigo-400" />
+                      <span className="text-slate-300 text-sm group-hover:text-white transition-colors flex-1 text-left">Kasalliklar KB</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 transition-colors" />
+                    </button>
+                    <button
+                      onClick={() => routerNavigate('/kb/review-queue')}
+                      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-600/20 transition-colors group"
+                    >
+                      <ClipboardList className="w-4 h-4 text-indigo-400" />
+                      <span className="text-slate-300 text-sm group-hover:text-white transition-colors flex-1 text-left">Review navbati</span>
+                      <ChevronRight className="w-3.5 h-3.5 text-slate-600 group-hover:text-slate-400 transition-colors" />
+                    </button>
+                  </>
+                )}
               </div>
             </motion.div>
 
