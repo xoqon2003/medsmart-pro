@@ -1,5 +1,5 @@
 import { apiFetch } from './http';
-import type { TriageMatchRequest, TriageMatchResult } from '../types/api/triage';
+import type { TriageMatchRequest, TriageMatchResult, AnswerValue } from '../types/api/triage';
 
 // ─── Doctor inbox ─────────────────────────────────────────────────────────────
 
