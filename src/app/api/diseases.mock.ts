@@ -73,6 +73,317 @@ const MOCK_DISEASES: DiseaseListItem[] = [
     category: 'yurak-qon-tomir', status: 'PUBLISHED',
     audienceLevels: ['L1'], updatedAt: '2026-04-17T10:00:00Z',
   },
+
+  // ── Yurak-qon-tomir (d10–d14) ─────────────────────────────────────────────
+  {
+    id: 'd10', slug: 'yurak-etishmovchiligi-i50', icd10: 'I50',
+    nameUz: 'Yurak etishmovchiligi', nameLat: 'Insufficientia cordis',
+    nameRu: 'Сердечная недостаточность',
+    category: 'yurak-qon-tomir', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd11', slug: 'ishemik-insult-i63', icd10: 'I63',
+    nameUz: 'Ishemik insult', nameLat: 'Ictus ischaemicus',
+    nameRu: 'Ишемический инсульт',
+    category: 'yurak-qon-tomir', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd12', slug: 'ateroskleroz-i70', icd10: 'I70',
+    nameUz: 'Ateroskleroz', nameLat: 'Atherosclerosis',
+    nameRu: 'Атеросклероз',
+    category: 'yurak-qon-tomir', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd13', slug: 'opka-tromboemboliyasi-i26', icd10: 'I26',
+    nameUz: "O'pka arteriyasi tromboembolizmi", nameLat: 'Embolia pulmonalis',
+    nameRu: 'Тромбоэмболия лёгочной артерии',
+    category: 'yurak-qon-tomir', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd14', slug: 'varikoz-venalar-i83', icd10: 'I83',
+    nameUz: 'Varikoz venalar', nameLat: 'Varices venosae',
+    nameRu: 'Варикозное расширение вен',
+    category: 'yurak-qon-tomir', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Nafas yo'llari (d15–d18) ─────────────────────────────────────────────
+  {
+    id: 'd15', slug: 'pnevmoniya-j18', icd10: 'J18',
+    nameUz: 'Pnevmoniya (zotiljam)', nameLat: 'Pneumonia',
+    nameRu: 'Пневмония',
+    category: 'nafas-yollari', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd16', slug: 'soobk-j44', icd10: 'J44',
+    nameUz: 'Surunkali obstruktiv o\'pka kasalligi (SOOBK)',
+    nameLat: 'Morbus pulmonalis obstructivus chronicus',
+    nameRu: 'ХОБЛ',
+    category: 'nafas-yollari', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd17', slug: 'tuberkulez-a15', icd10: 'A15',
+    nameUz: 'Tuberkulez', nameLat: 'Tuberculosis pulmonum',
+    nameRu: 'Туберкулёз',
+    category: 'nafas-yollari', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd18', slug: 'allergik-rinit-j30', icd10: 'J30',
+    nameUz: 'Allergik rinit', nameLat: 'Rhinitis allergica',
+    nameRu: 'Аллергический ринит',
+    category: 'nafas-yollari', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Endokrin (d19–d22) ────────────────────────────────────────────────────
+  {
+    id: 'd19', slug: 'qandli-diabet-1-tur-e10', icd10: 'E10',
+    nameUz: 'Qandli diabet 1-tur', nameLat: 'Diabetes mellitus typus 1',
+    nameRu: 'Сахарный диабет 1 типа',
+    category: 'endokrin', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd20', slug: 'gipotireoz-e03', icd10: 'E03',
+    nameUz: 'Gipotireoz', nameLat: 'Hypothyreosis',
+    nameRu: 'Гипотиреоз',
+    category: 'endokrin', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd21', slug: 'gipertireoz-e05', icd10: 'E05',
+    nameUz: 'Gipertireoz (Bazedov kasalligi)', nameLat: 'Hyperthyreosis',
+    nameRu: 'Гипертиреоз',
+    category: 'endokrin', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd22', slug: 'semirib-ketish-e66', icd10: 'E66',
+    nameUz: 'Semirib ketish (Obesitas)', nameLat: 'Obesitas',
+    nameRu: 'Ожирение',
+    category: 'endokrin', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Hazm tizimi (d23–d28) ─────────────────────────────────────────────────
+  {
+    id: 'd23', slug: 'gerk-k21', icd10: 'K21',
+    nameUz: 'Gastroezofageal reflyuks kasalligi (GERK)',
+    nameLat: 'Morbus gastroesophagealis reflux',
+    nameRu: 'Гастроэзофагеальная рефлюксная болезнь',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd24', slug: 'oshqozon-yara-k25', icd10: 'K25',
+    nameUz: "Oshqozon yara kasalligi", nameLat: 'Ulcus ventriculi',
+    nameRu: 'Язва желудка',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd25', slug: 'yarali-kolit-k51', icd10: 'K51',
+    nameUz: 'Yarali kolit', nameLat: 'Colitis ulcerosa',
+    nameRu: 'Язвенный колит',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd26', slug: 'gepatit-b-b18', icd10: 'B18',
+    nameUz: 'Surunkali gepatit B', nameLat: 'Hepatitis B chronica',
+    nameRu: 'Хронический гепатит B',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd27', slug: 'jigar-sirrozi-k74', icd10: 'K74',
+    nameUz: 'Jigar sirrozi', nameLat: 'Cirrhosis hepatis',
+    nameRu: 'Цирроз печени',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd28', slug: 'qis-k58', icd10: 'K58',
+    nameUz: "Qo'zg'aluvchan ichak sindromi (QIS)", nameLat: 'Syndroma intestini irritabilis',
+    nameRu: 'Синдром раздражённого кишечника',
+    category: 'hazm', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Nerv tizimi (d29–d34) ─────────────────────────────────────────────────
+  {
+    id: 'd29', slug: 'parkinson-kasalligi-g20', icd10: 'G20',
+    nameUz: 'Parkinson kasalligi', nameLat: 'Morbus Parkinson',
+    nameRu: 'Болезнь Паркинсона',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd30', slug: 'epilepsiya-g40', icd10: 'G40',
+    nameUz: 'Epilepsiya', nameLat: 'Epilepsia',
+    nameRu: 'Эпилепсия',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd31', slug: 'tia-g45', icd10: 'G45',
+    nameUz: 'Tranzitor ishemik ataka (TIA)', nameLat: 'Ictus ischaemicus transitorius',
+    nameRu: 'Транзиторная ишемическая атака',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd32', slug: 'alzheimer-g30', icd10: 'G30',
+    nameUz: 'Alzheimer kasalligi', nameLat: 'Morbus Alzheimer',
+    nameRu: 'Болезнь Альцгеймера',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd33', slug: 'depressiya-f32', icd10: 'F32',
+    nameUz: 'Depressiv buzilish', nameLat: 'Episodium depressivum',
+    nameRu: 'Депрессивный эпизод',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd34', slug: 'tashvish-buzilishi-f41', icd10: 'F41',
+    nameUz: 'Tashvish buzilishi (Nevrozlar)', nameLat: 'Perturbatio anxiosa',
+    nameRu: 'Тревожные расстройства',
+    category: 'nerv-tizimi', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Tayanch-harakat tizimi (d35–d39) ─────────────────────────────────────
+  {
+    id: 'd35', slug: 'artroz-m15', icd10: 'M15',
+    nameUz: 'Artroz (Osteoartroz)', nameLat: 'Arthrosis generalisata',
+    nameRu: 'Остеоартроз',
+    category: 'tayanch-harakat', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd36', slug: 'revmatoid-artrit-m05', icd10: 'M05',
+    nameUz: 'Revmatoid artrit', nameLat: 'Arthritis rheumatoides',
+    nameRu: 'Ревматоидный артрит',
+    category: 'tayanch-harakat', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd37', slug: 'bel-ogrigi-m54', icd10: 'M54',
+    nameUz: "Bel og'rig'i (Lumbalgiya)", nameLat: 'Lumbago',
+    nameRu: 'Боль в спине',
+    category: 'tayanch-harakat', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd38', slug: 'podagra-m10', icd10: 'M10',
+    nameUz: 'Podagra', nameLat: 'Podagra',
+    nameRu: 'Подагра',
+    category: 'tayanch-harakat', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd39', slug: 'osteoporoz-m81', icd10: 'M81',
+    nameUz: 'Osteoporoz', nameLat: 'Osteoporosis',
+    nameRu: 'Остеопороз',
+    category: 'tayanch-harakat', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Buyrak va siydik yo'llari (d40–d42) ──────────────────────────────────
+  {
+    id: 'd40', slug: 'surunkali-buyrak-kasalligi-n18', icd10: 'N18',
+    nameUz: 'Surunkali buyrak kasalligi', nameLat: 'Morbus renalis chronicus',
+    nameRu: 'Хроническая болезнь почек',
+    category: 'buyrak-siydik', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd41', slug: 'siydik-yollari-infeksiyasi-n39', icd10: 'N39',
+    nameUz: "Siydik yo'llari infeksiyasi", nameLat: 'Infectio tractus urinarii',
+    nameRu: 'Инфекция мочевыводящих путей',
+    category: 'buyrak-siydik', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd42', slug: 'buyrak-toshi-n20', icd10: 'N20',
+    nameUz: 'Buyrak toshi (Nefrolitiaz)', nameLat: 'Nephrolithiasis',
+    nameRu: 'Мочекаменная болезнь',
+    category: 'buyrak-siydik', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Qon kasalliklari (d43) ─────────────────────────────────────────────────
+  {
+    id: 'd43', slug: 'temir-tanqislik-anemiyasi-d50', icd10: 'D50',
+    nameUz: 'Temir tanqislik anemiyasi', nameLat: 'Anaemia sideropenica',
+    nameRu: 'Железодефицитная анемия',
+    category: 'qon', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Onkologiya (d44–d46) ──────────────────────────────────────────────────
+  {
+    id: 'd44', slug: 'opka-saratoni-c34', icd10: 'C34',
+    nameUz: "O'pka saratoni", nameLat: 'Carcinoma pulmonis',
+    nameRu: 'Рак лёгкого',
+    category: 'onkologiya', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd45', slug: 'meda-saratoni-c16', icd10: 'C16',
+    nameUz: "Me'da saratoni", nameLat: 'Carcinoma ventriculi',
+    nameRu: 'Рак желудка',
+    category: 'onkologiya', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd46', slug: 'kolorektal-saraton-c18', icd10: 'C18',
+    nameUz: 'Kolorektal saraton', nameLat: 'Carcinoma coli',
+    nameRu: 'Рак толстой кишки',
+    category: 'onkologiya', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Yuqumli kasalliklar (d47–d48) ─────────────────────────────────────────
+  {
+    id: 'd47', slug: 'covid-19-u07', icd10: 'U07',
+    nameUz: 'COVID-19', nameLat: 'COVID-19',
+    nameRu: 'COVID-19',
+    category: 'yuqumli', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd48', slug: 'gripp-j10', icd10: 'J10',
+    nameUz: 'Gripp', nameLat: 'Influenza',
+    nameRu: 'Грипп',
+    category: 'yuqumli', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+
+  // ── Teri kasalliklari (d49–d50) ───────────────────────────────────────────
+  {
+    id: 'd49', slug: 'ekzema-l30', icd10: 'L30',
+    nameUz: 'Ekzema (Dermatit)', nameLat: 'Eczema',
+    nameRu: 'Экзема',
+    category: 'teri', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
+  {
+    id: 'd50', slug: 'psoriaz-l40', icd10: 'L40',
+    nameUz: 'Psoriaz', nameLat: 'Psoriasis vulgaris',
+    nameRu: 'Псориаз',
+    category: 'teri', status: 'PUBLISHED',
+    audienceLevels: ['L1'], updatedAt: '2026-04-18T10:00:00Z',
+  },
 ];
 
 function blocksFor(disease: DiseaseListItem): DiseaseBlock[] {
@@ -282,6 +593,61 @@ const SCIENTISTS_BY_SLUG: Record<string, DiseaseScientist[]> = {
       createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
     },
   ],
+  'pnevmoniya-j18': [
+    {
+      id: 'sci-pasteur', diseaseId: 'd15',
+      fullName: 'Louis Pasteur', role: 'DISCOVERER',
+      country: 'Fransiya', birthYear: 1822, deathYear: 1895,
+      bioMd: 'Fransuz mikrobiolog va kimyogari; 1880-yilda pnevmokokkni ajratib oldi va mikrob nazariyasini asosladi. Vaksinatsiya prinsipini yaratdi.',
+      contributionsMd: 'Pnevmokokk izolyatsiyasi; bakteriologiya asoslari.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'tuberkulez-a15': [
+    {
+      id: 'sci-koch', diseaseId: 'd17',
+      fullName: 'Robert Koch', role: 'DISCOVERER',
+      country: 'Germaniya', birthYear: 1843, deathYear: 1910,
+      bioMd: 'Nemis shifokor-bakteriolog; 1882-yilda **Mycobacterium tuberculosis** ni kashf qildi — tibbiyot tarixidagi eng muhim yutuqlardan biri. 1905-yilda Nobel mukofoti.',
+      contributionsMd: 'TB qo\'zg\'atuvchisini topish; Koch postulatlarini shakllantirish.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'parkinson-kasalligi-g20': [
+    {
+      id: 'sci-parkinson', diseaseId: 'd29',
+      fullName: 'James Parkinson', role: 'DISCOVERER',
+      country: 'Angliya', birthYear: 1755, deathYear: 1824,
+      bioMd: 'Ingliz vrach va paleontolog; 1817-yilda **"An Essay on the Shaking Palsy"** asarida kasallikni birinchi batafsil tavsifladi. Kasallik uning sharafiga nomlandi.',
+      contributionsMd: 'Tremor, rigidlik va bradikinesiyani birinchi klinik tavsiflash.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'alzheimer-g30': [
+    {
+      id: 'sci-alzheimer', diseaseId: 'd32',
+      fullName: 'Alois Alzheimer', role: 'DISCOVERER',
+      country: 'Germaniya', birthYear: 1864, deathYear: 1915,
+      bioMd: 'Nemis psixiatr va neyropatolog; 1906-yilda Auguste Deter bemorining miya to\'qimasida **amiloid plakalar** va **neyrofibrillyar chigallar** ni topib, kasallikni birinchi tavsifladi.',
+      contributionsMd: 'Demensiyaning neyropatologik asosini aniqlash.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'revmatoid-artrit-m05': [
+    {
+      id: 'sci-garrod', diseaseId: 'd36',
+      fullName: 'Alfred Baring Garrod', role: 'CLASSIFIER',
+      country: 'Angliya', birthYear: 1819, deathYear: 1907,
+      bioMd: 'Ingliz terapevt; 1859-yilda **revmatoid artrit** atamasini kiritdi va uni podagra va revmatizmdan ajratib ko\'rsatdi.',
+      contributionsMd: 'Revmatoid artritni mustaqil kasallik sifatida klassifikatsiya qilish.',
+      photoUrl: null, orderIndex: 0,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
 };
 
 const RESEARCH_BY_SLUG: Record<string, DiseaseResearch[]> = {
@@ -341,6 +707,66 @@ const RESEARCH_BY_SLUG: Record<string, DiseaseResearch[]> = {
       createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
     },
   ],
+  'pnevmoniya-j18': [
+    {
+      id: 'res-cap-idsa', diseaseId: 'd15',
+      title: 'Infectious Diseases Society of America/American Thoracic Society Consensus Guidelines on the Management of Community-Acquired Pneumonia in Adults',
+      authors: 'Mandell LA et al. (IDSA/ATS)', journal: 'Clinical Infectious Diseases',
+      year: 2007, doi: '10.1086/511159', pubmedId: '17278083', nctId: null,
+      type: 'GUIDELINE',
+      summaryMd: 'Jamoatchi pnevmoniyani boshqarish uchun konsensus qo\'llanma — xavf stratifikatsiyasi (PORT/PSI), antibiotik tanlash tartibi, kasalxonaga yotqizish mezonlari.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'parkinson-kasalligi-g20': [
+    {
+      id: 'res-pdemed', diseaseId: 'd29',
+      title: 'PD MED: Long-term effectiveness of dopamine agonists and MAO-B inhibitors compared with levodopa as initial treatment (PDEMED)',
+      authors: 'PD MED Collaborative Group', journal: 'The Lancet',
+      year: 2014, doi: '10.1016/S0140-6736(14)60683-8', pubmedId: '25012900', nctId: 'ISRCTN32812724',
+      type: 'RCT',
+      summaryMd: 'Levodopa dastlabki davolashda dopamin agonistlari va MAO-B inhibitorlariga nisbatan hayot sifatini yaxshilashda ustunroq emasligi isbotlandi.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'alzheimer-g30': [
+    {
+      id: 'res-lecanemab', diseaseId: 'd32',
+      title: 'Lecanemab in Early Alzheimer\'s Disease (CLARITY AD)',
+      authors: 'van Dyck CH et al.', journal: 'New England Journal of Medicine',
+      year: 2023, doi: '10.1056/NEJMoa2212948', pubmedId: '36449413', nctId: 'NCT03887455',
+      type: 'RCT',
+      summaryMd: 'Anti-amiloid antitana **lecanemab** erta bosqichdagi Alzheimer kasalligi bemorlarida klinik yomonlashishni **27%** ga sekinlashtirdi.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'surunkali-buyrak-kasalligi-n18': [
+    {
+      id: 'res-kdigo-ckd', diseaseId: 'd40',
+      title: 'KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease',
+      authors: 'KDIGO CKD Work Group', journal: 'Kidney International',
+      year: 2024, doi: '10.1016/j.kint.2023.10.018', pubmedId: null, nctId: null,
+      type: 'GUIDELINE',
+      summaryMd: 'KDIGO 2024: GFR + albuminuriya bo\'yicha 5 bosqichli CKD klassifikatsiyasi; SGLT2 inhibitorlari va finerenon birinchi qator himoya.',
+      evidenceLevel: 'A', isLandmark: false,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'covid-19-u07': [
+    {
+      id: 'res-recovery', diseaseId: 'd47',
+      title: 'Dexamethasone in Hospitalized Patients with Covid-19 (RECOVERY)',
+      authors: 'RECOVERY Collaborative Group', journal: 'New England Journal of Medicine',
+      year: 2021, doi: '10.1056/NEJMoa2021436', pubmedId: '32678530', nctId: 'NCT04381936',
+      type: 'RCT',
+      summaryMd: 'Deksametazon og\'ir COVID-19 bemorlari (ventilyatsiya talab qiluvchilar)da 28 kunlik o\'limni **35%** ga kamaytirdi. Eng arzon va samarali COVID davolash usuli.',
+      evidenceLevel: 'A', isLandmark: true,
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
 };
 
 const GENETICS_BY_SLUG: Record<string, DiseaseGenetic[]> = {
@@ -374,6 +800,59 @@ const GENETICS_BY_SLUG: Record<string, DiseaseGenetic[]> = {
       penetrance: '0.700',
       bloodGroupRisk: null,
       populationNoteMd: 'Familial hemiplegic migraine type 1 (FHM1) — kalsiy kanali mutatsiyasi.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'alzheimer-g30': [
+    {
+      id: 'gen-alz-1', diseaseId: 'd32',
+      geneSymbol: 'APOE', variantType: 'ε4 allelesi',
+      inheritancePattern: 'COMPLEX',
+      penetrance: '0.550',
+      bloodGroupRisk: null,
+      populationNoteMd: 'APOE ε4 — kech bosqichdagi Alzheimer uchun eng kuchli genetik risk faktori. Bir nusxa (heterozigot) xavfni 3-4x, ikki nusxa (gomozigot) 8-12x oshiradi.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+    {
+      id: 'gen-alz-2', diseaseId: 'd32',
+      geneSymbol: 'APP', variantType: 'Missense / duplikatsiya',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: '0.990',
+      bloodGroupRisk: null,
+      populationNoteMd: 'Amiloid prekursor protein geni — erta bosqichdagi familial Alzheimer (FAD) da aniqlangan. Penetrans deyarli to\'liq.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'parkinson-kasalligi-g20': [
+    {
+      id: 'gen-park-1', diseaseId: 'd29',
+      geneSymbol: 'LRRK2', variantType: 'G2019S (rs34637584)',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: '0.280',
+      bloodGroupRisk: null,
+      populationNoteMd: 'Leucine-rich repeat kinase 2 — sporadik Parkinsonning eng keng tarqalgan monogen sababi. Ashkenazi yahudiy va shimoliy Afrika aholisida chastota 5-10x yuqori.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'revmatoid-artrit-m05': [
+    {
+      id: 'gen-ra-1', diseaseId: 'd36',
+      geneSymbol: 'HLA-DRB1', variantType: 'Shared epitope (SE)',
+      inheritancePattern: 'COMPLEX',
+      penetrance: '0.040',
+      bloodGroupRisk: null,
+      populationNoteMd: 'HLA-DRB1 "shared epitope" — RF+ revmatoid artrit uchun asosiy genetik risk. *0401, *0404, *0101 allellar OR ~3-5. O\'zbekistonda tadqiq etilmagan.',
+      createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
+    },
+  ],
+  'qandli-diabet-1-tur-e10': [
+    {
+      id: 'gen-t1d-1', diseaseId: 'd19',
+      geneSymbol: 'HLA-DR3/DR4', variantType: 'DR3-DQ2 / DR4-DQ8',
+      inheritancePattern: 'COMPLEX',
+      penetrance: '0.060',
+      bloodGroupRisk: null,
+      populationNoteMd: 'HLA bilvosita — T1D xavfining ~50% ni tushuntiradi. DR3-DQ2 va DR4-DQ8 kombinatsiyasi eng yuqori xavf (OR ~20). INS geni ham hissa qo\'shadi.',
       createdAt: '2026-04-20T10:00:00Z', updatedAt: '2026-04-20T10:00:00Z',
     },
   ],
