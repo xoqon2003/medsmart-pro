@@ -1525,7 +1525,7 @@ Jahon bo'yicha **64 million** kishida yurak etishmovchiligi bor.
 // ── STUBS (metadata-only, ≥ 50 kasallik uchun) ────────────────────────────────
 
 export const stubs: StubFixture[] = [
-  // --- Allaqachon to'liq fixture sifatida mavjud (seed script chiqarib tashlaydi) ---
+  // --- Umumiy kasalliklar (metadata-only, keyinchalik to'liq bloklar bilan kengaytiriladi) ---
   { slug: 'diabet-1', icd10: 'E10', nameUz: '1-tur qand kasalligi', nameRu: 'Сахарный диабет 1 типа', category: 'endokrinologiya' },
   { slug: 'surunkali-bronxit', icd10: 'J42', nameUz: 'Surunkali bronxit', nameRu: 'Хронический бронхит', category: 'pulmonologiya' },
   { slug: 'oshqozon-yara', icd10: 'K25.9', nameUz: 'Oshqozon yarasi', nameRu: 'Язва желудка', category: 'gastroenterologiya' },
@@ -1560,4 +1560,8 @@ export const stubs: StubFixture[] = [
   { slug: 'o-tkir-pielonefrit', icd10: 'N10', nameUz: "O'tkir pielonefrit", nameRu: 'Острый пиелонефрит', category: 'nefrologiya' },
   { slug: 'prostata-adenoma', icd10: 'N40.0', nameUz: "Prostata adenomasi (GSGO)", nameRu: 'ДГПЖ', category: 'urologiya' },
   { slug: 'o-tkir-gastroenterit', icd10: 'A09', nameUz: "O'tkir gastroenterit (diareya)", nameRu: 'Острый гастроэнтерит', category: 'infektologiya' },
+  { slug: 'otit', icd10: 'H66.9', nameUz: "O'rta quloq yallig'lanishi (otit)", nameRu: 'Средний отит', category: 'otorinolaringologiya' },
+  { slug: 'gerd', icd10: 'K21.0', nameUz: "Gastroezofageal reflyuks kasalligi (GERD)", nameRu: 'ГЭРБ', category: 'gastroenterologiya' },
+  { slug: 'allergik-rinit', icd10: 'J30.9', nameUz: "Allergik rinit", nameRu: 'Аллергический ринит', category: 'allergologiya' },
+  { slug: 'konyunktivit', icd10: 'H10.9', nameUz: "Konyunktivit", nameRu: 'Конъюнктивит', category: 'oftalmologiya' },
 ];
