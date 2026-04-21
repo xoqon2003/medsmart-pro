@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router';
-import { ArrowLeft, Save, Loader2, BookOpen } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, BookOpen, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '../../components/ui/resizable';
 import { MarkerTree } from '../../components/kb/MarkerTree';
@@ -113,6 +113,17 @@ export function KBDiseaseEditorPage() {
           placeholder="ICD-10"
           className="w-28 px-3 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-sm text-white font-mono outline-none focus:border-indigo-500"
         />
+
+        {!isNew && slug && (
+          <button
+            onClick={() => navigate(`/kb/diseases/${slug}/metadata`)}
+            className="flex items-center gap-2 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-sm transition-colors shrink-0"
+            title="Metadata (olimlar / tadqiqotlar / genetika)"
+          >
+            <Database className="w-3.5 h-3.5" />
+            Metadata
+          </button>
+        )}
 
         <button
           onClick={handleSaveDisease}

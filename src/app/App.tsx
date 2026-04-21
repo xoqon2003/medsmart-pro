@@ -112,6 +112,7 @@ const DiseaseCardPage      = lazy$(() => import('./pages/diseases/DiseaseCardPag
 // KB Admin
 const KBDiseaseListPage    = lazy$(() => import('./pages/kb/KBDiseaseListPage'),      'KBDiseaseListPage');
 const KBDiseaseEditorPage  = lazy$(() => import('./pages/kb/KBDiseaseEditorPage'),    'KBDiseaseEditorPage');
+const KBDiseaseMetadataPage= lazy$(() => import('./pages/kb/KBDiseaseMetadataPage'),  'KBDiseaseMetadataPage');
 const KBReviewQueuePage    = lazy$(() => import('./pages/kb/KBReviewQueuePage'),      'KBReviewQueuePage');
 
 // Bemor profili
@@ -260,6 +261,10 @@ function AppRoutes() {
       <Route
         path="/kb/diseases/:slug/edit"
         element={DISEASE_KB_ENABLED ? <KBDiseaseEditorPage /> : <Navigate to="/" replace />}
+      />
+      <Route
+        path="/kb/diseases/:slug/metadata"
+        element={DISEASE_KB_ENABLED ? <KBDiseaseMetadataPage /> : <Navigate to="/" replace />}
       />
       <Route
         path="/kb/review-queue"

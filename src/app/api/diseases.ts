@@ -7,6 +7,10 @@ import type {
   DiseaseScientist,
   DiseaseResearch,
   DiseaseGenetic,
+  ScientistRole,
+  ResearchType,
+  InheritancePattern,
+  BloodGroup,
 } from '../types/api/disease';
 import type { DiseaseSymptomWithWeight } from '../types/api/symptom';
 import {
@@ -18,6 +22,15 @@ import {
   mockGetDiseaseScientists,
   mockGetDiseaseResearch,
   mockGetDiseaseGenetics,
+  mockCreateScientist,
+  mockUpdateScientist,
+  mockDeleteScientist,
+  mockCreateResearch,
+  mockUpdateResearch,
+  mockDeleteResearch,
+  mockCreateGenetic,
+  mockUpdateGenetic,
+  mockDeleteGenetic,
 } from './diseases.mock';
 
 const USE_REAL_API = import.meta.env.VITE_USE_REAL_API === 'true';
@@ -57,10 +70,7 @@ export const semanticSearch = (q: string, limit = 10): Promise<DiseaseListItem[]
   );
 };
 
-// ── KB v2 metadata (PR-14/15) ───────────────────────────────────────────────
-//
-// Uchta yangi modelga public GET endpointlar. Backend mutation'lar
-// (POST/PATCH/DELETE) admin UI'da kerak bo'ladi — hozir faqat o'qish.
+// ── KB v2 metadata reads (PR-14/15) ─────────────────────────────────────────
 
 export const getDiseaseScientists = (slug: string): Promise<DiseaseScientist[]> => {
   if (!USE_REAL_API) return mockGetDiseaseScientists(slug);
@@ -75,4 +85,153 @@ export const getDiseaseResearch = (slug: string): Promise<DiseaseResearch[]> => 
 export const getDiseaseGenetics = (slug: string): Promise<DiseaseGenetic[]> => {
   if (!USE_REAL_API) return mockGetDiseaseGenetics(slug);
   return apiFetch<DiseaseGenetic[]>(`/diseases/${slug}/genetics`);
+};
+
+// ── KB v2 metadata mutations — admin UI uchun (PR-15 backend) ──────────────
+//
+// Backend write endpointlari `:id` (disease UUID) bo'yicha, read endpointlari
+// esa `:slug` bo'yicha — shuning uchun yozuv funksiyalarida `diseaseId`
+// parametri ishlatilgan.
+
+export type CreateScientistInput = {
+  fullName: string;
+  role: ScientistRole;
+  country?: string | null;
+  birthYear?: number | null;
+  deathYear?: number | null;
+  bioMd?: string | null;
+  contributionsMd?: string | null;
+  photoUrl?: string | null;
+  orderIndex?: number;
+};
+export type UpdateScientistInput = Partial<CreateScientistInput>;
+
+export type CreateResearchInput = {
+  title: string;
+  authors: string;
+  journal?: string | null;
+  year: number;
+  doi?: string | null;
+  pubmedId?: string | null;
+  nctId?: string | null;
+  type: ResearchType;
+  summaryMd: string;
+  evidenceLevel?: 'A' | 'B' | 'C' | 'D';
+  isLandmark?: boolean;
+};
+export type UpdateResearchInput = Partial<CreateResearchInput>;
+
+export type CreateGeneticInput = {
+  geneSymbol?: string | null;
+  variantType?: string | null;
+  inheritancePattern?: InheritancePattern | null;
+  penetrance?: string | number | null;
+  bloodGroupRisk?: BloodGroup | null;
+  populationNoteMd?: string | null;
+};
+export type UpdateGeneticInput = Partial<CreateGeneticInput>;
+
+// Scientists
+
+export const createScientist = (
+  diseaseId: string,
+  input: CreateScientistInput,
+): Promise<DiseaseScientist> => {
+  if (!USE_REAL_API) return mockCreateScientist(diseaseId, input);
+  return apiFetch<DiseaseScientist>(`/diseases/${diseaseId}/scientists`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+};
+
+export const updateScientist = (
+  diseaseId: string,
+  scientistId: string,
+  input: UpdateScientistInput,
+): Promise<DiseaseScientist> => {
+  if (!USE_REAL_API) return mockUpdateScientist(diseaseId, scientistId, input);
+  return apiFetch<DiseaseScientist>(`/diseases/${diseaseId}/scientists/${scientistId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+};
+
+export const deleteScientist = (
+  diseaseId: string,
+  scientistId: string,
+): Promise<{ ok: true }> => {
+  if (!USE_REAL_API) return mockDeleteScientist(diseaseId, scientistId);
+  return apiFetch<{ ok: true }>(`/diseases/${diseaseId}/scientists/${scientistId}`, {
+    method: 'DELETE',
+  });
+};
+
+// Research
+
+export const createResearch = (
+  diseaseId: string,
+  input: CreateResearchInput,
+): Promise<DiseaseResearch> => {
+  if (!USE_REAL_API) return mockCreateResearch(diseaseId, input);
+  return apiFetch<DiseaseResearch>(`/diseases/${diseaseId}/research`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+};
+
+export const updateResearch = (
+  diseaseId: string,
+  researchId: string,
+  input: UpdateResearchInput,
+): Promise<DiseaseResearch> => {
+  if (!USE_REAL_API) return mockUpdateResearch(diseaseId, researchId, input);
+  return apiFetch<DiseaseResearch>(`/diseases/${diseaseId}/research/${researchId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+};
+
+export const deleteResearch = (
+  diseaseId: string,
+  researchId: string,
+): Promise<{ ok: true }> => {
+  if (!USE_REAL_API) return mockDeleteResearch(diseaseId, researchId);
+  return apiFetch<{ ok: true }>(`/diseases/${diseaseId}/research/${researchId}`, {
+    method: 'DELETE',
+  });
+};
+
+// Genetics
+
+export const createGenetic = (
+  diseaseId: string,
+  input: CreateGeneticInput,
+): Promise<DiseaseGenetic> => {
+  if (!USE_REAL_API) return mockCreateGenetic(diseaseId, input);
+  return apiFetch<DiseaseGenetic>(`/diseases/${diseaseId}/genetics`, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+};
+
+export const updateGenetic = (
+  diseaseId: string,
+  geneticId: string,
+  input: UpdateGeneticInput,
+): Promise<DiseaseGenetic> => {
+  if (!USE_REAL_API) return mockUpdateGenetic(diseaseId, geneticId, input);
+  return apiFetch<DiseaseGenetic>(`/diseases/${diseaseId}/genetics/${geneticId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(input),
+  });
+};
+
+export const deleteGenetic = (
+  diseaseId: string,
+  geneticId: string,
+): Promise<{ ok: true }> => {
+  if (!USE_REAL_API) return mockDeleteGenetic(diseaseId, geneticId);
+  return apiFetch<{ ok: true }>(`/diseases/${diseaseId}/genetics/${geneticId}`, {
+    method: 'DELETE',
+  });
 };

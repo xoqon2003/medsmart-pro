@@ -224,6 +224,20 @@ export async function mockLookupByIcd(code: string): Promise<{ slug: string; id:
 //
 // Server fixtures (server/prisma/seeds/diseases/fixtures.ts) ga mos
 // namuna ma'lumotlar. Noma'lum slug uchun bo'sh ro'yxat qaytaradi.
+//
+// Storage'lar `let` bilan mutable — admin UI bular ustida CRUD qiladi (mock
+// dev-env'da). Slug ↔ id ni har ikki tomonga rezolv qilamiz, shunda
+// sahifa write'larda `disease.id` yoki `slug` yuborgan bo'lsa ham bir xil
+// bucket'ga tushadi. Real backend `:id` (UUID) ni kutadi.
+
+function resolveSlug(slugOrId: string): string {
+  const d = MOCK_DISEASES.find((x) => x.slug === slugOrId || x.id === slugOrId);
+  return d?.slug ?? slugOrId;
+}
+
+function nowIso(): string {
+  return new Date().toISOString();
+}
 
 const SCIENTISTS_BY_SLUG: Record<string, DiseaseScientist[]> = {
   'gipertoniya-i10': [
@@ -367,17 +381,195 @@ const GENETICS_BY_SLUG: Record<string, DiseaseGenetic[]> = {
 
 export async function mockGetDiseaseScientists(slug: string): Promise<DiseaseScientist[]> {
   await new Promise((r) => setTimeout(r, 200));
-  return SCIENTISTS_BY_SLUG[slug] ?? [];
+  return SCIENTISTS_BY_SLUG[resolveSlug(slug)] ?? [];
 }
 
 export async function mockGetDiseaseResearch(slug: string): Promise<DiseaseResearch[]> {
   await new Promise((r) => setTimeout(r, 200));
-  return RESEARCH_BY_SLUG[slug] ?? [];
+  return RESEARCH_BY_SLUG[resolveSlug(slug)] ?? [];
 }
 
 export async function mockGetDiseaseGenetics(slug: string): Promise<DiseaseGenetic[]> {
   await new Promise((r) => setTimeout(r, 200));
-  return GENETICS_BY_SLUG[slug] ?? [];
+  return GENETICS_BY_SLUG[resolveSlug(slug)] ?? [];
+}
+
+// ── Mutations (dev-env fake CRUD) ──────────────────────────────────────────
+//
+// Admin UI mock rejimda to'liq CRUD oqimini sinab ko'rsatadi: yaratish,
+// yangilash, o'chirish — list cache'ga qaytib ko'rinadi. Write'lar `slug`
+// yoki `disease.id` qabul qiladi.
+
+let mockIdCounter = 1000;
+function newId(prefix: string): string {
+  mockIdCounter += 1;
+  return `${prefix}-${mockIdCounter}`;
+}
+
+export async function mockCreateScientist(
+  diseaseIdOrSlug: string,
+  input: Omit<DiseaseScientist, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'orderIndex'> & {
+    orderIndex?: number;
+  },
+): Promise<DiseaseScientist> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const diseaseId = MOCK_DISEASES.find((x) => x.slug === slug)?.id ?? diseaseIdOrSlug;
+  const bucket = SCIENTISTS_BY_SLUG[slug] ?? [];
+  const created: DiseaseScientist = {
+    id: newId('sci'),
+    diseaseId,
+    fullName: input.fullName,
+    role: input.role,
+    country: input.country ?? null,
+    birthYear: input.birthYear ?? null,
+    deathYear: input.deathYear ?? null,
+    bioMd: input.bioMd ?? null,
+    contributionsMd: input.contributionsMd ?? null,
+    photoUrl: input.photoUrl ?? null,
+    orderIndex: input.orderIndex ?? bucket.length,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  SCIENTISTS_BY_SLUG[slug] = [...bucket, created];
+  return created;
+}
+
+export async function mockUpdateScientist(
+  diseaseIdOrSlug: string,
+  scientistId: string,
+  input: Partial<Omit<DiseaseScientist, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt'>>,
+): Promise<DiseaseScientist> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = SCIENTISTS_BY_SLUG[slug] ?? [];
+  const idx = bucket.findIndex((s) => s.id === scientistId);
+  if (idx === -1) throw new Error('Scientist not found');
+  const updated: DiseaseScientist = { ...bucket[idx], ...input, updatedAt: nowIso() };
+  SCIENTISTS_BY_SLUG[slug] = bucket.map((s, i) => (i === idx ? updated : s));
+  return updated;
+}
+
+export async function mockDeleteScientist(
+  diseaseIdOrSlug: string,
+  scientistId: string,
+): Promise<{ ok: true }> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = SCIENTISTS_BY_SLUG[slug] ?? [];
+  SCIENTISTS_BY_SLUG[slug] = bucket.filter((s) => s.id !== scientistId);
+  return { ok: true };
+}
+
+export async function mockCreateResearch(
+  diseaseIdOrSlug: string,
+  input: Omit<DiseaseResearch, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'evidenceLevel' | 'isLandmark'> & {
+    evidenceLevel?: 'A' | 'B' | 'C' | 'D';
+    isLandmark?: boolean;
+  },
+): Promise<DiseaseResearch> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const diseaseId = MOCK_DISEASES.find((x) => x.slug === slug)?.id ?? diseaseIdOrSlug;
+  const bucket = RESEARCH_BY_SLUG[slug] ?? [];
+  if (input.doi && bucket.some((r) => r.doi === input.doi)) {
+    throw new Error('DOI already exists for this disease');
+  }
+  const created: DiseaseResearch = {
+    id: newId('res'),
+    diseaseId,
+    title: input.title,
+    authors: input.authors,
+    journal: input.journal ?? null,
+    year: input.year,
+    doi: input.doi ?? null,
+    pubmedId: input.pubmedId ?? null,
+    nctId: input.nctId ?? null,
+    type: input.type,
+    summaryMd: input.summaryMd,
+    evidenceLevel: input.evidenceLevel ?? 'C',
+    isLandmark: input.isLandmark ?? false,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  RESEARCH_BY_SLUG[slug] = [created, ...bucket];
+  return created;
+}
+
+export async function mockUpdateResearch(
+  diseaseIdOrSlug: string,
+  researchId: string,
+  input: Partial<Omit<DiseaseResearch, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt'>>,
+): Promise<DiseaseResearch> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = RESEARCH_BY_SLUG[slug] ?? [];
+  const idx = bucket.findIndex((r) => r.id === researchId);
+  if (idx === -1) throw new Error('Research not found');
+  const updated: DiseaseResearch = { ...bucket[idx], ...input, updatedAt: nowIso() };
+  RESEARCH_BY_SLUG[slug] = bucket.map((r, i) => (i === idx ? updated : r));
+  return updated;
+}
+
+export async function mockDeleteResearch(
+  diseaseIdOrSlug: string,
+  researchId: string,
+): Promise<{ ok: true }> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = RESEARCH_BY_SLUG[slug] ?? [];
+  RESEARCH_BY_SLUG[slug] = bucket.filter((r) => r.id !== researchId);
+  return { ok: true };
+}
+
+export async function mockCreateGenetic(
+  diseaseIdOrSlug: string,
+  input: Partial<Omit<DiseaseGenetic, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt'>>,
+): Promise<DiseaseGenetic> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const diseaseId = MOCK_DISEASES.find((x) => x.slug === slug)?.id ?? diseaseIdOrSlug;
+  const bucket = GENETICS_BY_SLUG[slug] ?? [];
+  const created: DiseaseGenetic = {
+    id: newId('gen'),
+    diseaseId,
+    geneSymbol: input.geneSymbol ?? null,
+    variantType: input.variantType ?? null,
+    inheritancePattern: input.inheritancePattern ?? null,
+    penetrance: input.penetrance ?? null,
+    bloodGroupRisk: input.bloodGroupRisk ?? null,
+    populationNoteMd: input.populationNoteMd ?? null,
+    createdAt: nowIso(),
+    updatedAt: nowIso(),
+  };
+  GENETICS_BY_SLUG[slug] = [...bucket, created];
+  return created;
+}
+
+export async function mockUpdateGenetic(
+  diseaseIdOrSlug: string,
+  geneticId: string,
+  input: Partial<Omit<DiseaseGenetic, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt'>>,
+): Promise<DiseaseGenetic> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = GENETICS_BY_SLUG[slug] ?? [];
+  const idx = bucket.findIndex((g) => g.id === geneticId);
+  if (idx === -1) throw new Error('Genetic not found');
+  const updated: DiseaseGenetic = { ...bucket[idx], ...input, updatedAt: nowIso() };
+  GENETICS_BY_SLUG[slug] = bucket.map((g, i) => (i === idx ? updated : g));
+  return updated;
+}
+
+export async function mockDeleteGenetic(
+  diseaseIdOrSlug: string,
+  geneticId: string,
+): Promise<{ ok: true }> {
+  await new Promise((r) => setTimeout(r, 150));
+  const slug = resolveSlug(diseaseIdOrSlug);
+  const bucket = GENETICS_BY_SLUG[slug] ?? [];
+  GENETICS_BY_SLUG[slug] = bucket.filter((g) => g.id !== geneticId);
+  return { ok: true };
 }
 
 export async function mockSemanticSearch(q: string, limit: number): Promise<DiseaseListItem[]> {
