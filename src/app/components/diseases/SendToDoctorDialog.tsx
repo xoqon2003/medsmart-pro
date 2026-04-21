@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   Dialog,
   DialogContent,
@@ -36,6 +37,7 @@ export function SendToDoctorDialog({
   score,
   diseaseName,
 }: Props) {
+  const navigate = useNavigate();
   const [selectedDoctorId, setSelectedDoctorId] = useState<number | null>(null);
   const [anonymousMode, setAnonymousMode] = useState(false);
   const [consented, setConsented] = useState(false);
@@ -56,8 +58,13 @@ export function SendToDoctorDialog({
         doctorId: selectedDoctorId,
         anonymousMode,
       });
-      toast.success("Yuborildi! Shifokor tez orada javob beradi.");
+      toast.success("Yuborildi! Shifokor tez orada javob beradi.", {
+        description: "Natijalarni 'Mening tahlillarim' bo'limida kuzating.",
+        duration: 5000,
+      });
       onClose();
+      // Navigate to patient analysis history so the user can track their sent sessions
+      navigate('/bemor/tahlillarim');
     } catch {
       toast.error("Yuborishda xatolik yuz berdi. Qayta urinib ko'ring.");
     } finally {
