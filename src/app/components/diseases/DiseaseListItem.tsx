@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import { ChevronRightIcon } from 'lucide-react';
 import type { DiseaseListItem as DiseaseListItemType } from '../../types/api/disease';
+import { getCategoryLabel, getCategoryEmoji } from '../../constants/disease-categories';
 
 interface DiseaseListItemProps {
   disease: DiseaseListItemType;
@@ -43,7 +44,10 @@ export function DiseaseListItem({ disease }: DiseaseListItemProps) {
         {disease.nameLat && (
           <p className="text-xs text-muted-foreground truncate italic">{disease.nameLat}</p>
         )}
-        <p className="text-xs text-muted-foreground mt-0.5">{disease.category}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          <span className="mr-1">{getCategoryEmoji(disease.category)}</span>
+          {getCategoryLabel(disease.category)}
+        </p>
       </div>
       <ChevronRightIcon className="size-4 text-muted-foreground shrink-0" />
     </button>
