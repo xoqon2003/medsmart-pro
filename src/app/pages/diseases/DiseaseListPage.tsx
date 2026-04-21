@@ -90,7 +90,7 @@ export function DiseaseListPage() {
       )}
 
       <div className="space-y-3 mt-4">
-        {items.map((d) => <DiseaseListItem key={d.id} disease={d} />)}
+        {items.map((d) => <DiseaseListItem key={d.id} disease={d} highlight={q} />)}
       </div>
 
       {!isSemanticMode && ftsResult.data && total > page * 20 && (

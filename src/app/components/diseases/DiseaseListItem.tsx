@@ -5,6 +5,36 @@ import { getCategoryLabel, getCategoryEmoji } from '../../constants/disease-cate
 
 interface DiseaseListItemProps {
   disease: DiseaseListItemType;
+  /** Debounced search query — matched substrings are highlighted. */
+  highlight?: string;
+}
+
+/**
+ * Renders `text` with substrings matching `query` wrapped in a yellow
+ * <mark> element.  Case-insensitive; regex special chars are escaped.
+ */
+function HighlightText({ text, query }: { text: string; query?: string }) {
+  if (!query || query.trim() === '') return <>{text}</>;
+
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.trim().toLowerCase() ? (
+          <mark
+            key={i}
+            className="bg-yellow-200 text-yellow-900 rounded-[2px] px-[1px] not-italic"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -25,7 +55,7 @@ const STATUS_LABEL: Record<string, string> = {
   ARCHIVED:  'Arxiv',
 };
 
-export function DiseaseListItem({ disease }: DiseaseListItemProps) {
+export function DiseaseListItem({ disease, highlight }: DiseaseListItemProps) {
   const navigate = useNavigate();
 
   return (
@@ -35,14 +65,20 @@ export function DiseaseListItem({ disease }: DiseaseListItemProps) {
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
-          <span className="font-mono text-xs text-muted-foreground">{disease.icd10}</span>
+          <span className="font-mono text-xs text-muted-foreground">
+            <HighlightText text={disease.icd10} query={highlight} />
+          </span>
           <span className={`inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium ${STATUS_COLOR[disease.status] ?? 'bg-gray-100 text-gray-500'}`}>
             {STATUS_LABEL[disease.status] ?? disease.status}
           </span>
         </div>
-        <p className="text-sm font-medium truncate">{disease.nameUz}</p>
+        <p className="text-sm font-medium truncate">
+          <HighlightText text={disease.nameUz} query={highlight} />
+        </p>
         {disease.nameLat && (
-          <p className="text-xs text-muted-foreground truncate italic">{disease.nameLat}</p>
+          <p className="text-xs text-muted-foreground truncate italic">
+            <HighlightText text={disease.nameLat} query={highlight} />
+          </p>
         )}
         <p className="text-xs text-muted-foreground mt-0.5">
           <span className="mr-1">{getCategoryEmoji(disease.category)}</span>
