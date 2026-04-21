@@ -7511,6 +7511,11 @@
               "FEVER": "YES",
               "COUGH": "NO"
             }
+          },
+          "doctorNote": {
+            "type": "string",
+            "description": "Shifokorning tavsiyasi (markdown, max 2000 belgi)",
+            "example": "Qo'shimcha tekshiruvlar kerak: EKG, qon tahlili. Kasalxonaga yotqizish tavsiya qilinadi."
           }
         }
       },
