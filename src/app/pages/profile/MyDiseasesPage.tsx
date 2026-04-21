@@ -3,9 +3,30 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, Activity, ChevronRight, Loader2,
-  Send, Clock, CheckCircle2, AlertCircle, Stethoscope,
+  Send, Clock, CheckCircle2, AlertCircle, Stethoscope, XCircle,
 } from 'lucide-react';
 import { apiFetch } from '../../api/http';
+
+// Shifokor "Rad etish" flow doctorNote'ga [REJECT] prefix qo'yadi.
+// Bu konventsiya TriageActionBar (REJECT_PREFIX) bilan sinxron bo'lishi shart.
+const REJECT_PREFIX = '[REJECT]';
+
+interface ParsedDoctorNote {
+  kind: 'confirmed' | 'rejected';
+  body: string;
+}
+
+function parseDoctorNote(raw: string | null): ParsedDoctorNote | null {
+  if (!raw) return null;
+  const trimmed = raw.trimStart();
+  if (trimmed.startsWith(REJECT_PREFIX)) {
+    return {
+      kind: 'rejected',
+      body: trimmed.slice(REJECT_PREFIX.length).trimStart(),
+    };
+  }
+  return { kind: 'confirmed', body: raw };
+}
 
 // ── Types ──────────────────────────────────────────────────────────────────────
 
@@ -43,8 +64,16 @@ function useMyDiseases() {
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
 function getStatusConfig(session: MySession) {
-  // ARCHIVED with doctorNote = doctor responded
+  // ARCHIVED with doctorNote — decision was either confirmed or rejected
   if (session.status === 'ARCHIVED' && session.doctorNote) {
+    const parsed = parseDoctorNote(session.doctorNote);
+    if (parsed?.kind === 'rejected') {
+      return {
+        label: 'Shifokor rad etdi',
+        icon: <XCircle className="w-3 h-3" />,
+        color: 'text-red-500 bg-red-500/10',
+      };
+    }
     return {
       label: "Shifokor javob berdi",
       icon: <Stethoscope className="w-3 h-3" />,
@@ -168,16 +197,20 @@ export function MyDiseasesPage() {
         {sessions.map((session) => {
           const statusCfg = getStatusConfig(session);
           const { text: scoreText, color: scoreColor } = scoreLabel(session.matchScore);
-          const hasDoctorNote = !!session.doctorNote;
+          const parsedNote = parseDoctorNote(session.doctorNote);
+          const isRejected = parsedNote?.kind === 'rejected';
+          const hasDoctorNote = !!parsedNote;
 
           return (
             <div
               key={session.id}
               className={[
                 'bg-card border rounded-2xl overflow-hidden transition-colors cursor-pointer group',
-                hasDoctorNote
-                  ? 'border-violet-300 hover:border-violet-400'
-                  : 'border-border hover:border-foreground/20',
+                isRejected
+                  ? 'border-red-300 hover:border-red-400'
+                  : hasDoctorNote
+                    ? 'border-violet-300 hover:border-violet-400'
+                    : 'border-border hover:border-foreground/20',
               ].join(' ')}
               onClick={() => navigate(`/kasalliklar/${session.disease?.slug ?? ''}`)}
             >
@@ -202,22 +235,48 @@ export function MyDiseasesPage() {
                                          group-hover:text-foreground transition-colors" />
               </div>
 
-              {/* Doctor note banner — shown when doctor has responded */}
-              {hasDoctorNote && (
-                <div className="mx-5 mb-3 rounded-xl bg-violet-50 border border-violet-200 px-4 py-3">
+              {/* Doctor note banner — violet for confirmed, red for rejected */}
+              {hasDoctorNote && parsedNote && (
+                <div
+                  className={[
+                    'mx-5 mb-3 rounded-xl border px-4 py-3',
+                    isRejected
+                      ? 'bg-red-50 border-red-200'
+                      : 'bg-violet-50 border-violet-200',
+                  ].join(' ')}
+                >
                   <div className="flex items-center gap-1.5 mb-1.5">
-                    <Stethoscope className="w-3.5 h-3.5 text-violet-600 shrink-0" />
-                    <span className="text-xs font-semibold text-violet-700">
-                      Shifokor tavsiyasi
+                    {isRejected ? (
+                      <XCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
+                    ) : (
+                      <Stethoscope className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+                    )}
+                    <span
+                      className={[
+                        'text-xs font-semibold',
+                        isRejected ? 'text-red-700' : 'text-violet-700',
+                      ].join(' ')}
+                    >
+                      {isRejected ? 'Shifokor rad etdi' : 'Shifokor tavsiyasi'}
                       {session.doctorRespondedAt && (
-                        <span className="font-normal text-violet-500 ml-1.5">
+                        <span
+                          className={[
+                            'font-normal ml-1.5',
+                            isRejected ? 'text-red-500' : 'text-violet-500',
+                          ].join(' ')}
+                        >
                           · {formatDate(session.doctorRespondedAt)}
                         </span>
                       )}
                     </span>
                   </div>
-                  <p className="text-sm text-violet-900 leading-relaxed whitespace-pre-wrap">
-                    {session.doctorNote}
+                  <p
+                    className={[
+                      'text-sm leading-relaxed whitespace-pre-wrap',
+                      isRejected ? 'text-red-900' : 'text-violet-900',
+                    ].join(' ')}
+                  >
+                    {parsedNote.body}
                   </p>
                 </div>
               )}

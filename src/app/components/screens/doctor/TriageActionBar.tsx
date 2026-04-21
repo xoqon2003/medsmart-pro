@@ -11,13 +11,31 @@ interface Props {
   messageId: string;
 }
 
-type ActionState = 'idle' | 'composing' | 'submitting' | 'rejecting';
+type ActionState =
+  | 'idle'
+  | 'composing-confirm'
+  | 'composing-reject'
+  | 'submitting-confirm'
+  | 'submitting-reject';
 
-const NOTE_PLACEHOLDER =
-  "Shifokor tavsiyasi (ixtiyoriy):\n" +
+/**
+ * Reject marker — doctorNote'ning birinchi qatoriga qo'yiladi.
+ * MyDiseasesPage buni aniqlab, qizil "Rad etildi" banner ko'rsatadi.
+ * Bu yondashuv DB schema o'zgarishisiz confirmed vs rejected holatini ajratadi.
+ */
+export const REJECT_PREFIX = '[REJECT]';
+
+const CONFIRM_PLACEHOLDER =
+  "Tasdiqlash izohi (majburiy):\n" +
   "– Qo'shimcha tekshiruvlar...\n" +
   "– Dori-darmonlar...\n" +
   "– Kasalxonaga murojaat qilish...";
+
+const REJECT_PLACEHOLDER =
+  "Rad etish sababi (majburiy):\n" +
+  "– Simptomlar bu tashxisga to'g'ri kelmaydi...\n" +
+  "– Qo'shimcha ma'lumot kerak...\n" +
+  "– Boshqa mutaxassisga murojaat qiling...";
 
 export function TriageActionBar({ messageId }: Props) {
   const [state, setState] = useState<ActionState>('idle');
@@ -30,66 +48,94 @@ export function TriageActionBar({ messageId }: Props) {
     await qc.invalidateQueries({ queryKey: ['doctor-inbox'] });
   };
 
-  // ── Confirm — opens note composer first ────────────────────────────────────
-  const handleOpenCompose = () => {
+  const resetToIdle = () => {
+    setState('idle');
+    setNote('');
+  };
+
+  // ── Confirm flow ───────────────────────────────────────────────────────────
+  const handleOpenConfirm = () => {
     if (state !== 'idle') return;
-    setState('composing');
+    setState('composing-confirm');
   };
 
   const handleConfirm = async () => {
-    setState('submitting');
+    const trimmed = note.trim();
+    if (!trimmed) return;           // UI disabled, double safety
+    setState('submitting-confirm');
     try {
-      await updateTriageSession(messageId, 'ARCHIVED', note.trim() || undefined);
+      await updateTriageSession(messageId, 'ARCHIVED', trimmed);
       await invalidate();
       toast.success('Diagnoz tasdiqlandi', {
-        description: note.trim()
-          ? 'Tavsiyangiz bemorga yuborildi.'
-          : undefined,
+        description: 'Tavsiyangiz bemorga yuborildi.',
         duration: 4000,
       });
       navigate('/shifokor/inbox');
     } catch {
       toast.error("Xato yuz berdi. Qayta urinib ko'ring.");
-      setState('composing');
+      setState('composing-confirm');
     }
   };
 
-  // ── Reject — direct (no note required) ────────────────────────────────────
+  // ── Reject flow ────────────────────────────────────────────────────────────
+  const handleOpenReject = () => {
+    if (state !== 'idle') return;
+    setState('composing-reject');
+  };
+
   const handleReject = async () => {
-    if (state !== 'idle' && state !== 'composing') return;
-    setState('rejecting');
+    const trimmed = note.trim();
+    if (!trimmed) return;           // UI disabled, double safety
+    setState('submitting-reject');
     try {
-      await updateTriageSession(messageId, 'ARCHIVED');
+      // Prefix REJECT marker so patient sees this was a rejection,
+      // not a confirmation. Frontend strips the prefix before display.
+      const rejectNote = `${REJECT_PREFIX}\n${trimmed}`;
+      await updateTriageSession(messageId, 'ARCHIVED', rejectNote);
       await invalidate();
-      toast.info('Sessiya rad etildi va arxivlandi');
+      toast.info('Sessiya rad etildi', {
+        description: 'Sababingiz bemorga yuborildi.',
+        duration: 4000,
+      });
       navigate('/shifokor/inbox');
     } catch {
       toast.error("Xato yuz berdi. Qayta urinib ko'ring.");
-      setState('idle');
+      setState('composing-reject');
     }
   };
 
-  const busy = state === 'submitting' || state === 'rejecting';
+  const isComposingConfirm = state === 'composing-confirm' || state === 'submitting-confirm';
+  const isComposingReject  = state === 'composing-reject'  || state === 'submitting-reject';
+  const isSubmitting       = state === 'submitting-confirm' || state === 'submitting-reject';
+  const canSubmit          = note.trim().length > 0 && !isSubmitting;
 
   return (
     <div className="space-y-3 pt-4 border-t border-border">
 
-      {/* Note composer — shown when doctor clicks "Tasdiqlash" */}
-      {(state === 'composing' || state === 'submitting') && (
+      {/* Compose (confirm OR reject — same textarea, different CTAs) */}
+      {(isComposingConfirm || isComposingReject) && (
         <div className="space-y-2">
           <label className="text-xs font-medium text-muted-foreground">
-            Bemor uchun tavsiya (ixtiyoriy, max 2000 belgi)
+            {isComposingReject
+              ? 'Bemor uchun rad etish sababi (majburiy, max 2000 belgi)'
+              : 'Bemor uchun tavsiya (majburiy, max 2000 belgi)'}
           </label>
           <textarea
-            className="w-full rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-sm
-                       resize-none placeholder:text-muted-foreground/50 focus:outline-none
-                       focus:ring-2 focus:ring-primary/30 disabled:opacity-50"
+            className={[
+              'w-full rounded-xl border px-3 py-2.5 text-sm resize-none',
+              'placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2',
+              'disabled:opacity-50',
+              isComposingReject
+                ? 'border-red-200 bg-red-50/40 focus:ring-red-500/30'
+                : 'border-border bg-muted/40 focus:ring-primary/30',
+            ].join(' ')}
             rows={4}
             maxLength={2000}
-            placeholder={NOTE_PLACEHOLDER}
+            placeholder={isComposingReject ? REJECT_PLACEHOLDER : CONFIRM_PLACEHOLDER}
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            disabled={state === 'submitting'}
+            disabled={isSubmitting}
+            autoFocus
           />
           <div className="flex items-center justify-between">
             <span className="text-xs text-muted-foreground">{note.length} / 2000</span>
@@ -97,36 +143,53 @@ export function TriageActionBar({ messageId }: Props) {
               <Button
                 size="sm"
                 variant="ghost"
-                disabled={busy}
-                onClick={() => { setState('idle'); setNote(''); }}
+                disabled={isSubmitting}
+                onClick={resetToIdle}
               >
                 Bekor
               </Button>
-              <Button
-                size="sm"
-                className="bg-green-600 hover:bg-green-700 text-white gap-1.5"
-                disabled={busy}
-                onClick={() => void handleConfirm()}
-              >
-                {state === 'submitting' ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <CheckCircle className="w-3.5 h-3.5" />
-                )}
-                Yuborish
-              </Button>
+              {isComposingReject ? (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  className="gap-1.5"
+                  disabled={!canSubmit}
+                  onClick={() => void handleReject()}
+                >
+                  {state === 'submitting-reject' ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <XCircle className="w-3.5 h-3.5" />
+                  )}
+                  Rad etishni yuborish
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white gap-1.5"
+                  disabled={!canSubmit}
+                  onClick={() => void handleConfirm()}
+                >
+                  {state === 'submitting-confirm' ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-3.5 h-3.5" />
+                  )}
+                  Tasdiqlashni yuborish
+                </Button>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Action buttons */}
+      {/* Idle — two entry buttons */}
       {state === 'idle' && (
         <div className="flex gap-2">
           <Button
             size="sm"
             className="flex-1 gap-1.5 bg-green-600 hover:bg-green-700 text-white"
-            onClick={handleOpenCompose}
+            onClick={handleOpenConfirm}
           >
             <CheckCircle className="w-4 h-4" />
             Diagnoz tasdiqlash
@@ -137,28 +200,19 @@ export function TriageActionBar({ messageId }: Props) {
             size="sm"
             variant="outline"
             className="flex-1 gap-1.5 border-red-200 text-red-600 hover:bg-red-50"
-            onClick={() => void handleReject()}
+            onClick={handleOpenReject}
           >
             <XCircle className="w-4 h-4" />
             Rad etish
-          </Button>
-        </div>
-      )}
-
-      {/* While rejecting */}
-      {state === 'rejecting' && (
-        <div className="flex gap-2">
-          <Button size="sm" disabled className="flex-1 gap-1.5">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            Rad etilmoqda...
+            <ChevronDown className="w-3 h-3 ml-auto opacity-60" />
           </Button>
         </div>
       )}
 
       <Separator />
       <p className="text-xs text-muted-foreground text-center">
-        Tasdiqlash yoki rad etish sessiyani arxivlaydi.
-        Bemorga tavsiya matnini <span className="text-foreground font-medium">tasdiqlash</span> orqali yuborish mumkin.
+        Har ikkala qaror ham bemorga yuboriladi. Izoh majburiy — bemor sizning
+        fikringiz haqida xabar oladi.
       </p>
     </div>
   );
