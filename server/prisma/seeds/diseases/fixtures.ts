@@ -29,6 +29,45 @@ export interface SymptomFixture {
   isExcluding: boolean;
 }
 
+export interface ScientistFixture {
+  fullName: string;
+  role: 'DISCOVERER' | 'CLASSIFIER' | 'CONTRIBUTOR' | 'RESEARCHER' | 'EDITOR';
+  country?: string;
+  birthYear?: number;
+  deathYear?: number;
+  bioMd?: string;
+  contributionsMd?: string;
+  photoUrl?: string;
+  orderIndex: number;
+}
+
+export interface ResearchFixture {
+  title: string;
+  authors: string;
+  journal?: string;
+  year: number;
+  doi?: string;
+  pubmedId?: string;
+  nctId?: string;
+  type: 'RCT' | 'META_ANALYSIS' | 'SYSTEMATIC_REVIEW' | 'COHORT'
+      | 'CASE_CONTROL' | 'CASE_SERIES' | 'CASE_REPORT' | 'GUIDELINE';
+  summaryMd: string;
+  evidenceLevel: 'A' | 'B' | 'C' | 'D';
+  isLandmark: boolean;
+}
+
+export interface GeneticFixture {
+  geneSymbol?: string;
+  variantType?: string;
+  inheritancePattern?: 'AUTOSOMAL_DOMINANT' | 'AUTOSOMAL_RECESSIVE'
+    | 'X_LINKED_DOMINANT' | 'X_LINKED_RECESSIVE' | 'MITOCHONDRIAL'
+    | 'COMPLEX' | 'SPORADIC';
+  penetrance?: number;               // 0.000–1.000
+  bloodGroupRisk?: 'A_POS' | 'A_NEG' | 'B_POS' | 'B_NEG'
+    | 'AB_POS' | 'AB_NEG' | 'O_POS' | 'O_NEG';
+  populationNoteMd?: string;
+}
+
 export interface DiseaseFixture {
   slug: string;
   icd10: string;
@@ -41,6 +80,9 @@ export interface DiseaseFixture {
   protocolSources: string[];
   blocks: BlockFixture[];
   symptoms: SymptomFixture[];
+  scientists?: ScientistFixture[];
+  research?: ResearchFixture[];
+  genetics?: GeneticFixture[];
 }
 
 export interface StubFixture {
@@ -220,6 +262,68 @@ Migren patogenezining zamonaviy nazariyasi — **kortikal yoyiluvchi depressiya 
     { code: 'VOMITING', nameUz: 'Qayt qilish', category: 'umumiy', isRedFlag: false, weight: 0.5, isRequired: false, isExcluding: false },
     { code: 'THUNDERCLAP_HEADACHE', nameUz: 'Momaqaldiroq bosh og\'riq', category: 'nevrologik', bodyZone: 'head', isRedFlag: true, weight: 0.3, isRequired: false, isExcluding: false },
   ],
+  scientists: [
+    {
+      fullName: 'Edward Liveing',
+      role: 'CONTRIBUTOR',
+      country: 'Birlashgan Qirollik',
+      birthYear: 1832, deathYear: 1919,
+      bioMd: "Britaniyalik shifokor. 1873-yilda *\"On Megrim, Sick-Headache and some Allied Disorders\"* monografiyasini nashr etgan — migrenni zamonaviy tibbiyotda mustaqil kasallik sifatida tasvirlagan birinchi asarlardan biri.",
+      contributionsMd: "Migren hujumining fazaviy tabiatini (prodrom, hujum, postdrom) birinchi bo'lib tizimli tavsifladi.",
+      orderIndex: 0,
+    },
+    {
+      fullName: 'Peter J. Goadsby',
+      role: 'RESEARCHER',
+      country: 'Avstraliya / AQSh',
+      birthYear: 1961,
+      bioMd: "Neyrolog, King's College London va UCSF. Migrenning neyrobiologiyasi bo'yicha dunyodagi yetakchi tadqiqotchilardan biri.",
+      contributionsMd: "CGRP (calcitonin gene-related peptide) rolini aniqlab, zamonaviy anti-CGRP monoklonal antikor davolashining asoschilaridan. 2021 Brain Prize laureate.",
+      orderIndex: 1,
+    },
+  ],
+  research: [
+    {
+      title: "Erenumab for Episodic Migraine (STRIVE trial)",
+      authors: "Goadsby PJ, Reuter U, Hallström Y, et al.",
+      journal: "New England Journal of Medicine",
+      year: 2017,
+      doi: "10.1056/NEJMoa1705848",
+      pubmedId: "29171818",
+      nctId: "NCT02456740",
+      type: 'RCT',
+      summaryMd: "955 bemorda olib borilgan faza-3 RCT. Erenumab (anti-CGRP receptor antagonist) oyiga migren kunlarini placebo'ga nisbatan statistik ma'noda kamaytirdi — CGRP-ga qarshi birinchi ro'yxatdan o'tgan preparat uchun kalit ma'lumot.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+    {
+      title: "The International Classification of Headache Disorders, 3rd edition (ICHD-3)",
+      authors: "Headache Classification Committee of the International Headache Society (IHS)",
+      journal: "Cephalalgia",
+      year: 2018,
+      doi: "10.1177/0333102417738202",
+      type: 'GUIDELINE',
+      summaryMd: "Migren va boshqa bosh og'riq kasalliklarining standart klassifikatsiyasi. Zamonaviy klinik amaliyot va tadqiqotlarda majburiy yo'riqnoma.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+  ],
+  genetics: [
+    {
+      geneSymbol: 'CACNA1A',
+      variantType: 'Missense mutation',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: 0.9,
+      populationNoteMd: "Familial Hemiplegic Migraine type 1 (FHM1) uchun javobgar. Kalsiy kanali subbirligini kodlaydi; epileptik-migren spektrda uchraydi.",
+    },
+    {
+      geneSymbol: 'ATP1A2',
+      variantType: 'Missense mutation',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: 0.8,
+      populationNoteMd: "FHM2. Na+/K+-ATPase subbirligi. Bepushtlik migrenining nodir, lekin og'ir ko'rinishlari bilan bog'liq.",
+    },
+  ],
 };
 
 // ── 2. GIPERTONIYA ────────────────────────────────────────────────────────────
@@ -349,6 +453,61 @@ Kam: tuz, qizil go'sht, shirinliklar, to'yingan yog'lar
     { code: 'PALPITATIONS', nameUz: 'Yurak urishi tezlashishi', category: 'kardiovaskular', bodyZone: 'chest', isRedFlag: false, weight: 0.4, isRequired: false, isExcluding: false },
     { code: 'HYPERTENSIVE_CRISIS', nameUz: 'Gipertenziv kriz (BP ≥180/120)', category: 'kardiovaskular', isRedFlag: true, weight: 0.8, isRequired: false, isExcluding: false },
     { code: 'CHEST_PAIN', nameUz: 'Ko\'krak og\'rig\'i', category: 'kardiovaskular', bodyZone: 'chest', isRedFlag: true, weight: 0.3, isRequired: false, isExcluding: false },
+  ],
+  scientists: [
+    {
+      fullName: 'Scipione Riva-Rocci',
+      role: 'DISCOVERER',
+      country: 'Italiya',
+      birthYear: 1863, deathYear: 1937,
+      bioMd: "Italyan shifokor, Torino universiteti. 1896-yilda zamonaviy sfigmomanometr (qon bosimini o'lchovchi asbob)ni ixtiro qildi.",
+      contributionsMd: "Klinik amaliyotga non-invaziv qon bosimi o'lchovini kiritdi — gipertoniya tashxisi uchun fundamental asos.",
+      orderIndex: 0,
+    },
+    {
+      fullName: 'Nikolay Sergeyevich Korotkov',
+      role: 'CONTRIBUTOR',
+      country: 'Rossiya imperiyasi',
+      birthYear: 1874, deathYear: 1920,
+      bioMd: "Rus harbiy xirurgi. 1905-yilda St. Peterburgdagi tibbiyot akademiyasida auskultativ usulda sistolik va diastolik bosimni o'lchash uslubini taqdim etdi.",
+      contributionsMd: "\"Korotkov tovushlari\" — bugungi kun'gacha qo'l bilan qon bosimini o'lchashda ishlatiladi.",
+      orderIndex: 1,
+    },
+  ],
+  research: [
+    {
+      title: "A Randomized Trial of Intensive versus Standard Blood-Pressure Control (SPRINT)",
+      authors: "SPRINT Research Group, Wright JT Jr, Williamson JD, et al.",
+      journal: "New England Journal of Medicine",
+      year: 2015,
+      doi: "10.1056/NEJMoa1511939",
+      pubmedId: "26551272",
+      nctId: "NCT01206062",
+      type: 'RCT',
+      summaryMd: "9361 bemorda olib borilgan faza-4 trial. Intensiv strategiya (sistolik BP <120 mm Hg) standart strategiya (<140) bilan solishtirilganda kardiovaskular voqealar va umumiy o'limni sezilarli darajada kamaytirdi.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+    {
+      title: "2023 ESH Guidelines for the management of arterial hypertension",
+      authors: "Mancia G, Kreutz R, Brunström M, et al.",
+      journal: "Journal of Hypertension",
+      year: 2023,
+      doi: "10.1097/HJH.0000000000003480",
+      type: 'GUIDELINE',
+      summaryMd: "Evropa Gipertoniya Jamiyati tomonidan eng yangi ko'rsatmalar. BP tasniflash, davolash zinapoyasi, maqsadli qadriyatlar.",
+      evidenceLevel: 'A',
+      isLandmark: false,
+    },
+  ],
+  genetics: [
+    {
+      geneSymbol: 'AGT',
+      variantType: 'M235T polymorphism',
+      inheritancePattern: 'COMPLEX',
+      penetrance: 0.15,
+      populationNoteMd: "Angiotensinogen geni polimorfizmi. Essensial gipertoniya bilan kuchsiz-o'rta assotsiatsiya. Poligen tabiatli kasallik uchun ko'plab loklardan biri.",
+    },
   ],
 };
 
@@ -684,6 +843,77 @@ Bexterev kasalligi — umurtqa pog'onasi va qovurg'a-umurtqa bo'g'imlarini **sis
     { code: 'SACROILIAC_PAIN', nameUz: 'Son-chanoq bo\'g\'imi og\'rig\'i', category: 'muskuloskeletal', bodyZone: 'back', isRedFlag: false, weight: 0.7, isRequired: false, isExcluding: false },
     { code: 'HEEL_PAIN', nameUz: 'Tovon og\'rig\'i (enthesit)', category: 'muskuloskeletal', bodyZone: 'lower_limb', isRedFlag: false, weight: 0.5, isRequired: false, isExcluding: false },
   ],
+  scientists: [
+    {
+      fullName: 'Vladimir Mixaylovich Bexterev',
+      role: 'DISCOVERER',
+      country: 'Rossiya imperiyasi',
+      birthYear: 1857, deathYear: 1927,
+      bioMd: "Rus neyropatolog va psixiatr, Sankt-Peterburg Harbiy-tibbiy akademiyasi. 1893-yilda bu kasallikning klinik manzarasini batafsil tasvirlagan.",
+      contributionsMd: "Kasallikning klinik-patologik xususiyatlarini birinchi bo'lib tizimli tavsifladi; sharqiy Yevropada hozirgacha \"Bexterev kasalligi\" nomi qo'llaniladi.",
+      orderIndex: 0,
+    },
+    {
+      fullName: 'Adolf Strümpell',
+      role: 'CONTRIBUTOR',
+      country: 'Germaniya',
+      birthYear: 1853, deathYear: 1925,
+      bioMd: "Nemis neyrolog. 1897-yilda mustaqil ravishda shunga o'xshash holatni tasvirlagan.",
+      contributionsMd: "Sakroiliit va spinal anikilozning bog'liqligini ko'rsatdi.",
+      orderIndex: 1,
+    },
+    {
+      fullName: 'Pierre Marie',
+      role: 'CONTRIBUTOR',
+      country: 'Fransiya',
+      birthYear: 1853, deathYear: 1940,
+      bioMd: "Fransuz neyrolog, Charcot'ning shogirdi. 1898-yilda \"spondylose rhizomélique\" atamasini taqdim etgan.",
+      contributionsMd: "Yevropa adabiyotida kasallikning \"Marie-Strümpell\" nomi bilan tanilishiga asos bo'ldi.",
+      orderIndex: 2,
+    },
+  ],
+  research: [
+    {
+      title: "Efficacy and Safety of Adalimumab in Patients with Ankylosing Spondylitis (ATLAS)",
+      authors: "van der Heijde D, Kivitz A, Schiff MH, et al.",
+      journal: "Arthritis & Rheumatism",
+      year: 2006,
+      doi: "10.1002/art.21913",
+      pubmedId: "16802356",
+      nctId: "NCT00085644",
+      type: 'RCT',
+      summaryMd: "315 bemorda 24-haftalik placebo-kontrollik tadqiqot. TNF-α inhibitor (adalimumab) ASAS20 javobini sezilarli darajada oshirdi — biologik terapiyaning samaradorligini tasdiqlovchi kalit tadqiqotlardan.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+    {
+      title: "2022 ASAS-EULAR recommendations for the management of axial spondyloarthritis",
+      authors: "Ramiro S, Nikiphorou E, Sepriano A, et al.",
+      journal: "Annals of the Rheumatic Diseases",
+      year: 2023,
+      doi: "10.1136/ard-2022-223296",
+      type: 'GUIDELINE',
+      summaryMd: "Eng yangi yevropa tavsiyalari: NSAID birinchi chiziq, yetarli samarasiz bo'lsa biologik (TNFi / IL-17i) yoki JAK inhibitorlari.",
+      evidenceLevel: 'A',
+      isLandmark: false,
+    },
+  ],
+  genetics: [
+    {
+      geneSymbol: 'HLA-B27',
+      variantType: 'HLA class I allele',
+      inheritancePattern: 'COMPLEX',
+      penetrance: 0.05,
+      populationNoteMd: "Bexterev kasalligi bilan og'rigan bemorlarning ~90% HLA-B27 ijobiy. Biroq HLA-B27 musbat odamlarning atigi 1–5% kasallikni rivojlantiradi — ya'ni zarur, lekin yetarli bo'lmagan omil. O'rta Osiyo populyatsiyasida HLA-B27 tarqalish taxminan 5–8% ni tashkil etadi.",
+    },
+    {
+      geneSymbol: 'ERAP1',
+      variantType: 'SNP (rs30187)',
+      inheritancePattern: 'COMPLEX',
+      penetrance: 0.02,
+      populationNoteMd: "HLA-B27 bilan birga epistatik ta'sirda kasallik rivojlanishiga hissa qo'shadi.",
+    },
+  ],
 };
 
 // ── 6. DIABET-2 ───────────────────────────────────────────────────────────────
@@ -795,6 +1025,69 @@ Jahon aholisining **9%** dan ortig'i diabetdan aziyat chekadi. O'zbekistonda tax
     { code: 'RECURRENT_INFECTIONS', nameUz: 'Tez-tez infeksiyalar (siydik, teri)', category: 'immunologik', isRedFlag: false, weight: 0.6, isRequired: false, isExcluding: false },
     { code: 'HYPERGLYCEMIA', nameUz: 'Yuqori qon shakar darajasi', category: 'laborator', isRedFlag: true, weight: 1.0, isRequired: false, isExcluding: false },
     { code: 'KUSSMAUL_BREATHING', nameUz: 'Chuqur-tez nafas (aseton hidi)', category: 'nafas', isRedFlag: true, weight: 0.9, isRequired: false, isExcluding: false },
+  ],
+  scientists: [
+    {
+      fullName: 'Harold Himsworth',
+      role: 'CLASSIFIER',
+      country: 'Birlashgan Qirollik',
+      birthYear: 1905, deathYear: 1993,
+      bioMd: "Britaniyalik endokrinolog, University College London. 1936-yilda \"insulin-sezgir\" va \"insulin-sezgir bo'lmagan\" diabet turlarini ajratishga asos bo'ldi — zamonaviy 1-tur va 2-tur tasnifining yaqin prekursori.",
+      contributionsMd: "Diabet mellitus'ni bir kasallik emas, balki ikki xil sindrom sifatida tushunishga olib keldi.",
+      orderIndex: 0,
+    },
+    {
+      fullName: 'Gerald Reaven',
+      role: 'RESEARCHER',
+      country: 'AQSh',
+      birthYear: 1928, deathYear: 2018,
+      bioMd: "Stanford University endokrinologi. 1988-yilda \"Syndrome X\" (hozirgi metabolik sindrom) tushunchasini taqdim etgan.",
+      contributionsMd: "Insulin rezistentligi va kardiovaskular risk o'rtasidagi bog'liqlikni tizimli asoslagan.",
+      orderIndex: 1,
+    },
+  ],
+  research: [
+    {
+      title: "Intensive blood-glucose control with sulphonylureas or insulin compared with conventional treatment (UKPDS 33)",
+      authors: "UK Prospective Diabetes Study (UKPDS) Group",
+      journal: "The Lancet",
+      year: 1998,
+      doi: "10.1016/S0140-6736(98)07019-6",
+      pubmedId: "9742976",
+      type: 'RCT',
+      summaryMd: "3867 yangi tashxis qo'yilgan 2-tur diabet bemorlarida 10+ yillik kuzatuv. Intensiv glikemiya nazorati mikrovaskular asoratlarni 25% ga kamaytirdi — zamonaviy HbA1c-ga asoslangan davolash strategiyasining asoschisi.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+    {
+      title: "Empagliflozin, Cardiovascular Outcomes, and Mortality in Type 2 Diabetes (EMPA-REG OUTCOME)",
+      authors: "Zinman B, Wanner C, Lachin JM, et al.",
+      journal: "New England Journal of Medicine",
+      year: 2015,
+      doi: "10.1056/NEJMoa1504720",
+      pubmedId: "26378978",
+      nctId: "NCT01131676",
+      type: 'RCT',
+      summaryMd: "7020 yuqori kardiovaskular riskli 2-tur diabet bemorlari. Empagliflozin (SGLT2 inhibitor) yurak-qon tomir o'limini 38% ga kamaytirdi — diabet davolashida kardioprotektiv davr boshlanishini belgiladi.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+  ],
+  genetics: [
+    {
+      geneSymbol: 'TCF7L2',
+      variantType: 'SNP (rs7903146)',
+      inheritancePattern: 'COMPLEX',
+      penetrance: 0.1,
+      populationNoteMd: "2-tur diabet uchun eng kuchli umumiy genetik risk omili. Beta-hujayralar funksiyasiga ta'sir qiladi.",
+    },
+    {
+      geneSymbol: 'PPARG',
+      variantType: 'P12A polymorphism',
+      inheritancePattern: 'COMPLEX',
+      penetrance: 0.05,
+      populationNoteMd: "Adipogenez va insulin sezgirligi. Thiazolidinedionlar (pioglitazon) ta'sir nuqtasi.",
+    },
   ],
 };
 
@@ -1317,6 +1610,69 @@ Insult — O'zbekistonda **o'lim va nogironlikning** asosiy sababi. Har 40 soniy
     { code: 'SUDDEN_SEVERE_HEADACHE', nameUz: '"Hayotimdagi eng kuchli" bosh og\'rig\'i', category: 'nevrologik', bodyZone: 'head', isRedFlag: true, weight: 0.95, isRequired: false, isExcluding: false },
     { code: 'VISION_LOSS_UNILATERAL', nameUz: 'Bir tomonda ko\'rish to\'satdan yo\'qolishi', category: 'oftalmologik', bodyZone: 'head', isRedFlag: true, weight: 0.9, isRequired: false, isExcluding: false },
     { code: 'BALANCE_LOSS', nameUz: 'Muvozanat yo\'qolishi, aylana holati', category: 'nevrologik', isRedFlag: true, weight: 0.85, isRequired: false, isExcluding: false },
+  ],
+  scientists: [
+    {
+      fullName: 'Rudolf Virchow',
+      role: 'DISCOVERER',
+      country: 'Germaniya',
+      birthYear: 1821, deathYear: 1902,
+      bioMd: "Nemis patolog, \"zamonaviy patologiyaning otasi\". 1856-yilda emboliya va tromboz mexanizmlarini tushuntirib, insult patogenezining asosini yaratdi.",
+      contributionsMd: "Virchow triadasi: endotelial shikastlanish + gemostaz o'zgarishi + qon oqimi buzilishi — tromboembolik insultning klassik asosi.",
+      orderIndex: 0,
+    },
+    {
+      fullName: "J P Mohr",
+      role: 'RESEARCHER',
+      country: 'AQSh',
+      birthYear: 1936,
+      bioMd: "Columbia University neyrolog. Stroke Data Bank va NINDS rt-PA tadqiqotining asosiy tergovchilaridan biri.",
+      contributionsMd: "Zamonaviy stroke klassifikatsiyasi va tromboliz davolashi doktrinasi ishlab chiqilishiga muhim hissa qo'shgan.",
+      orderIndex: 1,
+    },
+  ],
+  research: [
+    {
+      title: "Tissue Plasminogen Activator for Acute Ischemic Stroke (NINDS rt-PA Stroke Trial)",
+      authors: "The National Institute of Neurological Disorders and Stroke rt-PA Stroke Study Group",
+      journal: "New England Journal of Medicine",
+      year: 1995,
+      doi: "10.1056/NEJM199512143332401",
+      pubmedId: "7477192",
+      type: 'RCT',
+      summaryMd: "624 bemorda faza-3 trial: belgilar boshlanishidan 3 soat ichida IV rt-PA (alteplaza) 3 oydan keyin funksional tiklanishni sezilarli darajada oshirdi. Zamonaviy acute stroke davolashining asoschi ishi.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+    {
+      title: "Thrombectomy 6 to 24 Hours after Stroke with a Mismatch between Deficit and Infarct (DAWN)",
+      authors: "Nogueira RG, Jadhav AP, Haussen DC, et al.",
+      journal: "New England Journal of Medicine",
+      year: 2018,
+      doi: "10.1056/NEJMoa1706442",
+      pubmedId: "29129157",
+      nctId: "NCT02142283",
+      type: 'RCT',
+      summaryMd: "206 bemor. Endovaskulyar trombektomiya oynasi 24 soatgacha kengaytirildi — agar klinik-vizual mismatch mavjud bo'lsa. Modernizatsiya davolash protokolining mezonini o'zgartirgan tadqiqot.",
+      evidenceLevel: 'A',
+      isLandmark: true,
+    },
+  ],
+  genetics: [
+    {
+      geneSymbol: 'F5',
+      variantType: 'Factor V Leiden (R506Q)',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: 0.1,
+      populationNoteMd: "Venoz tromboembolizm va yoshlardagi kriptogen ishemik insult riskini oshiradi. Yevropa populyatsiyasida ~5%, O'rta Osiyoda kamroq.",
+    },
+    {
+      geneSymbol: 'NOTCH3',
+      variantType: 'Missense mutations',
+      inheritancePattern: 'AUTOSOMAL_DOMINANT',
+      penetrance: 0.95,
+      populationNoteMd: "CADASIL (Cerebral Autosomal Dominant Arteriopathy with Subcortical Infarcts and Leukoencephalopathy) sababchisi. Nodir ammo diagnostik jihatdan muhim.",
+    },
   ],
 };
 

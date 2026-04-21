@@ -21,6 +21,10 @@ import {
   AudienceMode,
   SymptomSeverity,
   TranslationStatus,
+  ScientistRole,
+  ResearchType,
+  InheritancePattern,
+  BloodGroup,
 } from '@prisma/client';
 import {
   migren, gipertoniya, gastrit, pnevmoniya, bexterev,
@@ -112,7 +116,61 @@ async function seedFullDisease(fixture: DiseaseFixture): Promise<void> {
       });
     }
 
-    // 3 ── Symptom + DiseaseSymptom upsert ───────────────────────────────────
+    // 3 ── Scientists / Research / Genetics (idempotent: delete + create) ──
+    if (fixture.scientists && fixture.scientists.length > 0) {
+      await tx.diseaseScientist.deleteMany({ where: { diseaseId: disease.id } });
+      await tx.diseaseScientist.createMany({
+        data: fixture.scientists.map((s) => ({
+          diseaseId: disease.id,
+          fullName: s.fullName,
+          role: ScientistRole[s.role],
+          country: s.country ?? null,
+          birthYear: s.birthYear ?? null,
+          deathYear: s.deathYear ?? null,
+          bioMd: s.bioMd ?? null,
+          contributionsMd: s.contributionsMd ?? null,
+          photoUrl: s.photoUrl ?? null,
+          orderIndex: s.orderIndex,
+        })),
+      });
+    }
+
+    if (fixture.research && fixture.research.length > 0) {
+      await tx.diseaseResearch.deleteMany({ where: { diseaseId: disease.id } });
+      await tx.diseaseResearch.createMany({
+        data: fixture.research.map((r) => ({
+          diseaseId: disease.id,
+          title: r.title,
+          authors: r.authors,
+          journal: r.journal ?? null,
+          year: r.year,
+          doi: r.doi ?? null,
+          pubmedId: r.pubmedId ?? null,
+          nctId: r.nctId ?? null,
+          type: ResearchType[r.type],
+          summaryMd: r.summaryMd,
+          evidenceLevel: EvidenceLevel[r.evidenceLevel],
+          isLandmark: r.isLandmark,
+        })),
+      });
+    }
+
+    if (fixture.genetics && fixture.genetics.length > 0) {
+      await tx.diseaseGenetic.deleteMany({ where: { diseaseId: disease.id } });
+      await tx.diseaseGenetic.createMany({
+        data: fixture.genetics.map((g) => ({
+          diseaseId: disease.id,
+          geneSymbol: g.geneSymbol ?? null,
+          variantType: g.variantType ?? null,
+          inheritancePattern: g.inheritancePattern ? InheritancePattern[g.inheritancePattern] : null,
+          penetrance: g.penetrance ?? null,
+          bloodGroupRisk: g.bloodGroupRisk ? BloodGroup[g.bloodGroupRisk] : null,
+          populationNoteMd: g.populationNoteMd ?? null,
+        })),
+      });
+    }
+
+    // 4 ── Symptom + DiseaseSymptom upsert ───────────────────────────────────
     for (const sym of fixture.symptoms) {
       const symptom = await tx.symptom.upsert({
         where: { code: sym.code },
@@ -226,6 +284,9 @@ async function main(): Promise<void> {
 
   const totalSymptoms = fullDiseases.reduce((acc, d) => acc + d.symptoms.length, 0);
   const totalBlocks = fullDiseases.reduce((acc, d) => acc + d.blocks.length, 0);
+  const totalScientists = fullDiseases.reduce((acc, d) => acc + (d.scientists?.length ?? 0), 0);
+  const totalResearch = fullDiseases.reduce((acc, d) => acc + (d.research?.length ?? 0), 0);
+  const totalGenetics = fullDiseases.reduce((acc, d) => acc + (d.genetics?.length ?? 0), 0);
 
   console.log('\n━━━ Natija ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   console.log(`  To'liq kasalliklar : ${fullDiseases.length}`);
@@ -233,6 +294,9 @@ async function main(): Promise<void> {
   console.log(`  Jami kasalliklar   : ${fullDiseases.length + stubs.length}`);
   console.log(`  Jami bloklar       : ${totalBlocks}`);
   console.log(`  Jami simptomlar    : ${totalSymptoms}`);
+  console.log(`  Jami olimlar       : ${totalScientists}`);
+  console.log(`  Jami tadqiqotlar   : ${totalResearch}`);
+  console.log(`  Jami genetik       : ${totalGenetics}`);
   console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 }
 
