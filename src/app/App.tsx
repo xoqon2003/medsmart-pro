@@ -254,7 +254,7 @@ function AppRoutes() {
         element={DISEASE_KB_ENABLED ? <KBDiseaseEditorPage /> : <Navigate to="/" replace />}
       />
       <Route
-        path="/kb/review"
+        path="/kb/review-queue"
         element={DISEASE_KB_ENABLED ? <KBReviewQueuePage /> : <Navigate to="/" replace />}
       />
 
