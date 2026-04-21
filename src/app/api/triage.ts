@@ -64,6 +64,19 @@ export const saveTriageNote = (sessionId: string, noteMd: string) =>
   });
 
 /**
+ * Update triage session status (doctor side: archive after review).
+ * PATCH-like: POST /triage/sessions/:id/update
+ */
+export const updateTriageSession = (
+  sessionId: string,
+  status: 'ACTIVE' | 'ARCHIVED' | 'EXPIRED',
+) =>
+  apiFetch(`/triage/sessions/${sessionId}/update`, {
+    method: 'POST',
+    body: JSON.stringify({ status }),
+  });
+
+/**
  * Debounced answer sync — persists the current symptom answers to the session.
  * Called on every answer change with a 600 ms debounce so the DB stays in sync
  * even if the user leaves before clicking "Shifokorga yuborish".
