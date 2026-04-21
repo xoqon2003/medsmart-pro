@@ -425,6 +425,250 @@ export class DiseasesService {
     return { ok: true };
   }
 
+  // ── Metadata CRUD (scientists / research / genetics) ──────────────────────
+  //
+  // Bu metodlar PR-14 yangi modellari uchun admin CRUD operatsiyalarini ta'minlaydi.
+  // Barcha mutation'lar EDITOR+ rolini talab qiladi. GET endpointlar public:
+  // PUBLISHED bo'lmagan kasalliklar uchun yashirinadi (findBySlug pattern'i kabi).
+
+  // ── Scientists ─────────────────────────────────────────────────────────────
+
+  async listScientists(diseaseSlugOrId: string, caller: Caller) {
+    const disease = await this.requireAccessibleDisease(diseaseSlugOrId, caller);
+    return this.p.diseaseScientist.findMany({
+      where: { diseaseId: disease.id },
+      orderBy: { orderIndex: 'asc' },
+    });
+  }
+
+  async createScientist(diseaseId: string, dto: Record<string, unknown>, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireDiseaseExists(diseaseId);
+    const created = await this.p.diseaseScientist.create({
+      data: { ...dto, diseaseId, orderIndex: (dto.orderIndex as number | undefined) ?? 0 },
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'CREATE', { scientist: created });
+    return created;
+  }
+
+  async updateScientist(
+    diseaseId: string,
+    scientistId: string,
+    dto: Record<string, unknown>,
+    caller: Caller,
+  ) {
+    this.ensureEditor(caller);
+    await this.requireScientistBelongsToDisease(diseaseId, scientistId);
+    const updated = await this.p.diseaseScientist.update({
+      where: { id: scientistId },
+      data: dto,
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'UPDATE', {
+      scientistId,
+      after: dto,
+    });
+    return updated;
+  }
+
+  async deleteScientist(diseaseId: string, scientistId: string, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireScientistBelongsToDisease(diseaseId, scientistId);
+    await this.p.diseaseScientist.delete({ where: { id: scientistId } });
+    await this.writeMetaAuditLog(diseaseId, caller, 'DELETE', { scientistId });
+    return { ok: true };
+  }
+
+  // ── Research ───────────────────────────────────────────────────────────────
+
+  async listResearch(diseaseSlugOrId: string, caller: Caller) {
+    const disease = await this.requireAccessibleDisease(diseaseSlugOrId, caller);
+    return this.p.diseaseResearch.findMany({
+      where: { diseaseId: disease.id },
+      orderBy: [{ isLandmark: 'desc' }, { year: 'desc' }],
+    });
+  }
+
+  async createResearch(diseaseId: string, dto: Record<string, unknown>, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireDiseaseExists(diseaseId);
+
+    // DOI unique per disease — tekshiramiz
+    if (dto.doi) {
+      const existing = await this.p.diseaseResearch.findUnique({
+        where: { diseaseId_doi: { diseaseId, doi: dto.doi as string } },
+      });
+      if (existing) {
+        throw new ConflictException('Bu DOI shu kasallik uchun allaqachon qo\'shilgan');
+      }
+    }
+
+    const created = await this.p.diseaseResearch.create({
+      data: {
+        ...dto,
+        diseaseId,
+        evidenceLevel: (dto.evidenceLevel as string | undefined) ?? 'C',
+        isLandmark: (dto.isLandmark as boolean | undefined) ?? false,
+      },
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'CREATE', { research: created });
+    return created;
+  }
+
+  async updateResearch(
+    diseaseId: string,
+    researchId: string,
+    dto: Record<string, unknown>,
+    caller: Caller,
+  ) {
+    this.ensureEditor(caller);
+    await this.requireResearchBelongsToDisease(diseaseId, researchId);
+    const updated = await this.p.diseaseResearch.update({
+      where: { id: researchId },
+      data: dto,
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'UPDATE', { researchId, after: dto });
+    return updated;
+  }
+
+  async deleteResearch(diseaseId: string, researchId: string, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireResearchBelongsToDisease(diseaseId, researchId);
+    await this.p.diseaseResearch.delete({ where: { id: researchId } });
+    await this.writeMetaAuditLog(diseaseId, caller, 'DELETE', { researchId });
+    return { ok: true };
+  }
+
+  // ── Genetics ───────────────────────────────────────────────────────────────
+
+  async listGenetics(diseaseSlugOrId: string, caller: Caller) {
+    const disease = await this.requireAccessibleDisease(diseaseSlugOrId, caller);
+    return this.p.diseaseGenetic.findMany({
+      where: { diseaseId: disease.id },
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  async createGenetic(diseaseId: string, dto: Record<string, unknown>, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireDiseaseExists(diseaseId);
+    const created = await this.p.diseaseGenetic.create({
+      data: { ...dto, diseaseId },
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'CREATE', { genetic: created });
+    return created;
+  }
+
+  async updateGenetic(
+    diseaseId: string,
+    geneticId: string,
+    dto: Record<string, unknown>,
+    caller: Caller,
+  ) {
+    this.ensureEditor(caller);
+    await this.requireGeneticBelongsToDisease(diseaseId, geneticId);
+    const updated = await this.p.diseaseGenetic.update({
+      where: { id: geneticId },
+      data: dto,
+    });
+    await this.writeMetaAuditLog(diseaseId, caller, 'UPDATE', { geneticId, after: dto });
+    return updated;
+  }
+
+  async deleteGenetic(diseaseId: string, geneticId: string, caller: Caller) {
+    this.ensureEditor(caller);
+    await this.requireGeneticBelongsToDisease(diseaseId, geneticId);
+    await this.p.diseaseGenetic.delete({ where: { id: geneticId } });
+    await this.writeMetaAuditLog(diseaseId, caller, 'DELETE', { geneticId });
+    return { ok: true };
+  }
+
+  // ── Metadata helpers ───────────────────────────────────────────────────────
+
+  private async requireDiseaseExists(id: string): Promise<void> {
+    const exists = await this.repo.findUnique({ where: { id }, select: { id: true } });
+    if (!exists) throw new NotFoundException('Kasallik topilmadi');
+  }
+
+  /** slug yoki id qabul qiladi; public uchun PUBLISHED emasni 404. */
+  private async requireAccessibleDisease(
+    slugOrId: string,
+    caller: Caller,
+  ): Promise<{ id: string; status: string }> {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+      slugOrId,
+    );
+    const where = isUuid ? { id: slugOrId } : { slug: slugOrId };
+    const disease = (await this.repo.findUnique({
+      where,
+      select: { id: true, status: true },
+    })) as { id: string; status: string } | null;
+    if (!disease) throw new NotFoundException('Kasallik topilmadi');
+    const isPrivileged = !!caller && ADMIN_ROLES.includes(caller.role);
+    if (!isPrivileged && disease.status !== 'PUBLISHED') {
+      throw new NotFoundException('Kasallik topilmadi');
+    }
+    return disease;
+  }
+
+  private async requireScientistBelongsToDisease(
+    diseaseId: string,
+    scientistId: string,
+  ): Promise<void> {
+    const row = await this.p.diseaseScientist.findUnique({
+      where: { id: scientistId },
+      select: { diseaseId: true },
+    });
+    if (!row) throw new NotFoundException('Olim topilmadi');
+    if (row.diseaseId !== diseaseId) {
+      throw new NotFoundException('Olim bu kasallikka tegishli emas');
+    }
+  }
+
+  private async requireResearchBelongsToDisease(
+    diseaseId: string,
+    researchId: string,
+  ): Promise<void> {
+    const row = await this.p.diseaseResearch.findUnique({
+      where: { id: researchId },
+      select: { diseaseId: true },
+    });
+    if (!row) throw new NotFoundException('Tadqiqot topilmadi');
+    if (row.diseaseId !== diseaseId) {
+      throw new NotFoundException('Tadqiqot bu kasallikka tegishli emas');
+    }
+  }
+
+  private async requireGeneticBelongsToDisease(
+    diseaseId: string,
+    geneticId: string,
+  ): Promise<void> {
+    const row = await this.p.diseaseGenetic.findUnique({
+      where: { id: geneticId },
+      select: { diseaseId: true },
+    });
+    if (!row) throw new NotFoundException('Genetik yozuv topilmadi');
+    if (row.diseaseId !== diseaseId) {
+      throw new NotFoundException('Yozuv bu kasallikka tegishli emas');
+    }
+  }
+
+  private async writeMetaAuditLog(
+    diseaseId: string,
+    caller: Caller,
+    editType: 'CREATE' | 'UPDATE' | 'DELETE',
+    payload: Record<string, unknown>,
+  ): Promise<void> {
+    if (!caller?.id) return;
+    await this.p.diseaseEditLog.create({
+      data: {
+        diseaseId,
+        editorId: caller.id,
+        editType,
+        diffJson: payload as unknown as Prisma.InputJsonValue,
+      },
+    });
+  }
+
   // ── Helpers ───────────────────────────────────────────────────────────────
 
   private ensureEditor(caller: Caller) {

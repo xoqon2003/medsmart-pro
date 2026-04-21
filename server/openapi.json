@@ -4408,6 +4408,446 @@
         ]
       }
     },
+    "/api/v1/diseases/{slug}/scientists": {
+      "get": {
+        "operationId": "MetadataController_listScientists",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Disease slug yoki UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Kasallik olimlari ro'yxati",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/scientists": {
+      "post": {
+        "operationId": "MetadataController_createScientist",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Disease UUID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScientistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi olim qo'shish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/scientists/{scientistId}": {
+      "patch": {
+        "operationId": "MetadataController_updateScientist",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scientistId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateScientistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Olimni yangilash (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      },
+      "delete": {
+        "operationId": "MetadataController_deleteScientist",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "scientistId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Olimni o'chirish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/research": {
+      "get": {
+        "operationId": "MetadataController_listResearch",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Kasallikning tadqiqotlar ro'yxati",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/research": {
+      "post": {
+        "operationId": "MetadataController_createResearch",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateResearchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "409": {
+            "description": "DOI ziddiyat (kasallik ichida takrorlangan)"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi tadqiqot qo'shish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/research/{researchId}": {
+      "patch": {
+        "operationId": "MetadataController_updateResearch",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "researchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateResearchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tadqiqotni yangilash (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      },
+      "delete": {
+        "operationId": "MetadataController_deleteResearch",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "researchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tadqiqotni o'chirish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{slug}/genetics": {
+      "get": {
+        "operationId": "MetadataController_listGenetics",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Kasallikning genetik profili",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/genetics": {
+      "post": {
+        "operationId": "MetadataController_createGenetic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGeneticDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi genetik yozuv qo'shish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
+    "/api/v1/diseases/{id}/genetics/{geneticId}": {
+      "patch": {
+        "operationId": "MetadataController_updateGenetic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "geneticId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateGeneticDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Genetik yozuvni yangilash (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      },
+      "delete": {
+        "operationId": "MetadataController_deleteGenetic",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "geneticId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Genetik yozuvni o'chirish (EDITOR+)",
+        "tags": [
+          "disease-metadata"
+        ]
+      }
+    },
     "/api/v1/symptoms": {
       "get": {
         "operationId": "SymptomsController_list",
@@ -6771,6 +7211,365 @@
           "slug",
           "icd10"
         ]
+      },
+      "CreateScientistDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Olim to'liq ismi",
+            "example": "Scipione Riva-Rocci"
+          },
+          "role": {
+            "type": "string",
+            "description": "Roli",
+            "enum": [
+              "DISCOVERER",
+              "CLASSIFIER",
+              "CONTRIBUTOR",
+              "RESEARCHER",
+              "EDITOR"
+            ],
+            "example": "DISCOVERER"
+          },
+          "country": {
+            "type": "string",
+            "description": "Davlat",
+            "example": "Italiya"
+          },
+          "birthYear": {
+            "type": "number",
+            "description": "Tug'ilgan yil",
+            "example": 1863
+          },
+          "deathYear": {
+            "type": "number",
+            "description": "Vafot etgan yil",
+            "example": 1937
+          },
+          "bioMd": {
+            "type": "string",
+            "description": "Biografiya (Markdown)"
+          },
+          "contributionsMd": {
+            "type": "string",
+            "description": "Hissasi (Markdown)"
+          },
+          "photoUrl": {
+            "type": "string",
+            "description": "Rasm URL"
+          },
+          "orderIndex": {
+            "type": "number",
+            "description": "Tartib indeksi",
+            "default": 0
+          }
+        },
+        "required": [
+          "fullName",
+          "role"
+        ]
+      },
+      "UpdateScientistDto": {
+        "type": "object",
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Olim to'liq ismi",
+            "example": "Scipione Riva-Rocci"
+          },
+          "role": {
+            "type": "string",
+            "description": "Roli",
+            "enum": [
+              "DISCOVERER",
+              "CLASSIFIER",
+              "CONTRIBUTOR",
+              "RESEARCHER",
+              "EDITOR"
+            ],
+            "example": "DISCOVERER"
+          },
+          "country": {
+            "type": "string",
+            "description": "Davlat",
+            "example": "Italiya"
+          },
+          "birthYear": {
+            "type": "number",
+            "description": "Tug'ilgan yil",
+            "example": 1863
+          },
+          "deathYear": {
+            "type": "number",
+            "description": "Vafot etgan yil",
+            "example": 1937
+          },
+          "bioMd": {
+            "type": "string",
+            "description": "Biografiya (Markdown)"
+          },
+          "contributionsMd": {
+            "type": "string",
+            "description": "Hissasi (Markdown)"
+          },
+          "photoUrl": {
+            "type": "string",
+            "description": "Rasm URL"
+          },
+          "orderIndex": {
+            "type": "number",
+            "description": "Tartib indeksi",
+            "default": 0
+          }
+        }
+      },
+      "CreateResearchDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Tadqiqot sarlavhasi"
+          },
+          "authors": {
+            "type": "string",
+            "description": "Mualliflar",
+            "example": "Smith J, Brown A, et al."
+          },
+          "journal": {
+            "type": "string",
+            "description": "Jurnal"
+          },
+          "year": {
+            "type": "number",
+            "description": "Nashr etilgan yil",
+            "example": 2024
+          },
+          "doi": {
+            "type": "string",
+            "description": "DOI",
+            "example": "10.1056/NEJMoa1511939"
+          },
+          "pubmedId": {
+            "type": "string",
+            "description": "PubMed ID"
+          },
+          "nctId": {
+            "type": "string",
+            "description": "ClinicalTrials.gov NCT ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Tadqiqot turi",
+            "enum": [
+              "RCT",
+              "META_ANALYSIS",
+              "SYSTEMATIC_REVIEW",
+              "COHORT",
+              "CASE_CONTROL",
+              "CASE_SERIES",
+              "CASE_REPORT",
+              "GUIDELINE"
+            ]
+          },
+          "summaryMd": {
+            "type": "string",
+            "description": "Qisqacha mazmun (Markdown)"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "description": "Dalil darajasi",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "default": "C"
+          },
+          "isLandmark": {
+            "type": "boolean",
+            "description": "Landmark tadqiqot",
+            "default": false
+          }
+        },
+        "required": [
+          "title",
+          "authors",
+          "year",
+          "type",
+          "summaryMd"
+        ]
+      },
+      "UpdateResearchDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Tadqiqot sarlavhasi"
+          },
+          "authors": {
+            "type": "string",
+            "description": "Mualliflar",
+            "example": "Smith J, Brown A, et al."
+          },
+          "journal": {
+            "type": "string",
+            "description": "Jurnal"
+          },
+          "year": {
+            "type": "number",
+            "description": "Nashr etilgan yil",
+            "example": 2024
+          },
+          "doi": {
+            "type": "string",
+            "description": "DOI",
+            "example": "10.1056/NEJMoa1511939"
+          },
+          "pubmedId": {
+            "type": "string",
+            "description": "PubMed ID"
+          },
+          "nctId": {
+            "type": "string",
+            "description": "ClinicalTrials.gov NCT ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Tadqiqot turi",
+            "enum": [
+              "RCT",
+              "META_ANALYSIS",
+              "SYSTEMATIC_REVIEW",
+              "COHORT",
+              "CASE_CONTROL",
+              "CASE_SERIES",
+              "CASE_REPORT",
+              "GUIDELINE"
+            ]
+          },
+          "summaryMd": {
+            "type": "string",
+            "description": "Qisqacha mazmun (Markdown)"
+          },
+          "evidenceLevel": {
+            "type": "string",
+            "description": "Dalil darajasi",
+            "enum": [
+              "A",
+              "B",
+              "C",
+              "D"
+            ],
+            "default": "C"
+          },
+          "isLandmark": {
+            "type": "boolean",
+            "description": "Landmark tadqiqot",
+            "default": false
+          }
+        }
+      },
+      "CreateGeneticDto": {
+        "type": "object",
+        "properties": {
+          "geneSymbol": {
+            "type": "string",
+            "description": "Gen nomi",
+            "example": "HLA-B27"
+          },
+          "variantType": {
+            "type": "string",
+            "description": "Variant turi",
+            "example": "Missense mutation"
+          },
+          "inheritancePattern": {
+            "type": "string",
+            "description": "Nasl qoldirish pattern",
+            "enum": [
+              "AUTOSOMAL_DOMINANT",
+              "AUTOSOMAL_RECESSIVE",
+              "X_LINKED_DOMINANT",
+              "X_LINKED_RECESSIVE",
+              "MITOCHONDRIAL",
+              "COMPLEX",
+              "SPORADIC"
+            ]
+          },
+          "penetrance": {
+            "type": "number",
+            "description": "Penetrans (0.000 – 1.000)"
+          },
+          "bloodGroupRisk": {
+            "type": "string",
+            "description": "Qon guruh riski",
+            "enum": [
+              "A_POS",
+              "A_NEG",
+              "B_POS",
+              "B_NEG",
+              "AB_POS",
+              "AB_NEG",
+              "O_POS",
+              "O_NEG"
+            ]
+          },
+          "populationNoteMd": {
+            "type": "string",
+            "description": "Populyatsiya izohi (Markdown)"
+          }
+        }
+      },
+      "UpdateGeneticDto": {
+        "type": "object",
+        "properties": {
+          "geneSymbol": {
+            "type": "string",
+            "description": "Gen nomi",
+            "example": "HLA-B27"
+          },
+          "variantType": {
+            "type": "string",
+            "description": "Variant turi",
+            "example": "Missense mutation"
+          },
+          "inheritancePattern": {
+            "type": "string",
+            "description": "Nasl qoldirish pattern",
+            "enum": [
+              "AUTOSOMAL_DOMINANT",
+              "AUTOSOMAL_RECESSIVE",
+              "X_LINKED_DOMINANT",
+              "X_LINKED_RECESSIVE",
+              "MITOCHONDRIAL",
+              "COMPLEX",
+              "SPORADIC"
+            ]
+          },
+          "penetrance": {
+            "type": "number",
+            "description": "Penetrans (0.000 – 1.000)"
+          },
+          "bloodGroupRisk": {
+            "type": "string",
+            "description": "Qon guruh riski",
+            "enum": [
+              "A_POS",
+              "A_NEG",
+              "B_POS",
+              "B_NEG",
+              "AB_POS",
+              "AB_NEG",
+              "O_POS",
+              "O_NEG"
+            ]
+          },
+          "populationNoteMd": {
+            "type": "string",
+            "description": "Populyatsiya izohi (Markdown)"
+          }
+        }
       },
       "SymptomResponseDto": {
         "type": "object",
