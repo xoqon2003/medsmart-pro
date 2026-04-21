@@ -54,6 +54,7 @@ export const uz = {
   'triage.saveSuccess': 'Tahlil profilga saqlandi.',
   'triage.saveError': 'Saqlashda xatolik yuz berdi.',
   'triage.sessionError': 'Avval sessiya boshlanishi kerak.',
+  'triage.exportPdf': 'PDF yuklash',
 
   // Matcher wizard (GAP-01)
   'wizard.step': 'Bosqich',

@@ -56,6 +56,7 @@ export const en = {
   'triage.saveSuccess': 'Analysis saved to profile.',
   'triage.saveError': 'Error while saving.',
   'triage.sessionError': 'A session must be started first.',
+  'triage.exportPdf': 'Download PDF',
 
   // Matcher wizard (GAP-01)
   'wizard.step': 'Step',

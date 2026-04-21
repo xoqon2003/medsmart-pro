@@ -15,12 +15,14 @@ import {
   BookmarkPlus,
   ArrowLeft,
   ArrowRight,
+  Download,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSymptomMatcher } from '../../hooks/useSymptomMatcher';
 import { useDiseaseSymptoms, useDiseasesList } from '../../hooks/useDiseases';
 import { useMatcherWizard } from '../../hooks/useMatcherWizard';
 import { saveTriageNote } from '../../api/triage';
+import { exportTriageToPdf } from '../../lib/triage-pdf-export';
 import { MatcherWizardStepper } from './matcher/MatcherWizardStepper';
 import { MatcherStep1Symptoms } from './matcher/MatcherStep1Symptoms';
 import { MatcherStep2RiskFactors } from './matcher/MatcherStep2RiskFactors';
@@ -156,6 +158,21 @@ export function SymptomMatcherSheet({ isOpen, onClose, disease }: Props) {
     }
   };
 
+  const handleExportPdf = async () => {
+    try {
+      await exportTriageToPdf({
+        disease,
+        scores: wizard.scores,
+        ddx: wizard.ddx,
+        redFlagLabels: bannerRules.map((r) => r.conditionLabel),
+        answers,
+        timeline: wizard.timeline,
+      });
+    } catch {
+      toast.error(t('triage.saveError'));
+    }
+  };
+
   const isReady = status === 'ready' || status === 'idle';
   const isFinalStep = wizard.step === 4;
 
@@ -268,6 +285,18 @@ export function SymptomMatcherSheet({ isOpen, onClose, disease }: Props) {
                   <BookmarkPlus className="w-4 h-4" />
                 )}
                 {t('triage.save')}
+              </Button>
+            )}
+
+            {isFinalStep && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="w-full gap-2 text-muted-foreground"
+                onClick={handleExportPdf}
+              >
+                <Download className="w-4 h-4" />
+                {t('triage.exportPdf')}
               </Button>
             )}
 

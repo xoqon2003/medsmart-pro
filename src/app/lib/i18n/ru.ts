@@ -56,6 +56,7 @@ export const ru = {
   'triage.saveSuccess': 'Анализ сохранён в профиле.',
   'triage.saveError': 'Ошибка при сохранении.',
   'triage.sessionError': 'Сначала нужно начать сессию.',
+  'triage.exportPdf': 'Скачать PDF',
 
   // Matcher wizard (GAP-01)
   'wizard.step': 'Шаг',
