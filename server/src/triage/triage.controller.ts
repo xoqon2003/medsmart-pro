@@ -71,7 +71,7 @@ export class TriageController {
     @Param('id') id: string,
     @Body() dto: UpdateSessionDto,
   ) {
-    return this.triageService.updateSession(req.user.sub, id, dto);
+    return this.triageService.updateSession(req.user, id, dto);
   }
 
   // ─── POST /triage/sessions/:id/send-to-doctor ───────────────────────────────

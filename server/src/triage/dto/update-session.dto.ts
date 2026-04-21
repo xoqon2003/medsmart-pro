@@ -1,5 +1,5 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsIn, IsObject, IsOptional } from 'class-validator';
+import { IsIn, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export type MatchSessionStatusValue = 'ACTIVE' | 'ARCHIVED' | 'EXPIRED';
 
@@ -21,4 +21,17 @@ export class UpdateSessionDto {
   @IsOptional()
   @IsObject()
   userAnswers?: Record<string, string>;
+
+  /**
+   * Shifokorning tavsiyasi / izohi (faqat DOCTOR rolida).
+   * Bemorga ko'rsatiladigan matn xabar.
+   */
+  @ApiPropertyOptional({
+    description: "Shifokorning tavsiyasi (markdown, max 2000 belgi)",
+    example: "Qo'shimcha tekshiruvlar kerak: EKG, qon tahlili. Kasalxonaga yotqizish tavsiya qilinadi.",
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  doctorNote?: string;
 }

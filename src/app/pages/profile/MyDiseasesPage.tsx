@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, Activity, ChevronRight, Loader2,
-  Send, Clock, CheckCircle2, AlertCircle,
+  Send, Clock, CheckCircle2, AlertCircle, Stethoscope,
 } from 'lucide-react';
 import { apiFetch } from '../../api/http';
 
@@ -13,6 +13,8 @@ interface MySession {
   id: string;
   matchScore: number;
   status: 'ACTIVE' | 'SENT_TO_DOCTOR' | 'EXPIRED' | 'ARCHIVED';
+  doctorNote: string | null;
+  doctorRespondedAt: string | null;
   createdAt: string;
   updatedAt: string;
   expiresAt: string | null;
@@ -40,23 +42,39 @@ function useMyDiseases() {
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
-  ACTIVE: {
-    label: 'Faol',
-    icon: <Activity className="w-3 h-3" />,
-    color: 'text-blue-400 bg-blue-500/10',
-  },
-  SENT_TO_DOCTOR: {
-    label: 'Shifokorga yuborilgan',
-    icon: <Send className="w-3 h-3" />,
-    color: 'text-emerald-400 bg-emerald-500/10',
-  },
-  EXPIRED: {
-    label: "Muddati o'tgan",
-    icon: <Clock className="w-3 h-3" />,
-    color: 'text-slate-400 bg-slate-500/10',
-  },
-};
+function getStatusConfig(session: MySession) {
+  // ARCHIVED with doctorNote = doctor responded
+  if (session.status === 'ARCHIVED' && session.doctorNote) {
+    return {
+      label: "Shifokor javob berdi",
+      icon: <Stethoscope className="w-3 h-3" />,
+      color: 'text-violet-500 bg-violet-500/10',
+    };
+  }
+  const map: Record<string, { label: string; icon: React.ReactNode; color: string }> = {
+    ACTIVE: {
+      label: 'Faol',
+      icon: <Activity className="w-3 h-3" />,
+      color: 'text-blue-400 bg-blue-500/10',
+    },
+    SENT_TO_DOCTOR: {
+      label: 'Shifokorga yuborilgan',
+      icon: <Send className="w-3 h-3" />,
+      color: 'text-emerald-400 bg-emerald-500/10',
+    },
+    EXPIRED: {
+      label: "Muddati o'tgan",
+      icon: <Clock className="w-3 h-3" />,
+      color: 'text-slate-400 bg-slate-500/10',
+    },
+    ARCHIVED: {
+      label: 'Arxivlangan',
+      icon: <CheckCircle2 className="w-3 h-3" />,
+      color: 'text-slate-400 bg-slate-500/10',
+    },
+  };
+  return map[session.status] ?? map.ACTIVE;
+}
 
 function scoreLabel(score: number): { text: string; color: string } {
   if (score >= 0.7) return { text: 'Yuqori moslik', color: 'text-emerald-400' };
@@ -148,14 +166,19 @@ export function MyDiseasesPage() {
 
         {/* Session cards */}
         {sessions.map((session) => {
-          const statusCfg = STATUS_CONFIG[session.status] ?? STATUS_CONFIG.ACTIVE;
+          const statusCfg = getStatusConfig(session);
           const { text: scoreText, color: scoreColor } = scoreLabel(session.matchScore);
+          const hasDoctorNote = !!session.doctorNote;
 
           return (
             <div
               key={session.id}
-              className="bg-card border border-border rounded-2xl overflow-hidden
-                         hover:border-foreground/20 transition-colors cursor-pointer group"
+              className={[
+                'bg-card border rounded-2xl overflow-hidden transition-colors cursor-pointer group',
+                hasDoctorNote
+                  ? 'border-violet-300 hover:border-violet-400'
+                  : 'border-border hover:border-foreground/20',
+              ].join(' ')}
               onClick={() => navigate(`/kasalliklar/${session.disease?.slug ?? ''}`)}
             >
               <div className="px-5 py-4 flex items-start justify-between gap-3">
@@ -178,6 +201,26 @@ export function MyDiseasesPage() {
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 mt-1
                                          group-hover:text-foreground transition-colors" />
               </div>
+
+              {/* Doctor note banner — shown when doctor has responded */}
+              {hasDoctorNote && (
+                <div className="mx-5 mb-3 rounded-xl bg-violet-50 border border-violet-200 px-4 py-3">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Stethoscope className="w-3.5 h-3.5 text-violet-600 shrink-0" />
+                    <span className="text-xs font-semibold text-violet-700">
+                      Shifokor tavsiyasi
+                      {session.doctorRespondedAt && (
+                        <span className="font-normal text-violet-500 ml-1.5">
+                          · {formatDate(session.doctorRespondedAt)}
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <p className="text-sm text-violet-900 leading-relaxed whitespace-pre-wrap">
+                    {session.doctorNote}
+                  </p>
+                </div>
+              )}
 
               {/* Stats bar */}
               <div className="border-t border-border px-5 py-3 flex items-center gap-4 flex-wrap">

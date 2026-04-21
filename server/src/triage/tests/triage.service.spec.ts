@@ -86,29 +86,31 @@ describe('TriageService', () => {
     ).rejects.toThrow(BadRequestException);
   });
 
-  it('3. updateSession wrong owner → ForbiddenException', async () => {
+  it('3. updateSession wrong owner (non-doctor) → ForbiddenException', async () => {
     mockSymptomMatchSession.findUnique.mockResolvedValue({
       id: 'sess-1',
       userId: 99, // different user
+      sentToDoctorId: null,
       status: 'ACTIVE',
     });
     const svc = buildService();
     await expect(
-      svc.updateSession(1, 'sess-1', { status: 'ARCHIVED' }),
+      svc.updateSession({ sub: 1, role: 'PATIENT' }, 'sess-1', { status: 'ARCHIVED' }),
     ).rejects.toThrow(ForbiddenException);
   });
 
   it('3b. updateSession with userAnswers persists answers to DB', async () => {
     mockSymptomMatchSession.findUnique.mockResolvedValue({
-      id: 'sess-1', userId: 1, status: 'ACTIVE',
+      id: 'sess-1', userId: 1, sentToDoctorId: null, status: 'ACTIVE',
     });
     mockSymptomMatchSession.update.mockResolvedValue({
       id: 'sess-1', status: 'ACTIVE', userAnswers: { FEVER: 'YES', COUGH: 'NO' },
     });
     const svc = buildService();
-    const result = await svc.updateSession(1, 'sess-1', {
-      userAnswers: { FEVER: 'YES', COUGH: 'NO' },
-    });
+    const result = await svc.updateSession(
+      { sub: 1, role: 'PATIENT' }, 'sess-1',
+      { userAnswers: { FEVER: 'YES', COUGH: 'NO' } },
+    );
     expect(mockSymptomMatchSession.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: expect.objectContaining({ userAnswers: { FEVER: 'YES', COUGH: 'NO' } }),
@@ -119,21 +121,57 @@ describe('TriageService', () => {
 
   it('3c. updateSession with both status + userAnswers updates both fields', async () => {
     mockSymptomMatchSession.findUnique.mockResolvedValue({
-      id: 'sess-2', userId: 5, status: 'ACTIVE',
+      id: 'sess-2', userId: 5, sentToDoctorId: null, status: 'ACTIVE',
     });
     mockSymptomMatchSession.update.mockResolvedValue({
       id: 'sess-2', status: 'ARCHIVED', userAnswers: { HEADACHE: 'YES' },
     });
     const svc = buildService();
-    await svc.updateSession(5, 'sess-2', {
-      status: 'ARCHIVED',
-      userAnswers: { HEADACHE: 'YES' },
-    });
+    await svc.updateSession(
+      { sub: 5, role: 'PATIENT' }, 'sess-2',
+      { status: 'ARCHIVED', userAnswers: { HEADACHE: 'YES' } },
+    );
     expect(mockSymptomMatchSession.update).toHaveBeenCalledWith(
       expect.objectContaining({
         data: { status: 'ARCHIVED', userAnswers: { HEADACHE: 'YES' } },
       }),
     );
+  });
+
+  it('3d. updateSession: DOCTOR role can archive and add doctorNote', async () => {
+    mockSymptomMatchSession.findUnique.mockResolvedValue({
+      id: 'sess-3', userId: 10, sentToDoctorId: 42, status: 'SENT_TO_DOCTOR',
+    });
+    mockSymptomMatchSession.update.mockResolvedValue({
+      id: 'sess-3', status: 'ARCHIVED', doctorNote: 'Shifokor tavsiyasi',
+    });
+    const svc = buildService();
+    await svc.updateSession(
+      { sub: 42, role: 'DOCTOR' }, 'sess-3',
+      { status: 'ARCHIVED', doctorNote: 'Shifokor tavsiyasi' },
+    );
+    expect(mockSymptomMatchSession.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          status: 'ARCHIVED',
+          doctorNote: 'Shifokor tavsiyasi',
+          doctorRespondedAt: expect.any(Date),
+        }),
+      }),
+    );
+  });
+
+  it('3e. updateSession: DOCTOR cannot change userAnswers → ForbiddenException', async () => {
+    mockSymptomMatchSession.findUnique.mockResolvedValue({
+      id: 'sess-4', userId: 10, sentToDoctorId: 42, status: 'SENT_TO_DOCTOR',
+    });
+    const svc = buildService();
+    await expect(
+      svc.updateSession(
+        { sub: 42, role: 'DOCTOR' }, 'sess-4',
+        { userAnswers: { FEVER: 'YES' } },
+      ),
+    ).rejects.toThrow(ForbiddenException);
   });
 
   // ─── listDoctorInbox ──────────────────────────────────────────────────────
@@ -258,12 +296,14 @@ describe('TriageService', () => {
     ).rejects.toThrow(ForbiddenException);
   });
 
-  it('14. listMySessions returns only caller sessions, excludes ARCHIVED', async () => {
+  it('14. listMySessions: returns caller sessions; ARCHIVED+doctorNote included, bare ARCHIVED excluded', async () => {
     const row = {
       id: 'sess-99',
       userId: 7,
       status: 'ACTIVE',
       matchScore: new (class { toNumber() { return 0.75; } })(),
+      doctorNote: null,
+      doctorRespondedAt: null,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       expiresAt: null,
@@ -277,9 +317,16 @@ describe('TriageService', () => {
     const svc = buildService();
     const res = await svc.listMySessions(7, 1, 20);
 
+    // where clause uses OR to include ARCHIVED sessions that have doctor notes
     expect(mockSymptomMatchSession.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: { userId: 7, status: { not: 'ARCHIVED' } },
+        where: {
+          userId: 7,
+          OR: [
+            { status: { not: 'ARCHIVED' } },
+            { status: 'ARCHIVED', doctorNote: { not: null } },
+          ],
+        },
       }),
     );
     expect(res.total).toBe(1);
@@ -287,6 +334,7 @@ describe('TriageService', () => {
     expect(res.items[0].matchScore).toBe(0.75);
     expect(res.items[0].matchedSymptomCount).toBe(1);
     expect(res.items[0].missingSymptomCount).toBe(2);
+    expect(res.items[0].doctorNote).toBeNull();
   });
 
   it('4. saveNote calls userDiseaseNote.upsert', async () => {

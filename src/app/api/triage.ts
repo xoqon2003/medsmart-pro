@@ -64,16 +64,18 @@ export const saveTriageNote = (sessionId: string, noteMd: string) =>
   });
 
 /**
- * Update triage session status (doctor side: archive after review).
+ * Update triage session status (doctor or patient side).
+ * Doctors can also pass `doctorNote` — the text response visible to the patient.
  * PATCH-like: POST /triage/sessions/:id/update
  */
 export const updateTriageSession = (
   sessionId: string,
   status: 'ACTIVE' | 'ARCHIVED' | 'EXPIRED',
+  doctorNote?: string,
 ) =>
   apiFetch(`/triage/sessions/${sessionId}/update`, {
     method: 'POST',
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, ...(doctorNote ? { doctorNote } : {}) }),
   });
 
 /**

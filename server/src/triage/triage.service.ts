@@ -338,7 +338,15 @@ export class TriageService {
     const l = Math.min(Math.max(limit, 1), 50);
     const skip = (p - 1) * l;
 
-    const where = { userId, status: { not: 'ARCHIVED' } };
+    // Include ARCHIVED sessions that have a doctor note (patient needs to see response)
+    // Exclude ARCHIVED sessions without doctor note (patient-archived / expired-archived)
+    const where = {
+      userId,
+      OR: [
+        { status: { not: 'ARCHIVED' as const } },
+        { status: 'ARCHIVED' as const, doctorNote: { not: null } },
+      ],
+    };
 
     const [total, rows] = await Promise.all([
       this.p.symptomMatchSession.count({ where }),
@@ -353,6 +361,8 @@ export class TriageService {
           matchedSymptoms: true,
           missingSymptoms: true,
           status: true,
+          doctorNote: true,
+          doctorRespondedAt: true,
           createdAt: true,
           updatedAt: true,
           expiresAt: true,
@@ -369,6 +379,8 @@ export class TriageService {
       matchedSymptoms: unknown;
       missingSymptoms: unknown;
       status: string;
+      doctorNote: string | null;
+      doctorRespondedAt: Date | null;
       createdAt: Date;
       updatedAt: Date;
       expiresAt: Date | null;
@@ -382,6 +394,8 @@ export class TriageService {
           ? (r.matchScore as { toNumber(): number }).toNumber()
           : Number(r.matchScore),
       status: r.status,
+      doctorNote: r.doctorNote ?? null,
+      doctorRespondedAt: r.doctorRespondedAt ?? null,
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
       expiresAt: r.expiresAt,
@@ -395,17 +409,41 @@ export class TriageService {
 
   // ─── updateSession ───────────────────────────────────────────────────────────
 
-  async updateSession(userId: number, sessionId: string, dto: UpdateSessionDto) {
+  async updateSession(
+    caller: { sub: number; role: string },
+    sessionId: string,
+    dto: UpdateSessionDto,
+  ) {
     const session = await this.p.symptomMatchSession.findUnique({
       where: { id: sessionId },
     });
     if (!session) throw new NotFoundException('Sessiya topilmadi');
-    if (session.userId !== userId) throw new ForbiddenException('Ruxsat yo\'q');
 
-    // Build update payload — only include fields present in DTO
+    const isOwner   = session.userId === caller.sub;
+    const isDoctor  = DOCTOR_ROLES.includes(caller.role as typeof DOCTOR_ROLES[number]);
+    const isAssignedDoctor = session.sentToDoctorId === caller.sub;
+
+    // Ownership / role check:
+    //  • Bemor (owner) — status va userAnswers yangilashi
+    //  • Shifokor (doctor role yoki tayinlangan) — doctorNote + status ARCHIVED
+    if (!isOwner && !isDoctor && !isAssignedDoctor) {
+      throw new ForbiddenException('Ruxsat yo\'q');
+    }
+
+    // Doctors cannot change userAnswers
+    if (!isOwner && dto.userAnswers !== undefined) {
+      throw new ForbiddenException('Shifokor simptom javoblarini o\'zgartira olmaydi');
+    }
+
+    // Build update payload
     const data: Record<string, unknown> = {};
-    if (dto.status !== undefined) data.status = dto.status;
-    if (dto.userAnswers !== undefined) data.userAnswers = dto.userAnswers;
+    if (dto.status      !== undefined) data.status      = dto.status;
+    if (dto.userAnswers !== undefined) data.userAnswers  = dto.userAnswers;
+
+    if (dto.doctorNote !== undefined && (isDoctor || isAssignedDoctor)) {
+      data.doctorNote        = dto.doctorNote.trim();
+      data.doctorRespondedAt = new Date();
+    }
 
     return this.p.symptomMatchSession.update({
       where: { id: sessionId },

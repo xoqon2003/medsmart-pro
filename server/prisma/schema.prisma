@@ -1510,6 +1510,8 @@ model SymptomMatchSession {
   userAnswers        Json
   status             MatchSessionStatus  @default(ACTIVE)
   sentToDoctorId     Int?
+  doctorNote         String?
+  doctorRespondedAt  DateTime?
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   expiresAt          DateTime
