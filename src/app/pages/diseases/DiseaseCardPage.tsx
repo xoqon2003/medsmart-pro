@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router';
 import { ArrowLeft } from 'lucide-react';
-import { useDiseaseDetail } from '../../hooks/useDiseases';
+import { useDiseaseDetail, useDiseaseScientists, useDiseaseResearch, useDiseaseGenetics } from '../../hooks/useDiseases';
 import { DiseaseCardHero } from '../../components/diseases/DiseaseCardHero';
 import { AudienceSwitcher } from '../../components/diseases/AudienceSwitcher';
 import { DiseaseCardTabs } from '../../components/diseases/DiseaseCardTabs';
@@ -39,6 +39,11 @@ export function DiseaseCardPage() {
   const [matcherOpen, setMatcherOpen] = useState(false);
 
   const { data: disease, isLoading, isError } = useDiseaseDetail(slug ?? '', audience);
+
+  // Metadata — PDF eksport uchun (kartada alohida seksiyalar orqali ham ko'rinadi)
+  const { data: scientists = [] } = useDiseaseScientists(slug ?? '');
+  const { data: research = [] } = useDiseaseResearch(slug ?? '');
+  const { data: genetics = [] } = useDiseaseGenetics(slug ?? '');
 
   if (isLoading) return <DiseaseCardSkeleton />;
 
@@ -85,7 +90,12 @@ export function DiseaseCardPage() {
       {/* Action row: audience switcher + PDF download */}
       <div className="flex items-center justify-between flex-wrap gap-2 mt-2">
         <AudienceSwitcher value={audience} onChange={setAudience} />
-        <DownloadPdfButton disease={disease} />
+        <DownloadPdfButton
+          disease={disease}
+          scientists={scientists}
+          research={research}
+          genetics={genetics}
+        />
       </div>
 
       {/* 8-tab content (GAP-02) */}
