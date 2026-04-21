@@ -5488,6 +5488,43 @@
         ]
       }
     },
+    "/api/v1/triage/my-sessions": {
+      "get": {
+        "operationId": "TriageController_listMySessions",
+        "parameters": [
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Joriy foydalanuvchining triage sessiyalari (bemor 'Mening kasalliklarim' uchun)",
+        "tags": [
+          "triage"
+        ]
+      }
+    },
     "/api/v1/triage/sessions/{id}/update": {
       "post": {
         "operationId": "TriageController_updateSession",
@@ -7466,6 +7503,14 @@
               "ARCHIVED",
               "EXPIRED"
             ]
+          },
+          "userAnswers": {
+            "type": "object",
+            "description": "Simptom javoblari (code → YES/NO/SOMETIMES/UNKNOWN)",
+            "example": {
+              "FEVER": "YES",
+              "COUGH": "NO"
+            }
           }
         }
       },
