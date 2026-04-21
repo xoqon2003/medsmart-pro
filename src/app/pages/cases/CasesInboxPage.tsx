@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Inbox, RefreshCw, ChevronRight, AlertCircle } from 'lucide-react';
+import { Inbox, RefreshCw, ChevronRight, AlertCircle, Archive } from 'lucide-react';
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { useDoctorInbox } from '../../hooks/useDoctorInbox';
 import type { InboxSession } from '../../api/triage';
+
+type InboxTab = 'SENT_TO_DOCTOR' | 'ARCHIVED';
 
 // ─── Yordamchi: match score rangi ────────────────────────────────────────────
 function scoreColor(pct: number) {
@@ -71,24 +73,39 @@ function SessionCard({ session, onClick }: { session: InboxSession; onClick: () 
 // ─── CasesInboxPage ───────────────────────────────────────────────────────────
 export function CasesInboxPage() {
   const navigate = useNavigate();
+  const [tab, setTab] = useState<InboxTab>('SENT_TO_DOCTOR');
   const [page, setPage] = useState(1);
   const LIMIT = 15;
 
   const { data, isLoading, isError, refetch, isFetching } = useDoctorInbox({
-    status: 'SENT_TO_DOCTOR',
+    status: tab,
     page,
     limit: LIMIT,
   });
 
   const totalPages = data ? Math.ceil(data.total / LIMIT) : 1;
 
+  const switchTab = (next: InboxTab) => {
+    if (next === tab) return;
+    setTab(next);
+    setPage(1);
+  };
+
+  const isArchive = tab === 'ARCHIVED';
+
   return (
     <div className="max-w-2xl mx-auto px-4 py-6 space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Inbox className="w-5 h-5 text-primary" />
-          <h1 className="text-xl font-semibold">Kelgan natijalar</h1>
+          {isArchive ? (
+            <Archive className="w-5 h-5 text-primary" />
+          ) : (
+            <Inbox className="w-5 h-5 text-primary" />
+          )}
+          <h1 className="text-xl font-semibold">
+            {isArchive ? 'Javob berilganlar' : 'Kelgan natijalar'}
+          </h1>
           {data && (
             <Badge variant="secondary" className="text-xs">
               {data.total}
@@ -103,6 +120,36 @@ export function CasesInboxPage() {
           aria-label="Yangilash"
         >
           <RefreshCw className={`w-4 h-4 text-muted-foreground ${isFetching ? 'animate-spin' : ''}`} />
+        </button>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 bg-muted/60 rounded-xl">
+        <button
+          type="button"
+          onClick={() => switchTab('SENT_TO_DOCTOR')}
+          className={[
+            'flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+            tab === 'SENT_TO_DOCTOR'
+              ? 'bg-white text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          ].join(' ')}
+        >
+          <Inbox className="w-3.5 h-3.5" />
+          Kelgan
+        </button>
+        <button
+          type="button"
+          onClick={() => switchTab('ARCHIVED')}
+          className={[
+            'flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
+            tab === 'ARCHIVED'
+              ? 'bg-white text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground',
+          ].join(' ')}
+        >
+          <Archive className="w-3.5 h-3.5" />
+          Javob berilgan
         </button>
       </div>
 
@@ -129,9 +176,19 @@ export function CasesInboxPage() {
       {/* Bo'sh holat */}
       {!isLoading && !isError && data?.items.length === 0 && (
         <div className="text-center py-16 text-muted-foreground space-y-2">
-          <Inbox className="w-12 h-12 mx-auto text-gray-300" />
-          <p className="font-medium">Hozircha natija yo'q</p>
-          <p className="text-sm">Bemor triage natijasini yuborganda bu yerda ko'rinadi.</p>
+          {isArchive ? (
+            <>
+              <Archive className="w-12 h-12 mx-auto text-gray-300" />
+              <p className="font-medium">Arxivda hech narsa yo'q</p>
+              <p className="text-sm">Siz javob bergan sessiyalar bu yerda ko'rinadi.</p>
+            </>
+          ) : (
+            <>
+              <Inbox className="w-12 h-12 mx-auto text-gray-300" />
+              <p className="font-medium">Hozircha natija yo'q</p>
+              <p className="text-sm">Bemor triage natijasini yuborganda bu yerda ko'rinadi.</p>
+            </>
+          )}
         </div>
       )}
 
