@@ -22,7 +22,12 @@ import {
   SymptomSeverity,
   TranslationStatus,
 } from '@prisma/client';
-import { migren, gipertoniya, gastrit, pnevmoniya, bexterev, stubs } from './fixtures';
+import {
+  migren, gipertoniya, gastrit, pnevmoniya, bexterev,
+  diabet2, bronxialAstma, depressiya, gipotiroidizm,
+  revmatoidArtrit, insult, buyrakToshlari, yurakEtishmovchiligi,
+  stubs,
+} from './fixtures';
 import type { DiseaseFixture, StubFixture } from './fixtures';
 
 const prisma = new PrismaClient();
@@ -197,6 +202,14 @@ async function main(): Promise<void> {
     gastrit,
     pnevmoniya,
     bexterev,
+    diabet2,
+    bronxialAstma,
+    depressiya,
+    gipotiroidizm,
+    revmatoidArtrit,
+    insult,
+    buyrakToshlari,
+    yurakEtishmovchiligi,
   ];
 
   // ── To'liq kasalliklar ──
