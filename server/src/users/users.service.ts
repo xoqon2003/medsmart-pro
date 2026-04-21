@@ -11,19 +11,20 @@ export class UsersService {
     private cache: CacheService,
   ) {}
 
+  /**
+   * Foydalanuvchilar ro'yxati — ommaviy, autentifikatsiyasiz.
+   * PII (telefon, telegramId) qaytarilmaydi.
+   * Asosan shifokorlar tanlovida (SendToDoctorDialog) ishlatiladi.
+   */
   async findAll(role?: string) {
     const where = role ? { role: role.toUpperCase() as UserRole } : {};
     return this.prisma.user.findMany({
       where,
       select: {
         id: true,
-        telegramId: true,
-        username: true,
-        phone: true,
         fullName: true,
+        username: true,
         role: true,
-        gender: true,
-        birthDate: true,
         city: true,
         language: true,
         isActive: true,
@@ -33,6 +34,9 @@ export class UsersService {
         rating: true,
         totalConclusions: true,
         createdAt: true,
+        // NOTE: phone, telegramId, gender, birthDate intentionally omitted
+        // (PII — not needed for public doctor listing).
+        // JwtGuard will be added in the next sprint per TODO in controller.
       },
     });
   }
