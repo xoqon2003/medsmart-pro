@@ -1192,7 +1192,7 @@ MedSmart-Pro_Kasalliklar_Moduli_TZ.md §23 dagi ro'yxat bilan sinxron. Quyidagi 
 - [ ] Audience visibility aniqlangan.
 - [ ] DiseaseSymptom weight va specificity to'g'ri (sum ≤ 1.2).
 
-### 18.4. Ilova D — Migration uchun SQL qisqacha
+### 18.4. Ilova D — Migration uchun SQL qisqacha (qisqartirilgan)
 
 ```sql
 -- 20260421_disease_kb_v2
@@ -1215,6 +1215,253 @@ CREATE TYPE "SessionStatus" AS ENUM ('DRAFT','SUBMITTED','UNDER_REVIEW','RESOLVE
 -- ... ScientistRole, ResearchType, InheritancePattern, BloodGroup
 ```
 
+### 18.5. Ilova E — Review bo'shliqlarini yopish (v2.0.1)
+
+Bu ilova **review natijasi bo'yicha** 5 ta aniqlangan bo'shliqni yopadi. Ilova asosiy TT bilan birga o'qilishi shart.
+
+#### E.1. To'liq 40+ marker ro'yxati (§10.1 kengaytmasi)
+
+§10.1 dagi `DISEASE_MARKERS` asosiy 32 marker oldindan sanab o'tilgan. Quyidagi **10 qo'shimcha marker** ro'yxatni to'ldiradi (jami **42 marker**):
+
+```ts
+// Qo'shimchalar (42 ga yetkazadi):
+  legalDisclaimer:      { label_uz: ["Muhim ogohlantirish", "Yuridik izoh"],       level: 'L1', audience: ['PATIENT', 'STUDENT', 'NURSE', 'DOCTOR'] },
+  educationResources:   { label_uz: ["O'quv materiallari", "Qo'shimcha adabiyot"],  level: 'L2', audience: ['STUDENT', 'NURSE', 'DOCTOR', 'SPECIALIST'] },
+  emergencyContacts:    { label_uz: ["Shoshilinch aloqa", "103 qachon chaqiriladi"],level: 'L1', audience: ['PATIENT', 'NURSE'] },
+  dietNutrition:        { label_uz: ["Parhez va ovqatlanish", "Oziq-ovqat tavsiyalari"], level: 'L1', audience: ['PATIENT', 'NURSE', 'DOCTOR'] },
+  rehabilitation:       { label_uz: ["Reabilitatsiya", "Tiklanish rejasi"],         level: 'L2', audience: ['PATIENT', 'NURSE', 'DOCTOR', 'SPECIALIST'] },
+  followUpProtocol:     { label_uz: ["Kuzatuv protokoli", "Qayta ko'rik tartibi"],  level: 'L2', audience: ['NURSE', 'DOCTOR'] },
+  screeningRecommendations: { label_uz: ["Skrining tavsiyalari", "Erta aniqlash"],  level: 'L2', audience: ['STUDENT', 'NURSE', 'DOCTOR'] },
+  comorbidities:        { label_uz: ["Birga keladigan kasalliklar", "Komorbidlik"], level: 'L2', audience: ['STUDENT', 'DOCTOR', 'SPECIALIST'] },
+  realWorldEvidence:    { label_uz: ["Amaliy dalillar", "Real-world evidence (RWE)", "Tajribadan kelgan natijalar"], level: 'L3', audience: ['DOCTOR', 'SPECIALIST'] },
+  patientEducationVideos: { label_uz: ["Bemor uchun video darslar", "Vizual ko'rsatmalar"], level: 'L1', audience: ['PATIENT', 'NURSE'] },
+```
+
+**Hammasi: 42 marker** (32 asosiy + 10 qo'shimcha). Kod manzili: `server/src/diseases/markers/markers.ts`.
+
+> **Muhim**: `realWorldEvidence` markeri "tajriba orqali tasdiqlangan" talab uchun alohida marker sifatida qo'shildi (foydalanuvchi promptidan); u `Reference.type = REAL_WORLD_STUDY` enum qiymati bilan bog'lanadi.
+
+#### E.2. Bemor "Anonim / Ochiq" tanlovi (yangi ekran va endpoint)
+
+**Yangi talab**: bemor o'z kasallik sessiyasini shifokorlar va talabalar ko'rsa, o'zini **anonim** (faqat yosh/jinsi) yoki **ochiq** (to'liq profil) ko'rsatish huquqiga ega bo'ladi.
+
+**UI (ekran)**:
+- Joylashuv: `SendToDoctor.tsx` dialogi ichida yangi `<PrivacyToggle>` komponent (chiroyli 2-variant switch).
+- `SymptomMatcherSheet` tugagan zahoti, "Shifokorga yuborish" tugmasi bosilganda dialog ochiladi. Dialog ichida:
+
+```
+┌──────────────────────────────────────────┐
+│ Shifokorga yuborish                      │
+│ ──────────────────────────────────────── │
+│ Ma'lumotlarimni qanday ko'rsataman?     │
+│                                          │
+│ ( ) Ochiq  — ism, yosh, anamnez to'liq  │
+│ (•) Anonim — faqat yosh/jinsi, kasallik │
+│                                          │
+│ Shifokor: [🔽 Dr. Nevropatolog Akbar]   │
+│                                          │
+│ [FHIR preview ko'rish]                   │
+│ [Bekor qilish]   [✔ Yuborish]            │
+└──────────────────────────────────────────┘
+```
+
+**Ma'lumotlar modeli (qo'shimcha)**:
+
+```prisma
+model SymptomMatchSession {
+  // … mavjud maydonlar
+  visibility   SessionVisibility @default(ANONYMOUS)
+  // ANONYMOUS  — patientId yuborilmaydi; yosh/jinsi only
+  // IDENTIFIED — to'liq profil
+}
+
+enum SessionVisibility { ANONYMOUS IDENTIFIED }
+```
+
+**API (yangi / o'zgartirilgan)**:
+
+```
+POST /api/v1/symptom-sessions/:id/submit
+  Body: {doctorId, visibility: "ANONYMOUS" | "IDENTIFIED", fhirJson}
+  Qoida: agar visibility=ANONYMOUS — backend `patientId` ni doctor-facing response'dan chiqarib tashlaydi,
+         lekin audit uchun o'zi saqlaydi (FHIR `subject.reference` → "Patient/anon-xxxx")
+
+GET  /api/v1/symptom-sessions/:id (DOCTOR bilan)
+  Resp (ANONYMOUS):     {id, ageRange, gender, matchScore, ddxTop5, sessionSymptoms[...]}
+  Resp (IDENTIFIED):    {id, patient: {fullName, dob, contacts}, …, matchScore, …}
+```
+
+**UC (yangi)**:
+
+```gherkin
+Scenario UC-13: Bemor anonim yuboradi
+  Given I am a PATIENT on SendToDoctor dialog
+  When I select "Anonim" mode
+  And  Click "Yuborish"
+  Then The FHIR QuestionnaireResponse has subject.reference = "Patient/anon-{hash}"
+  And  Doctor sees only ageRange, gender, symptoms — not fullName or contacts
+  And  Session.visibility = ANONYMOUS in DB
+```
+
+#### E.3. Chat/Telefon gaplashish — consent modeli
+
+**Yangi talab**: bemor "shifokor / talaba men bilan chat yoki telefon orqali gaplasha oladi" ruxsatini beradi. Talabalar — faqat `STUDENT` rolida, faqat ruxsat bergan sessiyalarda.
+
+**Ma'lumotlar modeli**:
+
+```prisma
+model SessionConsent {
+  id           String   @id @default(cuid())
+  sessionId    String
+  session      SymptomMatchSession @relation(fields: [sessionId], references: [id])
+  consentType  ConsentType  // CHAT_WITH_DOCTOR, CHAT_WITH_STUDENT, PHONE_CALL
+  granted      Boolean      @default(false)
+  grantedAt    DateTime?
+  revokedAt    DateTime?
+  phoneNumber  String?      // faqat PHONE_CALL bo'lsa, maskalangan
+  chatChannelId String?     // Chat module integratsiyasi uchun
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@unique([sessionId, consentType])
+}
+
+enum ConsentType {
+  CHAT_WITH_DOCTOR
+  CHAT_WITH_STUDENT
+  PHONE_CALL
+}
+```
+
+**API**:
+
+```
+POST /api/v1/symptom-sessions/:id/consents
+  Body: {consentType, granted, phoneNumber?}
+  Auth: PATIENT (owner)
+
+DELETE /api/v1/symptom-sessions/:id/consents/:consentType
+  Auth: PATIENT (owner) — ruxsatni qaytarib olish
+
+GET /api/v1/symptom-sessions/:id/chat-channel
+  Resp: {channelId, wsUrl, participants[]}
+  Qoida: faqat consent.granted=true bo'lsa javob beradi
+         aks holda 403 Forbidden
+```
+
+**UI**:
+- `DiseaseCard.tsx` oxiridagi CTA joyida yangi `<ConsentToggle>` (uchta checkbox):
+  - ☐ Shifokor men bilan chat orqali gaplasha oladi
+  - ☐ Talaba (anonim holda) men bilan gaplasha oladi
+  - ☐ Telefon raqamimni shifokorga berish (opsional: `+998 XX *** XX XX`)
+- `IncomingCasePanel.tsx` ichida har sessiya uchun kichik ikonka: 💬 (chat), 📞 (phone) — agar ruxsat bo'lsa yoqilgan.
+- `CaseDetailScreen.tsx` — "Chat boshlash" tugmasi faqat `CHAT_WITH_DOCTOR.granted=true` bo'lganda.
+
+**Chat module integratsiyasi**:
+- Disease-KB moduli Chat module (alohida, `server/src/chat/`) bilan faqat `chatChannelId` orqali bog'lanadi.
+- WebSocket namespace: `/ws/case-chat/:sessionId`.
+
+**UC (yangi)**:
+
+```gherkin
+Scenario UC-14: Bemor chat ruxsatini beradi
+  Given I am a PATIENT viewing /disease/migraine?sessionId=abc
+  When I check "Shifokor men bilan chat orqali gaplasha oladi"
+  And  Click "Saqlash"
+  Then POST /symptom-sessions/abc/consents is called with CHAT_WITH_DOCTOR granted=true
+  And  Doctor sees a 💬 icon on the case card
+  When Doctor clicks "Chat boshlash"
+  Then A WebSocket channel /ws/case-chat/abc opens
+  And  Both participants join
+```
+
+#### E.4. Bemor summary pre-fill — "ariza"ga chiqishi algoritmi
+
+**Yangi talab (asl promptdan)**: *"Bemor uchun qaysi kassalik diagnozning qaysi qismini birinchi ko'rishi kerak? Kerak bo'lsa o'zi ko'proq ma'lumotga ega bo'lib o'zini tekshirib ko'rsin, aniqlik kiritsin, chuqur belgilagan ma'lumotlarini o'zi arizaga chiqsin."*
+
+**Mantiq** (backend service `DiseasePresentationService.buildPatientSummary(sessionId)`):
+
+1. **Priority 1 (red flag)**: agar sessiyada `redFlag` simptom bo'lsa — **`emergencyContacts`** + **`whenToSeeDoctor`** bloklari birinchi.
+2. **Priority 2 (patient-first bloklar)** — quyidagi tartibda ko'rsatiladi:
+   1. `generalInfo` (Umumiy ma'lumot, 2-3 jumla)
+   2. `clinicalSigns` (Belgilar) — **faqat bemor belgilagan simptomlar highlight** qilingan
+   3. `whenToSeeDoctor` (Qachon shifokorga borish)
+   4. `doNot` (Nimalar mumkin emas)
+   5. `recommended` (Tavsiya etiladi)
+   6. `prevention` (Profilaktika)
+   7. `patientFAQ` (Bemor savollari)
+3. **Priority 3 (expand-on-demand)**: `etiology`, `pathogenesis`, `classification` — "Batafsil o'qish" tugmasi ostida collapsed.
+
+**"Arizaga chiqishi"** (user phrase) — bu **summary object** `Application` moduli (asl `ariza`)ga ham uzatiladi:
+
+```ts
+interface PatientSummaryForApplication {
+  sessionId: string;
+  topDiagnosis: { slug: string; nameUz: string; icd10: string; probability: number };
+  matchedSymptoms: { code: string; nameUz: string; response: 'HAS' | 'UNSURE' }[];
+  redFlags: string[];       // bo'sh bo'lishi mumkin
+  recommendedSpecialist: string;
+  recommendedTests: string[];
+  urgency: 'EMERGENCY' | 'URGENT' | 'ROUTINE';
+  selectedBlocks: { marker: string; label: string; excerpt: string }[];  // bemor belgilagan bloklar
+  privacyMode: 'ANONYMOUS' | 'IDENTIFIED';
+  consents: ConsentType[];
+}
+```
+
+**API**:
+
+```
+GET /api/v1/symptom-sessions/:id/patient-summary
+  Resp: PatientSummaryForApplication
+  Qoida: ariza (Application) yaratilganda bu object `ApplicationDraft.payload` ga ko'chiriladi.
+
+POST /api/v1/applications (mavjud Application modulidagi endpoint, qo'shimcha payload maydoni)
+  Body: { …mavjud fields, diseaseSummary?: PatientSummaryForApplication }
+```
+
+**UI ekranda** (DiseaseCard sticky bottom):
+
+```
+┌─────────────────────────────────────────────┐
+│ [✔ 4/12 simptom belgilandi]  [Shifokor →] │
+│                                              │
+│ [⚑ Ariza bilan birga yuborish]               │
+└─────────────────────────────────────────────┘
+```
+
+`[⚑ Ariza bilan birga yuborish]` — bosilganda `Application` yangi arizasi avtomatik ravishda ushbu sessiya summary bilan ochiladi (pre-filled).
+
+#### E.5. Bemor uchun birinchi ekran: "Ariza preview" kartasi
+
+`Application` (ariza) modulining natija sahifasi (`/application/:id`) endi quyidagi blokni ham ko'rsatadi:
+
+```
+┌─────────────────────────────────────────────┐
+│ AI Tavsiya natijasi — Migren (G43.9, 86%)   │
+│ ─────────────────────────────────────────── │
+│ Belgilagan simptomlaringiz: 4/12            │
+│ Shoshilinch daraja: REJALI (24-48 soat)    │
+│ Tavsiya etilgan mutaxassis: Nevropatolog    │
+│ Tavsiya etilgan tahlillar:                  │
+│   • Nevrologik tekshiruv                    │
+│   • Bosh MRT (zarur bo'lsa)                 │
+│                                              │
+│ [Kasallik kartasini qayta ochish]           │
+│ [Simptom ro'yxatini yangilash]              │
+└─────────────────────────────────────────────┘
+```
+
+Bu blok `<PatientSummaryCard>` React komponenti orqali render qilinadi (yo'l: `src/app/components/screens/patient/PatientSummaryCard.tsx`).
+
+---
+
+**Ilova E statusi**: v2.0.1 patch, barcha 5 review bo'shlig'ini yopadi.
+
+**Yakuniy marker soni**: 42 (§18.5.1 + §10.1).
+**Yakuniy UC soni**: 14 (§5 + UC-13, UC-14).
+**Yakuniy yangi model soni**: 4 (DiseaseScientist, DiseaseResearch, DiseaseGenetic, SessionConsent).
+**Yakuniy yangi enum soni**: 8 (ScientistRole, ResearchType, InheritancePattern, BloodGroup, SymptomResponse, SessionStatus, SessionVisibility, ConsentType).
+
 ---
 
 ## 19. YAKUNIY TASDIQLASH
@@ -1230,6 +1477,7 @@ Ushbu hujjat **canonical source of truth** — Disease KB modulini yakunlash bo'
 **Tasdiqlovchilar**: Product Owner (PM) · Tech Lead · Medical Director (professor) · QA Lead.
 
 **Hujjat versiya jurnali**:
+- v2.0.1 (2026-04-21): patch — Ilova E qo'shildi; 5 ta review bo'shlig'i yopildi (42 marker, RWE, anonim toggle, chat consent, summary pre-fill).
 - v2.0 (2026-04-20): birinchi consolidated version, gap analizdan keyin.
 - v1.0 (2026-04-17): eski TZ (MedSmart-Pro_Kasalliklar_Moduli_TZ.md), 26 bo'lim.
 
