@@ -1,0 +1,36 @@
+{
+  "name": "@medsmart/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./disease": {
+      "types": "./src/disease.ts",
+      "default": "./src/disease.ts"
+    },
+    "./symptom": {
+      "types": "./src/symptom.ts",
+      "default": "./src/symptom.ts"
+    },
+    "./triage": {
+      "types": "./src/triage.ts",
+      "default": "./src/triage.ts"
+    },
+    "./matcher-wizard": {
+      "types": "./src/matcher-wizard.ts",
+      "default": "./src/matcher-wizard.ts"
+    }
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

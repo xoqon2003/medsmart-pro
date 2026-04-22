@@ -10,6 +10,9 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@medsmart/types": "workspace:*"
+  },
   "devDependencies": {
     "@tailwindcss/vite": "4.1.12",
     "@types/react": "^18.3.12",
