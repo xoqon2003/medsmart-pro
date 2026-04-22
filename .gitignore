@@ -60,9 +60,6 @@ dist/
 .turbo/
 .vite/
 
-# Generatsiya qilingan tiplar — OpenAPI'dan regen bo'ladi
-# src/app/types/api.generated.ts  ← agar regen flow barqaror bo'lsa uncomment qiling
-
 # Test coverage artefaktlari
 coverage/
 server/coverage/
