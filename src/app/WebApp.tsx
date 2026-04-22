@@ -79,7 +79,22 @@ import { WebKassaHistoryScreen } from './components/screens/web/WebKassaHistoryS
 // ── Web screen router ────────────────────────────────────────────────────────
 
 function WebAppContent() {
-  const { currentScreen } = useApp();
+  const { currentScreen, currentUser } = useApp();
+
+  // Safety guard: agar currentScreen `web_*` emas (masalan, mobile'dagi
+  // 'role_select' leak qilgan bo'lsa) — autentifikatsiya holatiga qarab
+  // to'g'ri screen'ga yo'naltiramiz. Bu web ↔ mobile collision'ni blokirlaydi.
+  const isWebScreen = typeof currentScreen === 'string' && currentScreen.startsWith('web_');
+  if (!isWebScreen) {
+    if (import.meta.env.DEV) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[WebApp] Non-web screen "${String(currentScreen)}" detected in web context; ` +
+        `falling back to ${currentUser ? 'web_dashboard' : 'web_login'}.`,
+      );
+    }
+    return currentUser ? <WebPlatformDashboard /> : <WebPlatformLogin />;
+  }
 
   switch (currentScreen) {
 
@@ -231,10 +246,20 @@ function WebAppContent() {
     case 'web_kassa_history':
       return <WebKassaHistoryScreen />;
 
-    // ── Login (default) ──
+    // ── Login ──
     case 'web_login':
-    default:
       return <WebPlatformLogin />;
+
+    // ── Default: noma'lum `web_*` screen — auth holatiga qarab dashboard/login ──
+    default:
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `[WebApp] Unmatched web screen "${String(currentScreen)}"; ` +
+          `falling back to ${currentUser ? 'dashboard' : 'login'}.`,
+        );
+      }
+      return currentUser ? <WebPlatformDashboard /> : <WebPlatformLogin />;
   }
 }
 

@@ -411,13 +411,18 @@ export function WebPlatformLayout({ children, title, subtitle }: WebPlatformLayo
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Mini app ga o'tish */}
-            <button onClick={() => navigate('role_select')} title="Mini ilovaga o'tish"
+            {/* Telegram mini-app — tashqi link (web va TMA — alohida yuzalar) */}
+            <a
+              href={import.meta.env.VITE_TELEGRAM_BOT_URL ?? 'https://t.me/MedSmartProBot'}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Telegram mini-ilovada ochish"
               className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors
-                ${dark ? 'text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700' : 'text-gray-500 hover:bg-gray-100 border border-gray-200'}`}>
+                ${dark ? 'text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-700' : 'text-gray-500 hover:bg-gray-100 border border-gray-200'}`}
+            >
               <Globe className="w-3.5 h-3.5" />
-              Mini App
-            </button>
+              Telegram'da
+            </a>
 
             {/* Bildirishnomalar */}
             <button onClick={() => navigate('web_notifications')} className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">

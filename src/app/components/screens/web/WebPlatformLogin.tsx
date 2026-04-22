@@ -475,16 +475,20 @@ export function WebPlatformLogin() {
                     ))}
                   </div>
 
-                  {/* Mini app o'tish */}
+                  {/* Telegram mini-ilovaga o'tish — tashqi link */}
                   <div className="mt-6 p-3 rounded-xl border border-slate-700/40 bg-slate-800/30 flex items-center justify-between">
                     <div>
-                      <p className="text-slate-300 text-xs font-medium">Mini ilovaga o'tish</p>
-                      <p className="text-slate-600 text-xs">Telegram / Mobil versiya</p>
+                      <p className="text-slate-300 text-xs font-medium">Telegram mini-ilova</p>
+                      <p className="text-slate-600 text-xs">Telegram'da ochish</p>
                     </div>
-                    <button onClick={() => navigate('role_select')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs transition-colors">
-                      O'tish <ChevronRight className="w-3 h-3" />
-                    </button>
+                    <a
+                      href={import.meta.env.VITE_TELEGRAM_BOT_URL ?? 'https://t.me/MedSmartProBot'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs transition-colors"
+                    >
+                      Ochish <ChevronRight className="w-3 h-3" />
+                    </a>
                   </div>
                 </motion.div>
               )}
