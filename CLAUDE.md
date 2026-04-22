@@ -106,3 +106,41 @@ server/src/
 ## Faol ish
 
 - **Disease KB moduli** — `docs/analysis/feature-analysis.md` + `docs/analysis/implementation-plan.md`. MVP: 50 kasallik × L1 × uz tilida. Flag: `APP_FEATURE_DISEASE_KB`.
+
+## Lessons (Claude uchun) — 2026-04-21
+
+### Claude Code infrastruktura
+- **Subagent'lar**: `.claude/agents/` — `code-reviewer`, `security-auditor`, `api-builder`, `db-migrator`, `test-writer`, `tg-integration-specialist`, `phi-guardian`.
+- **Skills**: `.claude/skills/` — `pr-review`, `pre-deploy`, `mock-to-real`.
+- **Hooks**: `.claude/hooks/` — `phi-scanner.sh` (PreToolUse), `secret-scanner.sh` (PreToolUse), `lint-after-edit.sh` (PostToolUse).
+- **MCP**: `postgres`, `github`, `playwright`, `context7` (`.claude/settings.json`).
+
+### Ish oqimi qoidalari
+1. **Yangi modul** → `api-builder` subagent chaqirilsin, triage template'iga mos fayl to'plami yaratsin.
+2. **Schema o'zgarsa** → `db-migrator` subagent. `prisma migrate dev --name <verb>_<target>`.
+3. **Test yozish** → `test-writer`. Mock Prisma + `$transaction` mock + 80% coverage.
+4. **Deploy oldi** → `pre-deploy` skill (`/skill pre-deploy`).
+5. **PR review** → `pr-review` skill (code-reviewer + security-auditor + phi-guardian).
+6. **PHI/Supabase** — yozishdan oldin `phi-scanner.sh` hook BLOCKER chiqaradi; `phi-guardian` subagent yopiq audit.
+
+### Telegram Mini-App
+- `packages/tg-auth/src/verify.ts` — HMAC-SHA256 verifier.
+- `server/src/tg-auth/` — `/api/v1/tg-auth/login` endpoint.
+- `apps/telegram-miniapp/` — Vite + React + `@telegram-apps/sdk-react@^3`.
+- `apps/bot/` — grammY bot.
+- `User.telegramId` — alohida migration, `@unique`.
+
+### Foydali buyruqlar
+```bash
+# Migration yangi
+pnpm --dir server exec prisma migrate dev --name <verb>_<target>
+
+# Test (watch)
+pnpm --dir server test --watch <module>
+
+# OpenAPI qayta generatsiya
+pnpm --dir server run openapi:generate
+
+# Frontend type regen
+pnpm dlx openapi-typescript server/openapi.json -o src/app/types/api.generated.ts
+```
