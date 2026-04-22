@@ -36,6 +36,10 @@ import { KbModerationModule } from './kb-moderation/kb-moderation.module';
 import { TriageModule } from './triage/triage.module';
 import { ClinicalToolsModule } from './clinical-tools/clinical-tools.module';
 import { ChatModule } from './chat/chat.module';
+import { ConsultationModule } from './consultation/consultation.module';
+import { HomeVisitModule } from './home-visit/home-visit.module';
+import { RadiologyModule } from './radiology/radiology.module';
+import { TgAuthModule } from './tg-auth/tg-auth.module';
 
 @Module({
   imports: [
@@ -82,6 +86,10 @@ import { ChatModule } from './chat/chat.module';
     TriageModule,
     ClinicalToolsModule,
     ChatModule,
+    ConsultationModule,
+    HomeVisitModule,
+    RadiologyModule,
+    TgAuthModule,
   ],
   providers: [
     // Global rate limiter

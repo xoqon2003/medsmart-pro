@@ -6626,6 +6626,453 @@
           "clinical-tools-admin"
         ]
       }
+    },
+    "/api/v1/consultation": {
+      "post": {
+        "operationId": "ConsultationController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConsultationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Yangi konsultatsiya so'rovi yaratish",
+        "tags": [
+          "consultation"
+        ]
+      },
+      "get": {
+        "operationId": "ConsultationController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Foydalanuvchi konsultatsiyalar ro'yxati (paginated)",
+        "tags": [
+          "consultation"
+        ]
+      }
+    },
+    "/api/v1/consultation/{id}": {
+      "get": {
+        "operationId": "ConsultationController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Konsultatsiya tafsilotlari",
+        "tags": [
+          "consultation"
+        ]
+      },
+      "patch": {
+        "operationId": "ConsultationController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConsultationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Konsultatsiyani yangilash",
+        "tags": [
+          "consultation"
+        ]
+      }
+    },
+    "/api/v1/consultation/{id}/cancel": {
+      "patch": {
+        "operationId": "ConsultationController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelConsultationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bekor qilish",
+        "tags": [
+          "consultation"
+        ]
+      }
+    },
+    "/api/v1/home-visit": {
+      "post": {
+        "operationId": "HomeVisitController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateHomeVisitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Uy-vizit arizasi yaratish",
+        "tags": [
+          "home-visit"
+        ]
+      },
+      "get": {
+        "operationId": "HomeVisitController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Uy-vizit arizalari ro'yxati (paginated)",
+        "tags": [
+          "home-visit"
+        ]
+      }
+    },
+    "/api/v1/home-visit/{id}": {
+      "get": {
+        "operationId": "HomeVisitController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Bitta uy-vizit tafsilotlari",
+        "tags": [
+          "home-visit"
+        ]
+      },
+      "patch": {
+        "operationId": "HomeVisitController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateHomeVisitDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Uy-vizitni yangilash",
+        "tags": [
+          "home-visit"
+        ]
+      }
+    },
+    "/api/v1/radiology": {
+      "post": {
+        "operationId": "RadiologyController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRadiologyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Radiologik ariza yaratish",
+        "tags": [
+          "radiology"
+        ]
+      },
+      "get": {
+        "operationId": "RadiologyController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Radiologik arizalar ro'yxati (paginated)",
+        "tags": [
+          "radiology"
+        ]
+      }
+    },
+    "/api/v1/radiology/{id}": {
+      "get": {
+        "operationId": "RadiologyController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Radiologik ariza tafsilotlari",
+        "tags": [
+          "radiology"
+        ]
+      }
+    },
+    "/api/v1/radiology/{id}/assign": {
+      "patch": {
+        "operationId": "RadiologyController_assign",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignRadiologistDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Radiologni tayinlash",
+        "tags": [
+          "radiology"
+        ]
+      }
+    },
+    "/api/v1/radiology/{id}/study": {
+      "patch": {
+        "operationId": "RadiologyController_uploadStudy",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadStudyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tekshiruv ma'lumotlarini yuklash",
+        "tags": [
+          "radiology"
+        ]
+      }
+    },
+    "/api/v1/tg-auth/login": {
+      "post": {
+        "operationId": "TgAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TgLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Telegram initData orqali login — JWT qaytaradi",
+        "tags": [
+          "tg-auth"
+        ]
+      }
     }
   },
   "info": {
@@ -9014,6 +9461,254 @@
         "required": [
           "clinicId",
           "isActive"
+        ]
+      },
+      "CreateConsultationDto": {
+        "type": "object",
+        "properties": {
+          "doctorId": {
+            "type": "string"
+          },
+          "slotId": {
+            "type": "string"
+          },
+          "consultType": {
+            "type": "string",
+            "enum": [
+              "OFFLINE",
+              "ONLINE",
+              "PHONE",
+              "VIDEO"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "doctorId",
+          "slotId",
+          "consultType"
+        ]
+      },
+      "UpdateConsultationDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "CONFIRMED",
+              "IN_PROGRESS",
+              "COMPLETED",
+              "RESCHEDULED"
+            ]
+          },
+          "meetingUrl": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "comment": {
+            "type": "string"
+          },
+          "isPaid": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CancelConsultationDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "CreateHomeVisitDto": {
+        "type": "object",
+        "properties": {
+          "hvAddress": {
+            "type": "string"
+          },
+          "hvClinicName": {
+            "type": "string"
+          },
+          "hvDoctorName": {
+            "type": "string"
+          },
+          "hvDoctorSpeciality": {
+            "type": "string"
+          },
+          "hvVisitDay": {
+            "type": "string"
+          },
+          "hvTimeSlot": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "URGENT",
+              "EMERGENCY"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "hvAddress",
+          "price"
+        ]
+      },
+      "UpdateHomeVisitDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "PAID_PENDING",
+              "ACCEPTED",
+              "EXTRA_INFO_NEEDED",
+              "WITH_SPECIALIST",
+              "CONCLUSION_WRITING",
+              "DONE",
+              "FAILED",
+              "ARCHIVED",
+              "HV_ONWAY",
+              "HV_ARRIVED"
+            ]
+          },
+          "hvVisitDay": {
+            "type": "string"
+          },
+          "hvTimeSlot": {
+            "type": "string"
+          },
+          "hvAddress": {
+            "type": "string"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "ratingComment": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateRadiologyDto": {
+        "type": "object",
+        "properties": {
+          "scanType": {
+            "type": "string",
+            "example": "CT"
+          },
+          "organ": {
+            "type": "string",
+            "example": "chest"
+          },
+          "scanFacility": {
+            "type": "string"
+          },
+          "scanDate": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "serviceType": {
+            "type": "string",
+            "enum": [
+              "AI_RADIOLOG",
+              "RADIOLOG_ONLY",
+              "RADIOLOG_SPECIALIST"
+            ]
+          },
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "NORMAL",
+              "URGENT",
+              "EMERGENCY"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "scanType",
+          "price"
+        ]
+      },
+      "AssignRadiologistDto": {
+        "type": "object",
+        "properties": {
+          "radiologistId": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "radiologistId"
+        ]
+      },
+      "UploadStudyDto": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string"
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          },
+          "originalName": {
+            "type": "string"
+          },
+          "scanDate": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "bucket",
+          "path",
+          "mimeType",
+          "sizeBytes",
+          "originalName"
+        ]
+      },
+      "TgLoginDto": {
+        "type": "object",
+        "properties": {
+          "initData": {
+            "type": "string",
+            "description": "window.Telegram.WebApp.initData raw string",
+            "example": "query_id=AAHd...&user=%7B%22id%22%3A42%7D&auth_date=1712345678&hash=abc..."
+          }
+        },
+        "required": [
+          "initData"
         ]
       }
     }
