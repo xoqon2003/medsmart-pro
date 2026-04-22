@@ -33,3 +33,56 @@ pnpm-debug.log*
 
 .vercel
 .github/workflows/
+
+# Backup arxivlar
+Delop_qilingani.7z
+Delop_qilingani.zip
+*.7z
+*.zip
+
+# Office lock fayllari
+~$*.docx
+~$*.xlsx
+~$*.pptx
+
+# Lokal dev env
+server/.env.development.local
+server/.env.local
+server/.env.*.local
+
+# Docker volumes
+docker-data/
+pg-data/
+
+# Build artefaktlar
+server/dist/
+dist/
+.turbo/
+.vite/
+
+# Generatsiya qilingan tiplar — OpenAPI'dan regen bo'ladi
+# src/app/types/api.generated.ts  ← agar regen flow barqaror bo'lsa uncomment qiling
+
+# Test coverage artefaktlari
+coverage/
+server/coverage/
+.nyc_output/
+*.lcov
+
+# Log fayllari
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Editor cache
+.vscode/*.log
+.idea/workspace.xml
+.idea/tasks.xml
+*.swp
+*.swo
+
+# OS artefaktlar
+.DS_Store
+Thumbs.db
+desktop.ini
