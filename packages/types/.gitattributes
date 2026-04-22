@@ -1,0 +1,3 @@
+# OpenAPI-generated: do not edit by hand. Regenerate via
+#   pnpm --filter @medsmart/types generate
+src/generated.ts linguist-generated=true diff=minimal

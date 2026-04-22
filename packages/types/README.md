@@ -5,11 +5,20 @@ and — eventually — Capacitor mobile).
 
 ## Nimani o'z ichiga oladi
 
+**Handwritten domen tiplari:**
 - `disease` — kasallik ro'yxati, detail, bloklari, KB v2 metadatasi
   (olim, tadqiqot, genetika)
 - `symptom` — SymptomListItem + DiseaseSymptomWithWeight (og'irlik bilan)
 - `triage` — AnswerValue, TriageMatchRequest/Result/Session
 - `matcher-wizard` — 4-bosqichli wizard state (symptoms → risk → timeline → DDx)
+
+**OpenAPI'dan avtomatik:**
+- `generated` — `paths`, `components`, `operations` — `server/openapi.json`'dan
+  `openapi-typescript` bilan emit qilinadi. Qayta generate qilish:
+  ```bash
+  pnpm --filter @medsmart/types generate
+  ```
+  Fayl `linguist-generated=true` flag bilan belgilangan (diff gigiyenasi).
 
 ## Source strategy
 
@@ -49,9 +58,27 @@ import type { DiseaseDetail } from '@medsmart/types/disease';
 import qiladi — bu i18n runtime bog'liqlik. Uni bu paketga ko'chirish
 i18n ni ham shared paketga aylantirishni talab qiladi — bu keyingi phase.
 
-## Keyingi qadamlar (Phase 3.2+)
+## OpenAPI'dan tiplarni ishlatish
 
-- **3.2** `server/scripts/generate-openapi.ts` + `openapi-typescript` →
-  `packages/types/src/generated.ts` (backend kontrakti avtomatik sinkron).
+```ts
+import type { paths, components } from '@medsmart/types';
+
+// Endpoint response
+type GetDiseaseResp =
+  paths['/api/v1/diseases/{id}']['get']['responses']['200']['content']['application/json'];
+
+// Schema komponenti (DTO)
+type DiseaseDto = components['schemas']['DiseaseDto'];
+```
+
+Yoki to'g'ridan-to'g'ri:
+```ts
+import type { operations } from '@medsmart/types/generated';
+```
+
+## Keyingi qadamlar (Phase 3.3+)
+
 - **3.3** `packages/api-client/` — `apiClient.ts` ni workspace'ga ko'chirish,
-  bu paketdan tiplar iste'mol qilish.
+  bu paketdan `paths[...]` tiplari bilan type-safe HTTP wrapper yaratish.
+- **3.4** Consumer surfaces (`apps/web/`, `apps/telegram-miniapp/`) yangi
+  shared paketga o'tadi.

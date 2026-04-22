@@ -25,12 +25,18 @@
     "./matcher-wizard": {
       "types": "./src/matcher-wizard.ts",
       "default": "./src/matcher-wizard.ts"
+    },
+    "./generated": {
+      "types": "./src/generated.ts",
+      "default": "./src/generated.ts"
     }
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate": "openapi-typescript ../../server/openapi.json -o src/generated.ts"
   },
   "devDependencies": {
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "openapi-typescript": "^7.13.0"
   }
 }

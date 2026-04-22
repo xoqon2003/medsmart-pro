@@ -332,6 +332,9 @@ importers:
 
   packages/types:
     devDependencies:
+      openapi-typescript:
+        specifier: ^7.13.0
+        version: 7.13.0(typescript@5.9.3)
       typescript:
         specifier: ^5.0.0
         version: 5.9.3
