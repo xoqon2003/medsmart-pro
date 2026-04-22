@@ -83,3 +83,4 @@ yarn-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+test-results/
