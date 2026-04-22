@@ -59,8 +59,12 @@ export function DoctorPublicProfile() {
             certificates: [
               { id: '1', doctorId: String(doc.id), name: `${doc.specialty || 'Tibbiyot'} bo'yicha malaka oshirish`, organization: 'Toshkent TTA', direction: doc.specialty || 'Umumiy', year: 2023, isVerified: true },
             ],
+            isPublic: true,
+            isBusinessAccount: false,
             totalConsultations: doc.totalConclusions || 100,
             totalOperations: Math.floor((doc.totalConclusions || 100) / 3),
+            onlineConsultations: Math.floor((doc.totalConclusions || 100) * 0.6),
+            offlineConsultations: Math.floor((doc.totalConclusions || 100) * 0.4),
             averageRating: doc.rating || 4.5,
             totalRatings: Math.floor((doc.totalConclusions || 100) * 0.6),
             user: { id: doc.id, fullName: doc.fullName, specialty: doc.specialty, avatar: doc.avatar, isOnline: true, verificationStatus: 'verified' as any },
@@ -102,8 +106,12 @@ export function DoctorPublicProfile() {
               certificates: [
                 { id: '1', doctorId: String(currentUser.id), name: `${currentUser.specialty || 'Tibbiyot'} bo'yicha malaka oshirish`, organization: 'Toshkent TTA', direction: currentUser.specialty || 'Umumiy', year: 2023, isVerified: true },
               ],
+              isPublic: true,
+              isBusinessAccount: false,
               totalConsultations: currentUser.totalConclusions || 312,
               totalOperations: Math.floor((currentUser.totalConclusions || 312) / 3),
+              onlineConsultations: Math.floor((currentUser.totalConclusions || 312) * 0.7),
+              offlineConsultations: Math.floor((currentUser.totalConclusions || 312) * 0.3),
               averageRating: currentUser.rating || 4.85,
               totalRatings: Math.floor((currentUser.totalConclusions || 312) * 0.6),
               user: { id: currentUser.id, fullName: currentUser.fullName, specialty: currentUser.specialty, avatar: currentUser.avatar, isOnline: true, verificationStatus: 'verified' as any },
@@ -385,19 +393,19 @@ export function DoctorPublicProfile() {
                   )}
                 </h3>
                 <div className="flex gap-3">
-                  {profile.socialLinks.telegram && (
+                  {profile.socialLinks?.telegram && (
                     <a href={`https://t.me/${profile.socialLinks.telegram.replace('@', '')}`}
                        className="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center">
                       <Send size={16} className="text-sky-500" />
                     </a>
                   )}
-                  {profile.socialLinks.instagram && (
+                  {profile.socialLinks?.instagram && (
                     <a href={`https://instagram.com/${profile.socialLinks.instagram.replace('@', '')}`}
                        className="w-10 h-10 rounded-xl bg-pink-50 flex items-center justify-center">
                       <Instagram size={16} className="text-pink-500" />
                     </a>
                   )}
-                  {profile.socialLinks.youtube && (
+                  {profile.socialLinks?.youtube && (
                     <a href={profile.socialLinks.youtube}
                        className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center">
                       <Youtube size={16} className="text-red-500" />

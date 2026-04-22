@@ -23,14 +23,14 @@ function sym(
   opts: { isRedFlag?: boolean; isExcluding?: boolean } = {},
 ): DiseaseSymptomWithWeight {
   return {
+    id: code,
     code,
     weight,
     isRedFlag: opts.isRedFlag ?? false,
     isExcluding: opts.isExcluding ?? false,
     nameUz: code,
-    nameRu: null,
+    category: 'general',
     isRequired: false,
-    description: null,
   };
 }
 

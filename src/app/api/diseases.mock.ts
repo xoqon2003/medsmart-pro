@@ -887,7 +887,13 @@ function newId(prefix: string): string {
 
 export async function mockCreateScientist(
   diseaseIdOrSlug: string,
-  input: Omit<DiseaseScientist, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'orderIndex'> & {
+  input: Omit<DiseaseScientist, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'orderIndex' | 'country' | 'birthYear' | 'deathYear' | 'bioMd' | 'contributionsMd' | 'photoUrl'> & {
+    country?: string | null;
+    birthYear?: number | null;
+    deathYear?: number | null;
+    bioMd?: string | null;
+    contributionsMd?: string | null;
+    photoUrl?: string | null;
     orderIndex?: number;
   },
 ): Promise<DiseaseScientist> {
@@ -942,7 +948,11 @@ export async function mockDeleteScientist(
 
 export async function mockCreateResearch(
   diseaseIdOrSlug: string,
-  input: Omit<DiseaseResearch, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'evidenceLevel' | 'isLandmark'> & {
+  input: Omit<DiseaseResearch, 'id' | 'diseaseId' | 'createdAt' | 'updatedAt' | 'evidenceLevel' | 'isLandmark' | 'journal' | 'doi' | 'pubmedId' | 'nctId'> & {
+    journal?: string | null;
+    doi?: string | null;
+    pubmedId?: string | null;
+    nctId?: string | null;
     evidenceLevel?: 'A' | 'B' | 'C' | 'D';
     isLandmark?: boolean;
   },

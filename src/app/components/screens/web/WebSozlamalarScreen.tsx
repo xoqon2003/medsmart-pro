@@ -11,7 +11,8 @@ import {
   Monitor, Globe, Check, ChevronRight, Eye, EyeOff,
   Save, RefreshCw, LogOut, Trash2, Plus, ExternalLink,
   Sun, Moon, Languages, Clock, CreditCard, AlertTriangle,
-  CheckCircle2, Toggle, Info, Copy, RotateCcw, Zap,
+  CheckCircle2, ToggleLeft as Toggle, Info, Copy, RotateCcw, Zap,
+  MessageSquare,
 } from 'lucide-react';
 import { WebPlatformLayout } from './WebPlatformLayout';
 import { useApp } from '../../../store/appStore';

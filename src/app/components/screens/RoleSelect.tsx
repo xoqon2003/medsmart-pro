@@ -96,6 +96,7 @@ const DEMO_USERS: Record<UserRole, number> = {
   specialist: 6,
   doctor: 7,
   kassir: 8,
+  tibbiy_ekspert: 9,
 };
 
 export function RoleSelect() {

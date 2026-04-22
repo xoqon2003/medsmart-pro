@@ -19,6 +19,12 @@ export interface DiseaseBlock {
   level: 'L1' | 'L2' | 'L3';
   orderIndex: number;
   contentMd: string;
+  /**
+   * Structured block metadata. Backend returns an opaque JSON object that
+   * consumers narrow via type assertions (see EmergencyBanner severity).
+   * Kept `unknown`-typed here because shape varies per block `marker`.
+   */
+  contentJson?: Record<string, unknown> | null;
   evidenceLevel: 'A' | 'B' | 'C' | 'D';
   status: string;
   publishedAt?: string;

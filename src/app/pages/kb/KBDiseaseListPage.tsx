@@ -186,11 +186,11 @@ export function KBDiseaseListPage() {
           <div className="text-center py-20">
             <FileText className="w-10 h-10 text-slate-600 mx-auto mb-3" />
             <p className="text-slate-500 text-sm">
-              {search || statusFilter !== 'ALL'
+              {debouncedQ || statusFilter !== 'ALL'
                 ? "Qidiruv bo'yicha natija topilmadi"
                 : 'Hali kasallik qo\'shilmagan'}
             </p>
-            {!search && statusFilter === 'ALL' && (
+            {!debouncedQ && statusFilter === 'ALL' && (
               <button
                 onClick={() => navigate('/kb/diseases/new')}
                 className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white

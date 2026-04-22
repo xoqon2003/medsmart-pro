@@ -44,7 +44,7 @@ export function ExamDatePicker({ selected, onSelect, maxDate }: Props) {
     a.getMonth()    === b.getMonth()    &&
     a.getDate()     === b.getDate();
 
-  const direction = slide[view].enter - slide[prevView as keyof typeof slide]?.enter ?? 0;
+  const direction = slide[view].enter - (slide[prevView as keyof typeof slide]?.enter ?? 0);
 
   /* ══════ YEAR VIEW ══════ */
   const YearView = () => {
