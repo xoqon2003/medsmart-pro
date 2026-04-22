@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Plus, Search, ArrowLeft, Edit3, Loader2,
@@ -41,16 +41,54 @@ const FILTER_OPTIONS = [
   { value: 'ARCHIVED',  label: 'Arxiv' },
 ];
 
+// ── HighlightText (dark admin theme) ──────────────────────────────────────────
+
+/**
+ * Wraps substrings matching `query` in a dark-theme <mark>.
+ * Case-insensitive; regex special characters are escaped.
+ */
+function HighlightText({ text, query }: { text: string; query?: string }) {
+  if (!query || query.trim() === '') return <>{text}</>;
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const parts = text.split(new RegExp(`(${escaped})`, 'gi'));
+  return (
+    <>
+      {parts.map((part, i) =>
+        part.toLowerCase() === query.trim().toLowerCase() ? (
+          <mark
+            key={i}
+            className="bg-yellow-400/25 text-yellow-300 rounded-[2px] px-[1px] not-italic"
+          >
+            {part}
+          </mark>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 // ── Page component ─────────────────────────────────────────────────────────────
 
 export function KBDiseaseListPage() {
   const navigate = useNavigate();
 
-  const [search, setSearch]       = useState('');
-  const [statusFilter, setStatus] = useState('ALL');
+  // `inputValue` — live UI value; `debouncedQ` — sent to query + used for highlight
+  const [inputValue,  setInputValue]  = useState('');
+  const [debouncedQ,  setDebouncedQ]  = useState('');
+  const [statusFilter, setStatus]     = useState('ALL');
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // 300ms debounce — same as DiseaseSearchBar
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => setDebouncedQ(inputValue), 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [inputValue]);
 
   const queryParams: Record<string, string | number | undefined> = {
-    ...(search ? { search } : {}),
+    ...(debouncedQ ? { search: debouncedQ } : {}),
     ...(statusFilter !== 'ALL' ? { status: statusFilter } : {}),
     limit: 100,
   };
@@ -98,8 +136,8 @@ export function KBDiseaseListPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
             <input
               type="text"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
               placeholder="Kasallik nomi yoki ICD-10..."
               className="w-full pl-9 pr-4 py-2 bg-slate-800 border border-slate-700
                          rounded-xl text-sm text-white placeholder-slate-500
