@@ -1,0 +1,22 @@
+{
+  "name": "@medsmart/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MedSmart-Pro web platforma (Vite + React + Router v7). Phase 2.1 skeleton — src/ hali root'da, vite root override orqali ulanadi.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.1.12",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "4.7.0",
+    "typescript": "^5.0.0",
+    "vite": "6.3.5",
+    "vite-plugin-pwa": "^0.21.0"
+  }
+}
