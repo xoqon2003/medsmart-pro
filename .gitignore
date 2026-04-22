@@ -32,7 +32,6 @@ pnpm-debug.log*
 .vite/
 
 .vercel
-.github/workflows/
 
 # Backup arxivlar
 Delop_qilingani.7z

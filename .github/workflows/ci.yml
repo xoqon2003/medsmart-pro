@@ -1,0 +1,177 @@
+name: MedSmart Pro CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  # ─── Lint + type-check (parallel, tez) ──────────────────────────────────
+  static-checks:
+    name: Static checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate (tiplar uchun)
+        run: pnpm --dir server exec prisma generate
+
+      - name: Backend type-check
+        run: pnpm --dir server exec tsc --noEmit
+
+      - name: Frontend type-check
+        run: pnpm exec tsc --noEmit
+
+      - name: PHI scanner
+        run: bash .claude/hooks/phi-scanner.sh || true
+        # hozir warning-only; true-positive topilsa chiqaramiz va exit qilamiz
+
+      - name: Secret scanner
+        run: bash .claude/hooks/secret-scanner.sh
+
+  # ─── Unit + integration testlar (Postgres + Redis bilan) ────────────────
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: medsmart_ci
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U ci -d medsmart_ci"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+      redis:
+        image: redis:7-alpine
+        ports: [6379:6379]
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: "postgresql://ci:ci@localhost:5432/medsmart_ci?schema=public"
+      REDIS_URL: "redis://localhost:6379"
+      JWT_SECRET: "ci-test-secret-ci-test-secret-ci-test-secret-ci"
+      NODE_ENV: test
+      # Feature flag'lar testda yoqilgan
+      APP_FEATURE_CONSULTATION: 'true'
+      APP_FEATURE_HOME_VISIT: 'true'
+      APP_FEATURE_RADIOLOGY: 'true'
+      APP_FEATURE_TG_AUTH: 'true'
+      APP_FEATURE_DISEASE_KB: 'true'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Prisma generate
+        run: pnpm --dir server exec prisma generate
+
+      - name: Prisma migrate deploy (CI DB)
+        run: pnpm --dir server exec prisma migrate deploy
+
+      - name: Server tests (coverage)
+        run: pnpm --dir server test -- --ci --coverage
+
+      - name: Package tests — @medsmart/tg-auth
+        run: pnpm --dir packages/tg-auth test
+
+      - name: Frontend tests (vitest)
+        run: pnpm test -- --run
+
+      - name: Upload coverage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-coverage
+          path: server/coverage/
+          retention-days: 7
+
+  # ─── Build (server + frontend) ──────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [static-checks, test]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir server exec prisma generate
+      - run: pnpm --dir server build
+      - run: pnpm build
+
+      - name: Upload server dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-dist
+          path: server/dist/
+          retention-days: 3
+
+      - name: Upload frontend dist
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 3
+
+  # ─── OpenAPI drift check — generatsiya committed bilan mosmi? ───────────
+  openapi-drift:
+    name: OpenAPI drift
+    runs-on: ubuntu-latest
+    needs: [static-checks]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v4
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir server exec prisma generate
+      - name: Regenerate OpenAPI
+        run: pnpm --dir server run openapi:generate
+      - name: Check drift
+        run: |
+          if ! git diff --exit-code server/openapi.json; then
+            echo "::error::OpenAPI drift topildi. Lokal: pnpm --dir server run openapi:generate && git add server/openapi.json"
+            exit 1
+          fi
